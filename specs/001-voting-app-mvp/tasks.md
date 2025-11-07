@@ -77,31 +77,31 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T032 [P] [US1] Unit test for PollManager.createPoll() in backend/tests/unit/PollManager.test.js (test unique room code generation)
-- [ ] T033 [P] [US1] Unit test for PollManager.changePollState() in backend/tests/unit/PollManager.test.js (test host validation, state transitions)
-- [ ] T034 [P] [US1] Unit test for roomCodeGenerator in backend/tests/unit/roomCodeGenerator.test.js (test format, collision resistance)
-- [ ] T035 [P] [US1] Contract test for POST /api/polls in backend/tests/contract/pollApi.test.js (test validation, success response)
-- [ ] T036 [P] [US1] Contract test for GET /api/polls/:roomCode in backend/tests/contract/pollApi.test.js (test 200 and 404 responses)
-- [ ] T037 [P] [US1] Contract test for change-poll-state Socket.io event in backend/tests/contract/websocket.test.js (test host-only validation)
-- [ ] T038 [US1] Integration test for host poll lifecycle in backend/tests/integration/hostFlow.test.js (create → open → close flow)
+- [X] T032 [P] [US1] Unit test for PollManager.createPoll() in backend/tests/unit/PollManager.test.js (test unique room code generation)
+- [X] T033 [P] [US1] Unit test for PollManager.changePollState() in backend/tests/unit/PollManager.test.js (test host validation, state transitions)
+- [X] T034 [P] [US1] Unit test for roomCodeGenerator in backend/tests/unit/roomCodeGenerator.test.js (test format, collision resistance)
+- [X] T035 [P] [US1] Contract test for POST /api/polls in backend/tests/contract/pollApi.test.js (test validation, success response)
+- [X] T036 [P] [US1] Contract test for GET /api/polls/:roomCode in backend/tests/contract/pollApi.test.js (test 200 and 404 responses)
+- [X] T037 [P] [US1] Contract test for change-poll-state Socket.io event in backend/tests/contract/websocket.test.js (test host-only validation)
+- [X] T038 [US1] Integration test for host poll lifecycle in backend/tests/integration/hostFlow.test.js (create → open → close flow)
 
 ### Implementation for User Story 1
 
-- [ ] T039 [P] [US1] Implement PollManager.createPoll() method with unique room code generation
-- [ ] T040 [P] [US1] Implement PollManager.getPoll() method for room code lookup
-- [ ] T041 [P] [US1] Implement PollManager.changePollState() method with host socket ID validation
-- [ ] T042 [US1] Implement POST /api/polls route in backend/src/api/routes/pollRoutes.js (create poll, return room code)
-- [ ] T043 [US1] Implement GET /api/polls/:roomCode route in backend/src/api/routes/pollRoutes.js (poll validation)
-- [ ] T044 [US1] Implement change-poll-state Socket.io event handler in backend/src/sockets/events/changePollState.js
-- [ ] T045 [US1] Implement broadcastStateChange emitter in backend/src/sockets/emitters/broadcastStateChange.js (poll-state-changed event)
-- [ ] T046 [P] [US1] Create HostDashboard component in frontend/src/pages/HostDashboard.js with poll creation form
-- [ ] T047 [P] [US1] Create PollControls component in frontend/src/components/PollControls.js (Open/Close voting buttons)
-- [ ] T048 [P] [US1] Create PollResults component in frontend/src/components/PollResults.js (bar chart/percentages display)
-- [ ] T049 [P] [US1] Create ParticipantCounter component in frontend/src/components/ParticipantCounter.js (live participant count)
-- [ ] T050 [US1] Connect HostDashboard to apiService (poll creation) and socketService (state changes, results updates)
-- [ ] T051 [US1] Add Socket.io event listeners in HostDashboard for vote-update, participant-joined, participant-left, poll-state-changed
-- [ ] T052 [US1] Add validation and error handling for poll creation (question length, option count)
-- [ ] T053 [US1] Add logging for poll creation, state changes, and host actions
+- [X] T039 [P] [US1] Implement PollManager.createPoll() method with unique room code generation
+- [X] T040 [P] [US1] Implement PollManager.getPoll() method for room code lookup
+- [X] T041 [P] [US1] Implement PollManager.changePollState() method with host socket ID validation
+- [X] T042 [US1] Implement POST /api/polls route in backend/src/api/routes/pollRoutes.js (create poll, return room code)
+- [X] T043 [US1] Implement GET /api/polls/:roomCode route in backend/src/api/routes/pollRoutes.js (poll validation)
+- [X] T044 [US1] Implement change-poll-state Socket.io event handler in backend/src/sockets/events/changePollState.js
+- [X] T045 [US1] Implement broadcastStateChange emitter in backend/src/sockets/emitters/broadcastStateChange.js (poll-state-changed event)
+- [X] T046 [P] [US1] Create HostDashboard component in frontend/src/pages/HostDashboard.js with poll creation form
+- [X] T047 [P] [US1] Create PollControls component in frontend/src/components/PollControls.js (Open/Close voting buttons)
+- [X] T048 [P] [US1] Create PollResults component in frontend/src/components/PollResults.js (bar chart/percentages display)
+- [X] T049 [P] [US1] Create ParticipantCounter component in frontend/src/components/ParticipantCounter.js (live participant count)
+- [X] T050 [US1] Connect HostDashboard to apiService (poll creation) and socketService (state changes, results updates)
+- [X] T051 [US1] Add Socket.io event listeners in HostDashboard for vote-update, participant-joined, participant-left, poll-state-changed
+- [X] T052 [US1] Add validation and error handling for poll creation (question length, option count)
+- [X] T053 [US1] Add logging for poll creation, state changes, and host actions
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -115,32 +115,32 @@
 
 ### Tests for User Story 2 (TDD Required by Constitution)
 
-- [ ] T054 [P] [US2] Unit test for PollManager.addParticipant() in backend/tests/unit/PollManager.test.js (test nickname uniqueness, room full validation)
-- [ ] T055 [P] [US2] Unit test for PollManager.recordVote() in backend/tests/unit/PollManager.test.js (test vote recording, vote change, state validation)
-- [ ] T056 [P] [US2] Unit test for vote counting in backend/tests/unit/voteTracker.test.js (test counts, percentages calculation)
-- [ ] T057 [P] [US2] Contract test for join-room Socket.io event in backend/tests/contract/websocket.test.js (test success, nickname taken, poll not found, room full errors)
-- [ ] T058 [P] [US2] Contract test for submit-vote Socket.io event in backend/tests/contract/websocket.test.js (test success, voting not open, invalid option errors)
-- [ ] T059 [US2] Integration test for participant join-vote flow in backend/tests/integration/participantFlow.test.js (join → vote → confirm → change vote)
+- [X] T054 [P] [US2] Unit test for PollManager.addParticipant() in backend/tests/unit/PollManager.test.js (test nickname uniqueness, room full validation)
+- [X] T055 [P] [US2] Unit test for PollManager.recordVote() in backend/tests/unit/PollManager.test.js (test vote recording, vote change, state validation)
+- [X] T056 [P] [US2] Unit test for vote counting in backend/tests/unit/voteTracker.test.js (test counts, percentages calculation)
+- [X] T057 [P] [US2] Contract test for join-room Socket.io event in backend/tests/contract/websocket.test.js (test success, nickname taken, poll not found, room full errors)
+- [X] T058 [P] [US2] Contract test for submit-vote Socket.io event in backend/tests/contract/websocket.test.js (test success, voting not open, invalid option errors)
+- [X] T059 [US2] Integration test for participant join-vote flow in backend/tests/integration/participantFlow.test.js (join → vote → confirm → change vote)
 
 ### Implementation for User Story 2
 
-- [ ] T060 [P] [US2] Implement PollManager.addParticipant() method with nickname uniqueness and capacity validation
-- [ ] T061 [P] [US2] Implement PollManager.recordVote() method with state validation and vote counting
-- [ ] T062 [P] [US2] Create vote counting logic methods in PollManager (_calculateVoteCounts, _calculatePercentages)
-- [ ] T063 [US2] Implement join-room Socket.io event handler in backend/src/sockets/events/joinRoom.js with acknowledgment
-- [ ] T064 [US2] Implement submit-vote Socket.io event handler in backend/src/sockets/events/submitVote.js with acknowledgment
-- [ ] T065 [US2] Implement broadcastVoteUpdate emitter in backend/src/sockets/emitters/broadcastVoteUpdate.js (vote-update event)
-- [ ] T066 [US2] Add participant-joined broadcast to join-room handler
-- [ ] T067 [P] [US2] Create JoinPage component in frontend/src/pages/JoinPage.js with room code and nickname form
-- [ ] T068 [P] [US2] Create VotePage component in frontend/src/pages/VotePage.js with question display and option selection
-- [ ] T069 [P] [US2] Create VoteConfirmation component in frontend/src/components/VoteConfirmation.js (toast/modal for vote success)
-- [ ] T070 [US2] Connect JoinPage to socketService (join-room event with acknowledgment handling)
-- [ ] T071 [US2] Connect VotePage to socketService (submit-vote event with acknowledgment handling)
-- [ ] T072 [US2] Add Socket.io event listeners in VotePage for vote-update, poll-state-changed
-- [ ] T073 [US2] Add client-side validation for room code format, nickname length
-- [ ] T074 [US2] Add error handling for join failures (invalid code, nickname taken, room full)
-- [ ] T075 [US2] Add error handling for vote failures (voting not open, invalid option)
-- [ ] T076 [US2] Add logging for participant join, vote submission, vote changes
+- [X] T060 [P] [US2] Implement PollManager.addParticipant() method with nickname uniqueness and capacity validation
+- [X] T061 [P] [US2] Implement PollManager.recordVote() method with state validation and vote counting
+- [X] T062 [P] [US2] Create vote counting logic methods in PollManager (_calculateVoteCounts, _calculatePercentages)
+- [X] T063 [US2] Implement join-room Socket.io event handler in backend/src/sockets/events/joinRoom.js with acknowledgment
+- [X] T064 [US2] Implement submit-vote Socket.io event handler in backend/src/sockets/events/submitVote.js with acknowledgment
+- [X] T065 [US2] Implement broadcastVoteUpdate emitter in backend/src/sockets/emitters/broadcastVoteUpdate.js (vote-update event)
+- [X] T066 [US2] Add participant-joined broadcast to join-room handler
+- [X] T067 [P] [US2] Create JoinPage component in frontend/src/pages/JoinPage.js with room code and nickname form
+- [X] T068 [P] [US2] Create VotePage component in frontend/src/pages/VotePage.js with question display and option selection
+- [X] T069 [P] [US2] Create VoteConfirmation component in frontend/src/components/VoteConfirmation.js (toast/modal for vote success)
+- [X] T070 [US2] Connect JoinPage to socketService (join-room event with acknowledgment handling)
+- [X] T071 [US2] Connect VotePage to socketService (submit-vote event with acknowledgment handling)
+- [X] T072 [US2] Add Socket.io event listeners in VotePage for vote-update, poll-state-changed
+- [X] T073 [US2] Add client-side validation for room code format, nickname length
+- [X] T074 [US2] Add error handling for join failures (invalid code, nickname taken, room full)
+- [X] T075 [US2] Add error handling for vote failures (voting not open, invalid option)
+- [X] T076 [US2] Add logging for participant join, vote submission, vote changes
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 

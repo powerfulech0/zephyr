@@ -134,4 +134,163 @@ describe('PollManager', () => {
       expect(result.previousState).toBe('waiting');
     });
   });
+
+  describe('addParticipant()', () => {
+    let poll;
+    let hostSocketId;
+
+    beforeEach(() => {
+      hostSocketId = 'host-123';
+      poll = pollManager.createPoll('Test question?', ['A', 'B', 'C'], hostSocketId);
+    });
+
+    it('should add participant with valid nickname and socket ID', () => {
+      const result = pollManager.addParticipant(poll.roomCode, 'Alice', 'socket-alice');
+
+      expect(result.success).toBe(true);
+      expect(result.poll).toBeDefined();
+      expect(poll.participants.has('Alice')).toBe(true);
+      expect(pollManager.socketRoomMap.get('socket-alice')).toBe(poll.roomCode);
+    });
+
+    it('should reject duplicate nickname in same room', () => {
+      pollManager.addParticipant(poll.roomCode, 'Alice', 'socket-alice-1');
+      const result = pollManager.addParticipant(poll.roomCode, 'Alice', 'socket-alice-2');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Nickname already taken');
+    });
+
+    it('should reject when poll not found', () => {
+      const result = pollManager.addParticipant('FAKE99', 'Alice', 'socket-alice');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Poll not found');
+    });
+
+    it('should reject when room is full (20 participants max)', () => {
+      // Add 20 participants
+      for (let i = 0; i < 20; i += 1) {
+        pollManager.addParticipant(poll.roomCode, `User${i}`, `socket-${i}`);
+      }
+
+      const result = pollManager.addParticipant(poll.roomCode, 'User21', 'socket-21');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Room is full (20 participants max)');
+      expect(poll.participants.size).toBe(20);
+    });
+
+    it('should allow same nickname in different rooms', () => {
+      const poll2 = pollManager.createPoll('Another poll?', ['X', 'Y'], 'host-456');
+
+      const result1 = pollManager.addParticipant(poll.roomCode, 'Alice', 'socket-alice-1');
+      const result2 = pollManager.addParticipant(poll2.roomCode, 'Alice', 'socket-alice-2');
+
+      expect(result1.success).toBe(true);
+      expect(result2.success).toBe(true);
+    });
+  });
+
+  describe('recordVote()', () => {
+    let poll;
+    let hostSocketId;
+
+    beforeEach(() => {
+      hostSocketId = 'host-123';
+      poll = pollManager.createPoll('What is your favorite?', ['A', 'B', 'C'], hostSocketId);
+      pollManager.addParticipant(poll.roomCode, 'Alice', 'socket-alice');
+      pollManager.addParticipant(poll.roomCode, 'Bob', 'socket-bob');
+      pollManager.changePollState(poll.roomCode, 'open', hostSocketId);
+    });
+
+    it('should record vote when poll is open', () => {
+      const result = pollManager.recordVote(poll.roomCode, 'Alice', 0);
+
+      expect(result.success).toBe(true);
+      expect(result.votes).toBeDefined();
+      expect(result.percentages).toBeDefined();
+      expect(poll.votes.get('Alice')).toBe(0);
+    });
+
+    it('should return updated vote counts after recording', () => {
+      pollManager.recordVote(poll.roomCode, 'Alice', 0);
+      const result = pollManager.recordVote(poll.roomCode, 'Bob', 0);
+
+      expect(result.success).toBe(true);
+      expect(result.votes).toEqual([2, 0, 0]); // 2 votes for option A
+      expect(result.percentages).toEqual([100, 0, 0]); // 100% for option A
+    });
+
+    it('should allow participant to change their vote', () => {
+      pollManager.recordVote(poll.roomCode, 'Alice', 0);
+      const result = pollManager.recordVote(poll.roomCode, 'Alice', 1);
+
+      expect(result.success).toBe(true);
+      expect(poll.votes.get('Alice')).toBe(1);
+      expect(result.votes).toEqual([0, 1, 0]); // Vote changed to option B
+    });
+
+    it('should reject vote when poll state is waiting', () => {
+      const poll2 = pollManager.createPoll('New poll?', ['X', 'Y'], 'host-456');
+      pollManager.addParticipant(poll2.roomCode, 'Charlie', 'socket-charlie');
+
+      const result = pollManager.recordVote(poll2.roomCode, 'Charlie', 0);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Voting is not open');
+    });
+
+    it('should reject vote when poll state is closed', () => {
+      pollManager.changePollState(poll.roomCode, 'closed', hostSocketId);
+      const result = pollManager.recordVote(poll.roomCode, 'Alice', 0);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Voting is not open');
+    });
+
+    it('should reject vote for invalid option index', () => {
+      const result = pollManager.recordVote(poll.roomCode, 'Alice', 5);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Invalid option index');
+    });
+
+    it('should reject vote for negative option index', () => {
+      const result = pollManager.recordVote(poll.roomCode, 'Alice', -1);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Invalid option index');
+    });
+
+    it('should reject vote from participant not in room', () => {
+      const result = pollManager.recordVote(poll.roomCode, 'Unknown', 0);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Participant not in room');
+    });
+
+    it('should reject vote when poll not found', () => {
+      const result = pollManager.recordVote('FAKE99', 'Alice', 0);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Poll not found');
+    });
+
+    it('should calculate percentages correctly with multiple votes', () => {
+      pollManager.recordVote(poll.roomCode, 'Alice', 0);
+      pollManager.recordVote(poll.roomCode, 'Bob', 1);
+
+      const poll2 = pollManager.getPoll(poll.roomCode);
+      // Add more participants for better percentage test
+      pollManager.addParticipant(poll.roomCode, 'Charlie', 'socket-charlie');
+      pollManager.addParticipant(poll.roomCode, 'Diana', 'socket-diana');
+      pollManager.recordVote(poll.roomCode, 'Charlie', 0);
+      const result = pollManager.recordVote(poll.roomCode, 'Diana', 2);
+
+      expect(result.success).toBe(true);
+      expect(result.votes).toEqual([2, 1, 1]); // 2 for A, 1 for B, 1 for C
+      expect(result.percentages).toEqual([50, 25, 25]); // 50%, 25%, 25%
+    });
+  });
 });
