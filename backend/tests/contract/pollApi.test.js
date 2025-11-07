@@ -204,9 +204,7 @@ describe('Poll API Contract Tests', () => {
     });
 
     it('should not expose internal implementation details', async () => {
-      const response = await request(app)
-        .get(`/api/polls/${createdPoll.roomCode}`)
-        .expect(200);
+      const response = await request(app).get(`/api/polls/${createdPoll.roomCode}`).expect(200);
 
       // Should not expose hostSocketId, internal maps, etc.
       expect(response.body.poll.hostSocketId).toBeUndefined();

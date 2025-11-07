@@ -59,9 +59,7 @@ describe('Host Poll Lifecycle Integration Test', () => {
     pollManager.socketRoomMap.set(hostSocket.id, createdPoll.roomCode);
 
     // Step 3: Verify poll is in waiting state
-    const getResponse = await request(app)
-      .get(`/api/polls/${createdPoll.roomCode}`)
-      .expect(200);
+    const getResponse = await request(app).get(`/api/polls/${createdPoll.roomCode}`).expect(200);
 
     expect(getResponse.body.poll.state).toBe('waiting');
 
@@ -99,9 +97,7 @@ describe('Host Poll Lifecycle Integration Test', () => {
     expect(closeResult.previousState).toBe('open');
 
     // Step 7: Verify final state is closed
-    const finalResponse = await request(app)
-      .get(`/api/polls/${createdPoll.roomCode}`)
-      .expect(200);
+    const finalResponse = await request(app).get(`/api/polls/${createdPoll.roomCode}`).expect(200);
 
     expect(finalResponse.body.poll.state).toBe('closed');
 

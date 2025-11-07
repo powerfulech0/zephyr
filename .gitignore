@@ -92,3 +92,10 @@ Thumbs.db
 # Package manager lock files (keep package-lock.json but ignore others if using npm)
 # yarn.lock
 # pnpm-lock.yaml
+
+# Playwright test artifacts
+/playwright-report/
+/test-results/
+/screenshots/
+/videos/
+/traces/

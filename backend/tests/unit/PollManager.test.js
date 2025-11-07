@@ -293,4 +293,53 @@ describe('PollManager', () => {
       expect(result.percentages).toEqual([50, 25, 25]); // 50%, 25%, 25%
     });
   });
+
+  describe('removeParticipant() - T082', () => {
+    let poll;
+
+    beforeEach(() => {
+      poll = pollManager.createPoll('Test?', ['A', 'B'], 'socket-host');
+      pollManager.addParticipant(poll.roomCode, 'Alice', 'socket-alice');
+      pollManager.addParticipant(poll.roomCode, 'Bob', 'socket-bob');
+    });
+
+    it('should remove participant and return correct info', () => {
+      const result = pollManager.removeParticipant('socket-alice');
+
+      expect(result).toBeDefined();
+      expect(result.roomCode).toBe(poll.roomCode);
+      expect(result.nickname).toBe('Alice');
+      expect(result.cleared).toBe(false);
+
+      // Verify Alice is no longer in participants
+      const updatedPoll = pollManager.getPoll(poll.roomCode);
+      expect(updatedPoll.participants.has('Alice')).toBe(false);
+      expect(updatedPoll.participants.has('Bob')).toBe(true);
+    });
+
+    it('should return null if socketId not found', () => {
+      const result = pollManager.removeParticipant('socket-unknown');
+      expect(result).toBeNull();
+    });
+
+    it('should clear poll when all participants and host disconnect', () => {
+      // Remove both participants
+      pollManager.removeParticipant('socket-alice');
+      pollManager.removeParticipant('socket-bob');
+
+      // Remove host - should clear poll
+      const result = pollManager.removeParticipant('socket-host');
+
+      expect(result.cleared).toBe(true);
+      expect(pollManager.getPoll(poll.roomCode)).toBeUndefined();
+    });
+
+    it('should not clear poll if host disconnects but participants remain', () => {
+      // Remove host first
+      const result = pollManager.removeParticipant('socket-host');
+
+      expect(result.cleared).toBe(false);
+      expect(pollManager.getPoll(poll.roomCode)).toBeDefined();
+    });
+  });
 });

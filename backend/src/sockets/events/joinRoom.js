@@ -33,16 +33,13 @@ function handleJoinRoom(socket, pollManager, io) {
     // Join socket.io room
     socket.join(roomCode);
 
-    logger.info(
-      { socketId: socket.id, roomCode, nickname },
-      'Participant joined room'
-    );
+    logger.info({ socketId: socket.id, roomCode, nickname }, 'Participant joined room');
 
-    // Broadcast to all clients in room (including joiner)
+    // T066/T085: Broadcast to all clients in room (including joiner)
     const participantCount = result.poll.participants.size;
     io.to(roomCode).emit(PARTICIPANT_JOINED, {
       nickname,
-      participantCount,
+      count: participantCount,
       timestamp: new Date().toISOString(),
     });
 

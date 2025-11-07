@@ -8,6 +8,7 @@ const {
   SUBMIT_VOTE,
   VOTE_UPDATE,
   PARTICIPANT_JOINED,
+  PARTICIPANT_LEFT,
 } = require('../../../shared/eventTypes.js');
 
 describe('WebSocket Contract Tests', () => {
@@ -52,11 +53,7 @@ describe('WebSocket Contract Tests', () => {
       });
 
       hostSocket.on('connect', () => {
-        poll = pollManager.createPoll(
-          'Test question?',
-          ['Option A', 'Option B'],
-          hostSocket.id
-        );
+        poll = pollManager.createPoll('Test question?', ['Option A', 'Option B'], hostSocket.id);
         done();
       });
     });
@@ -121,15 +118,11 @@ describe('WebSocket Contract Tests', () => {
     });
 
     it('should reject state change for non-existent room code', done => {
-      hostSocket.emit(
-        CHANGE_POLL_STATE,
-        { roomCode: 'FAKE99', newState: 'open' },
-        response => {
-          expect(response.success).toBe(false);
-          expect(response.error).toContain('Poll not found');
-          done();
-        }
-      );
+      hostSocket.emit(CHANGE_POLL_STATE, { roomCode: 'FAKE99', newState: 'open' }, response => {
+        expect(response.success).toBe(false);
+        expect(response.error).toContain('Poll not found');
+        done();
+      });
     });
 
     it('should reject invalid state transitions', done => {
@@ -209,33 +202,25 @@ describe('WebSocket Contract Tests', () => {
     });
 
     it('should allow participant to join with valid room code and nickname', done => {
-      clientSocket.emit(
-        JOIN_ROOM,
-        { roomCode: poll.roomCode, nickname: 'Alice' },
-        response => {
-          expect(response.success).toBe(true);
-          expect(response.poll).toBeDefined();
-          expect(response.poll.roomCode).toBe(poll.roomCode);
-          expect(response.poll.question).toBe('Test question?');
+      clientSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' }, response => {
+        expect(response.success).toBe(true);
+        expect(response.poll).toBeDefined();
+        expect(response.poll.roomCode).toBe(poll.roomCode);
+        expect(response.poll.question).toBe('Test question?');
 
-          // Verify participant was added
-          const currentPoll = pollManager.getPoll(poll.roomCode);
-          expect(currentPoll.participants.has('Alice')).toBe(true);
-          done();
-        }
-      );
+        // Verify participant was added
+        const currentPoll = pollManager.getPoll(poll.roomCode);
+        expect(currentPoll.participants.has('Alice')).toBe(true);
+        done();
+      });
     });
 
     it('should reject join when room code is invalid', done => {
-      clientSocket.emit(
-        JOIN_ROOM,
-        { roomCode: 'FAKE99', nickname: 'Alice' },
-        response => {
-          expect(response.success).toBe(false);
-          expect(response.error).toBe('Poll not found');
-          done();
-        }
-      );
+      clientSocket.emit(JOIN_ROOM, { roomCode: 'FAKE99', nickname: 'Alice' }, response => {
+        expect(response.success).toBe(false);
+        expect(response.error).toBe('Poll not found');
+        done();
+      });
     });
 
     it('should reject join when nickname is already taken', done => {
@@ -246,25 +231,21 @@ describe('WebSocket Contract Tests', () => {
       });
 
       participant1.on('connect', () => {
-        participant1.emit(
-          JOIN_ROOM,
-          { roomCode: poll.roomCode, nickname: 'Alice' },
-          response1 => {
-            expect(response1.success).toBe(true);
+        participant1.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' }, response1 => {
+          expect(response1.success).toBe(true);
 
-            // Second participant tries same nickname
-            clientSocket.emit(
-              JOIN_ROOM,
-              { roomCode: poll.roomCode, nickname: 'Alice' },
-              response2 => {
-                expect(response2.success).toBe(false);
-                expect(response2.error).toBe('Nickname already taken');
-                participant1.disconnect();
-                done();
-              }
-            );
-          }
-        );
+          // Second participant tries same nickname
+          clientSocket.emit(
+            JOIN_ROOM,
+            { roomCode: poll.roomCode, nickname: 'Alice' },
+            response2 => {
+              expect(response2.success).toBe(false);
+              expect(response2.error).toBe('Nickname already taken');
+              participant1.disconnect();
+              done();
+            }
+          );
+        });
       });
     });
 
@@ -327,7 +308,7 @@ describe('WebSocket Contract Tests', () => {
         // Listen for broadcast when second participant joins
         participant1.on(PARTICIPANT_JOINED, data => {
           expect(data.nickname).toBe('Bob');
-          expect(data.participantCount).toBeGreaterThan(0);
+          expect(data.count).toBeGreaterThan(0);
           participant1.disconnect();
           done();
         });
@@ -375,13 +356,9 @@ describe('WebSocket Contract Tests', () => {
         });
 
         participantSocket.on('connect', () => {
-          participantSocket.emit(
-            JOIN_ROOM,
-            { roomCode: poll.roomCode, nickname: 'Alice' },
-            () => {
-              done();
-            }
-          );
+          participantSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' }, () => {
+            done();
+          });
         });
       });
     });
@@ -485,6 +462,241 @@ describe('WebSocket Contract Tests', () => {
             done();
           }
         );
+      });
+    });
+  });
+
+  describe('Broadcast Schema Tests (US3)', () => {
+    describe('vote-update broadcast schema (T078)', () => {
+      let poll;
+      let hostSocket;
+      let participantSocket;
+
+      beforeEach(done => {
+        hostSocket = ioClient(serverUrl, {
+          transports: ['websocket'],
+          forceNew: true,
+        });
+
+        hostSocket.on('connect', () => {
+          poll = pollManager.createPoll('Test?', ['A', 'B', 'C'], hostSocket.id);
+          pollManager.changePollState(poll.roomCode, 'open', hostSocket.id);
+
+          participantSocket = ioClient(serverUrl, {
+            transports: ['websocket'],
+            forceNew: true,
+          });
+
+          participantSocket.on('connect', () => {
+            participantSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' }, () =>
+              done()
+            );
+          });
+        });
+      });
+
+      afterEach(() => {
+        if (hostSocket.connected) hostSocket.disconnect();
+        if (participantSocket && participantSocket.connected) participantSocket.disconnect();
+      });
+
+      it('should validate vote-update broadcast contains votes array', done => {
+        hostSocket.on(VOTE_UPDATE, data => {
+          expect(data).toBeDefined();
+          expect(data.votes).toBeDefined();
+          expect(Array.isArray(data.votes)).toBe(true);
+          expect(data.votes.length).toBe(3); // Should match number of options
+          done();
+        });
+
+        setTimeout(() => {
+          participantSocket.emit(SUBMIT_VOTE, {
+            roomCode: poll.roomCode,
+            nickname: 'Alice',
+            optionIndex: 0,
+          });
+        }, 100);
+      });
+
+      it('should validate vote-update broadcast contains percentages array', done => {
+        hostSocket.on(VOTE_UPDATE, data => {
+          expect(data).toBeDefined();
+          expect(data.percentages).toBeDefined();
+          expect(Array.isArray(data.percentages)).toBe(true);
+          expect(data.percentages.length).toBe(3); // Should match number of options
+          expect(data.percentages[0]).toBe(100); // Alice voted for option 0
+          expect(data.percentages[1]).toBe(0);
+          expect(data.percentages[2]).toBe(0);
+          done();
+        });
+
+        setTimeout(() => {
+          participantSocket.emit(SUBMIT_VOTE, {
+            roomCode: poll.roomCode,
+            nickname: 'Alice',
+            optionIndex: 0,
+          });
+        }, 100);
+      });
+
+      it('should validate votes are integers and percentages sum to 100', done => {
+        hostSocket.on(VOTE_UPDATE, data => {
+          // Validate votes are integers
+          data.votes.forEach(count => {
+            expect(Number.isInteger(count)).toBe(true);
+            expect(count).toBeGreaterThanOrEqual(0);
+          });
+
+          // Validate percentages are integers
+          data.percentages.forEach(percentage => {
+            expect(Number.isInteger(percentage)).toBe(true);
+            expect(percentage).toBeGreaterThanOrEqual(0);
+            expect(percentage).toBeLessThanOrEqual(100);
+          });
+
+          // Validate percentages sum to 100 (allowing rounding tolerance)
+          const sum = data.percentages.reduce((a, b) => a + b, 0);
+          expect(sum).toBeGreaterThanOrEqual(99);
+          expect(sum).toBeLessThanOrEqual(100);
+
+          done();
+        });
+
+        setTimeout(() => {
+          participantSocket.emit(SUBMIT_VOTE, {
+            roomCode: poll.roomCode,
+            nickname: 'Alice',
+            optionIndex: 0,
+          });
+        }, 100);
+      });
+    });
+
+    describe('participant-joined broadcast schema (T079)', () => {
+      let poll;
+      let hostSocket;
+
+      beforeEach(done => {
+        hostSocket = ioClient(serverUrl, {
+          transports: ['websocket'],
+          forceNew: true,
+        });
+
+        hostSocket.on('connect', () => {
+          poll = pollManager.createPoll('Test?', ['A', 'B'], hostSocket.id);
+          done();
+        });
+      });
+
+      afterEach(() => {
+        if (hostSocket.connected) hostSocket.disconnect();
+      });
+
+      it('should validate participant-joined contains nickname string', done => {
+        hostSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Host' }, () => {
+          hostSocket.on(PARTICIPANT_JOINED, data => {
+            expect(data).toBeDefined();
+            expect(data.nickname).toBeDefined();
+            expect(typeof data.nickname).toBe('string');
+            expect(data.nickname.length).toBeGreaterThan(0);
+            expect(data.nickname.length).toBeLessThanOrEqual(20); // FR-004 max length
+            done();
+          });
+
+          const participantSocket = ioClient(serverUrl, {
+            transports: ['websocket'],
+            forceNew: true,
+          });
+
+          participantSocket.on('connect', () => {
+            participantSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' });
+          });
+        });
+      });
+
+      it('should validate participant-joined contains participant count', done => {
+        hostSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Host' }, () => {
+          hostSocket.on(PARTICIPANT_JOINED, data => {
+            expect(data).toBeDefined();
+            expect(data.count).toBeDefined();
+            expect(Number.isInteger(data.count)).toBe(true);
+            expect(data.count).toBeGreaterThan(0);
+            expect(data.count).toBeLessThanOrEqual(20); // FR-016 max participants
+            expect(data.count).toBe(2); // Host + Alice
+            done();
+          });
+
+          const participantSocket = ioClient(serverUrl, {
+            transports: ['websocket'],
+            forceNew: true,
+          });
+
+          participantSocket.on('connect', () => {
+            participantSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' });
+          });
+        });
+      });
+    });
+
+    describe('participant-left broadcast schema (T080)', () => {
+      let poll;
+      let hostSocket;
+      let participantSocket;
+
+      beforeEach(done => {
+        hostSocket = ioClient(serverUrl, {
+          transports: ['websocket'],
+          forceNew: true,
+        });
+
+        hostSocket.on('connect', () => {
+          poll = pollManager.createPoll('Test?', ['A', 'B'], hostSocket.id);
+
+          participantSocket = ioClient(serverUrl, {
+            transports: ['websocket'],
+            forceNew: true,
+          });
+
+          participantSocket.on('connect', () => {
+            participantSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' }, () =>
+              done()
+            );
+          });
+        });
+      });
+
+      afterEach(() => {
+        if (hostSocket.connected) hostSocket.disconnect();
+        if (participantSocket && participantSocket.connected) participantSocket.disconnect();
+      });
+
+      it('should validate participant-left contains nickname string', done => {
+        hostSocket.on(PARTICIPANT_LEFT, data => {
+          expect(data).toBeDefined();
+          expect(data.nickname).toBeDefined();
+          expect(typeof data.nickname).toBe('string');
+          expect(data.nickname).toBe('Alice');
+          done();
+        });
+
+        setTimeout(() => {
+          participantSocket.disconnect();
+        }, 100);
+      });
+
+      it('should validate participant-left contains updated participant count', done => {
+        hostSocket.on(PARTICIPANT_LEFT, data => {
+          expect(data).toBeDefined();
+          expect(data.count).toBeDefined();
+          expect(Number.isInteger(data.count)).toBe(true);
+          expect(data.count).toBeGreaterThanOrEqual(0);
+          expect(data.count).toBe(0); // Only host remains (host not counted in participants)
+          done();
+        });
+
+        setTimeout(() => {
+          participantSocket.disconnect();
+        }, 100);
       });
     });
   });

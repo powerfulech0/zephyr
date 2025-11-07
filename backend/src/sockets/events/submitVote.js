@@ -12,11 +12,7 @@ function handleSubmitVote(socket, pollManager, io) {
     const { roomCode, nickname, optionIndex } = data;
 
     // Validate required fields
-    if (
-      roomCode === undefined ||
-      nickname === undefined ||
-      optionIndex === undefined
-    ) {
+    if (roomCode === undefined || nickname === undefined || optionIndex === undefined) {
       const error = 'Missing required fields: roomCode, nickname, and optionIndex';
       logger.warn({ socketId: socket.id, data }, error);
       if (callback) callback({ success: false, error });
@@ -35,10 +31,7 @@ function handleSubmitVote(socket, pollManager, io) {
       return;
     }
 
-    logger.info(
-      { socketId: socket.id, roomCode, nickname, optionIndex },
-      'Vote recorded'
-    );
+    logger.info({ socketId: socket.id, roomCode, nickname, optionIndex }, 'Vote recorded');
 
     // Broadcast updated vote counts to all clients in room
     broadcastVoteUpdate(io, roomCode, result.votes, result.percentages);

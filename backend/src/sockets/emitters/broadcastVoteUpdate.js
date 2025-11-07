@@ -16,10 +16,7 @@ function broadcastVoteUpdate(io, roomCode, votes, percentages) {
     timestamp: new Date().toISOString(),
   };
 
-  logger.info(
-    { roomCode, votes, percentages },
-    'Broadcasting vote-update event'
-  );
+  logger.info({ roomCode, votes, percentages }, 'Broadcasting vote-update event');
 
   io.to(roomCode).emit(VOTE_UPDATE, payload);
 }

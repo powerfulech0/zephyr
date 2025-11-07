@@ -4,6 +4,8 @@ import {
   submitVote,
   onPollStateChanged,
   onVoteUpdate,
+  onConnectionStatus,
+  onReconnecting,
   disconnect,
 } from '../services/socketService';
 import VoteConfirmation from '../components/VoteConfirmation';
@@ -23,6 +25,8 @@ function VotePage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false); // T091
+  const [connectionStatus, setConnectionStatus] = useState('connected'); // T092
 
   useEffect(() => {
     // Load data from sessionStorage
@@ -63,10 +67,23 @@ function VotePage() {
       });
     });
 
-    // Cleanup on unmount
+    // Connection status listener (T092)
+    onConnectionStatus(status => {
+      setConnectionStatus(status.status);
+      if (status.status === 'connected') {
+        setIsReconnecting(false);
+      }
+    });
+
+    // Reconnecting listener (T091)
+    onReconnecting(data => {
+      setIsReconnecting(data.attempting);
+    });
+
+    // Cleanup on unmount - DO NOT disconnect socket (it's a singleton)
     // eslint-disable-next-line consistent-return
     return () => {
-      disconnect();
+      // Socket should persist across components, so no disconnect here
     };
   }, [navigate, urlRoomCode]);
 
@@ -124,6 +141,21 @@ function VotePage() {
   return (
     <div className="vote-page">
       <div className="vote-container">
+        {/* Connection Status Indicator (T092) */}
+        <div className={`connection-status ${connectionStatus}`}>
+          {connectionStatus === 'connected' && '🟢 Connected'}
+          {connectionStatus === 'disconnected' && '🔴 Disconnected'}
+          {connectionStatus === 'failed' && '⚠️ Connection Failed'}
+        </div>
+
+        {/* Reconnecting UI State (T091) */}
+        {isReconnecting && (
+          <div className="reconnecting-banner">
+            <span className="reconnecting-spinner">⟳</span>
+            Reconnecting to server...
+          </div>
+        )}
+
         <div className="vote-header">
           <div className="room-info">
             <span className="room-label">Room Code:</span>

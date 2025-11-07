@@ -154,26 +154,26 @@
 
 ### Tests for User Story 3 (TDD Required by Constitution)
 
-- [ ] T077 [P] [US3] Integration test for multi-client vote synchronization in backend/tests/integration/realTimeSync.test.js (3 clients: host + 2 participants)
-- [ ] T078 [P] [US3] Contract test for vote-update broadcast schema in backend/tests/contract/websocket.test.js (votes array, percentages array)
-- [ ] T079 [P] [US3] Contract test for participant-joined broadcast schema in backend/tests/contract/websocket.test.js (nickname, count)
-- [ ] T080 [P] [US3] Contract test for participant-left broadcast schema in backend/tests/contract/websocket.test.js (nickname, count)
+- [X] T077 [P] [US3] Integration test for multi-client vote synchronization in backend/tests/integration/realTimeSync.test.js (3 clients: host + 2 participants)
+- [X] T078 [P] [US3] Contract test for vote-update broadcast schema in backend/tests/contract/websocket.test.js (votes array, percentages array)
+- [X] T079 [P] [US3] Contract test for participant-joined broadcast schema in backend/tests/contract/websocket.test.js (nickname, count)
+- [X] T080 [P] [US3] Contract test for participant-left broadcast schema in backend/tests/contract/websocket.test.js (nickname, count)
 
 ### Implementation for User Story 3
 
-- [ ] T081 [P] [US3] Implement disconnect Socket.io event handler in backend/src/sockets/events/disconnect.js with participant cleanup
-- [ ] T082 [P] [US3] Implement PollManager.removeParticipant() method with poll cleanup when empty (FR-020)
-- [ ] T083 [US3] Add participant-left broadcast to disconnect handler
-- [ ] T084 [US3] Ensure vote-update broadcasts to all room clients after every vote submission
-- [ ] T085 [US3] Ensure participant-joined broadcasts to all room clients on join
-- [ ] T086 [US3] Ensure poll-state-changed broadcasts to all room clients on state change
-- [ ] T087 [P] [US3] Add real-time vote count updates to PollResults component (chart.js integration)
-- [ ] T088 [P] [US3] Add real-time participant count updates to ParticipantCounter component
-- [ ] T089 [P] [US3] Add real-time state change notifications to VotePage (voting closed message)
-- [ ] T090 [US3] Implement reconnection handling in socketService (sessionStorage for room code/nickname, auto-rejoin on reconnect event)
-- [ ] T091 [US3] Add "Reconnecting..." UI state in VotePage and HostDashboard for disconnect event
-- [ ] T092 [US3] Add Socket.io connection status indicators to all pages (connected/disconnected)
-- [ ] T093 [US3] Add logging for broadcasts, disconnections, reconnections
+- [X] T081 [P] [US3] Implement disconnect Socket.io event handler in backend/src/sockets/socketHandler.js with participant cleanup
+- [X] T082 [P] [US3] Implement PollManager.removeParticipant() method with poll cleanup when empty (FR-020)
+- [X] T083 [US3] Add participant-left broadcast to disconnect handler
+- [X] T084 [US3] Ensure vote-update broadcasts to all room clients after every vote submission
+- [X] T085 [US3] Ensure participant-joined broadcasts to all room clients on join
+- [X] T086 [US3] Ensure poll-state-changed broadcasts to all room clients on state change
+- [X] T087 [P] [US3] Add real-time vote count updates to PollResults component (chart.js integration)
+- [X] T088 [P] [US3] Add real-time participant count updates to ParticipantCounter component
+- [X] T089 [P] [US3] Add real-time state change notifications to VotePage (voting closed message)
+- [X] T090 [US3] Implement reconnection handling in socketService (sessionStorage for room code/nickname, auto-rejoin on reconnect event)
+- [X] T091 [US3] Add "Reconnecting..." UI state in VotePage and HostDashboard for disconnect event
+- [X] T092 [US3] Add Socket.io connection status indicators to all pages (connected/disconnected)
+- [X] T093 [US3] Add logging for broadcasts, disconnections, reconnections
 
 **Checkpoint**: All user stories should now be independently functional with full real-time synchronization
 
@@ -183,20 +183,20 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T094 [P] Create room code formatter utility in frontend/src/utils/roomCodeFormatter.js (display formatting)
-- [ ] T095 [P] Add unit tests for frontend components in frontend/tests/unit/components.test.js
-- [ ] T096 [P] Add end-to-end user flow tests in frontend/tests/integration/userFlows.test.js (simulate host + participant interactions)
-- [ ] T097 Add performance testing for 20 concurrent participants (verify <2s broadcast latency per SC-004)
-- [ ] T098 [P] Add security validation (input sanitization, room code validation, SQL injection prevention in validators)
-- [ ] T099 [P] Add comprehensive error logging for all error paths
-- [ ] T100 Verify all acceptance scenarios from spec.md (5 scenarios per user story = 15 total)
-- [ ] T101 Run quickstart.md manual testing workflow (all 3 user stories + 7 edge cases)
-- [ ] T102 [P] Code cleanup and refactoring (remove console.logs, unused imports)
-- [ ] T103 Run ESLint and Prettier across entire codebase (backend and frontend)
-- [ ] T104 Verify pre-commit hooks work correctly (trigger lint-staged, block commit on failure)
-- [ ] T105 [P] Update CLAUDE.md with final technology stack and project structure
-- [ ] T106 Verify test coverage ≥90% for backend core logic (PollManager, event handlers)
-- [ ] T107 Final constitution compliance check (all 6 principles satisfied)
+- [X] T094 [P] Create room code formatter utility in frontend/src/utils/roomCodeFormatter.js (display formatting)
+- [X] T095 [P] Add unit tests for frontend components in frontend/tests/unit/components.test.js
+- [X] T096 [P] Add end-to-end user flow tests in frontend/tests/integration/userFlows.test.js (simulate host + participant interactions)
+- [X] T097 Add performance testing for 20 concurrent participants (verify <2s broadcast latency per SC-004)
+- [X] T098 [P] Add security validation (input sanitization, room code validation, SQL injection prevention in validators)
+- [X] T099 [P] Add comprehensive error logging for all error paths
+- [X] T100 Verify all acceptance scenarios from spec.md (5 scenarios per user story = 15 total)
+- [X] T101 Run quickstart.md manual testing workflow (all 3 user stories + 7 edge cases)
+- [X] T102 [P] Code cleanup and refactoring (remove console.logs, unused imports)
+- [X] T103 Run ESLint and Prettier across entire codebase (backend and frontend)
+- [X] T104 Verify pre-commit hooks work correctly (trigger lint-staged, block commit on failure)
+- [X] T105 [P] Update CLAUDE.md with final technology stack and project structure
+- [X] T106 Verify test coverage ≥90% for backend core logic (PollManager, event handlers)
+- [X] T107 Final constitution compliance check (all 6 principles satisfied)
 
 ---
 
@@ -301,6 +301,7 @@ Task: "Add real-time state change notifications to VotePage"
 ```
 
 ---
+
 
 ## Implementation Strategy
 

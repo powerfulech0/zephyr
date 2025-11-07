@@ -24,11 +24,18 @@ function initializeSocketHandler(io, pollManager) {
     socket.on('join', roomCode => {
       socket.join(roomCode);
       logger.info({ socketId: socket.id, roomCode }, 'Socket joined room');
+
+      // Update host socket ID when host joins via WebSocket
+      const result = pollManager.updateHostSocketId(roomCode, socket.id);
+      if (result.success) {
+        logger.info({ socketId: socket.id, roomCode }, 'Updated host socket ID');
+      }
     });
 
+    // T081: Handle disconnect with participant cleanup and broadcast
     socket.on('disconnect', () => {
       logger.info({ socketId: socket.id }, 'Socket disconnected');
-      // Clean up participant on disconnect
+      // T082: Clean up participant on disconnect
       const result = pollManager.removeParticipant(socket.id);
       if (result) {
         logger.info(
@@ -41,15 +48,23 @@ function initializeSocketHandler(io, pollManager) {
           'Participant removed on disconnect'
         );
 
-        // Broadcast participant-left event if nickname was tracked
+        // T083: Broadcast participant-left event if nickname was tracked
         if (result.nickname && !result.cleared) {
           const poll = pollManager.getPoll(result.roomCode);
           if (poll) {
             io.to(result.roomCode).emit(PARTICIPANT_LEFT, {
               nickname: result.nickname,
-              participantCount: poll.participants.size,
+              count: poll.participants.size,
               timestamp: new Date().toISOString(),
             });
+            logger.info(
+              {
+                roomCode: result.roomCode,
+                nickname: result.nickname,
+                remainingCount: poll.participants.size,
+              },
+              'Broadcast participant-left event'
+            );
           }
         }
       }

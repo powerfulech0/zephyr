@@ -4,6 +4,7 @@ class PollManager {
   constructor() {
     this.polls = new Map(); // roomCode → Poll object
     this.socketRoomMap = new Map(); // socketId → roomCode
+    this.socketNicknameMap = new Map(); // socketId → nickname
   }
 
   /**
@@ -33,6 +34,22 @@ class PollManager {
    */
   getPoll(roomCode) {
     return this.polls.get(roomCode);
+  }
+
+  /**
+   * Update host socket ID when host joins via WebSocket
+   */
+  updateHostSocketId(roomCode, newHostSocketId) {
+    const poll = this.polls.get(roomCode);
+    if (!poll) {
+      return { success: false, error: 'Poll not found' };
+    }
+
+    // Update host socket ID
+    poll.hostSocketId = newHostSocketId;
+    this.socketRoomMap.set(newHostSocketId, roomCode);
+
+    return { success: true, poll };
   }
 
   /**
@@ -78,6 +95,7 @@ class PollManager {
 
     poll.participants.add(nickname);
     this.socketRoomMap.set(socketId, roomCode);
+    this.socketNicknameMap.set(socketId, nickname);
 
     return { success: true, poll };
   }
@@ -114,35 +132,34 @@ class PollManager {
   }
 
   /**
-   * Remove participant on disconnect
+   * Remove participant on disconnect (T082)
+   * FR-020: Clear poll from memory when all participants disconnect
    */
   removeParticipant(socketId) {
     const roomCode = this.socketRoomMap.get(socketId);
+    const nickname = this.socketNicknameMap.get(socketId);
+
     if (!roomCode) return null;
 
     const poll = this.polls.get(roomCode);
     if (!poll) return null;
 
-    // Find and remove nickname
-    let removedNickname = null;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const nickname of poll.participants) {
-      // Match by socketId (simple approach: remove first match)
-      // In production, would need better socket-to-nickname mapping
-      removedNickname = nickname;
+    // Remove participant from poll
+    if (nickname) {
       poll.participants.delete(nickname);
-      break;
     }
 
+    // Clean up socket mappings
     this.socketRoomMap.delete(socketId);
+    this.socketNicknameMap.delete(socketId);
 
-    // Clear poll if all participants gone and host disconnected
+    // FR-020: Clear poll if all participants gone and host disconnected
     if (poll.participants.size === 0 && poll.hostSocketId === socketId) {
       this.polls.delete(roomCode);
-      return { roomCode, cleared: true, nickname: removedNickname };
+      return { roomCode, cleared: true, nickname };
     }
 
-    return { roomCode, cleared: false, nickname: removedNickname };
+    return { roomCode, cleared: false, nickname };
   }
 
   /**

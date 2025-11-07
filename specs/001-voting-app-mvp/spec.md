@@ -127,3 +127,4 @@ Participants and hosts see real-time updates of vote counts and percentages as v
 - One poll per session per host (no multi-poll management in MVP)
 - English language UI for MVP
 - Data privacy is not a critical concern (no sensitive voting topics expected in MVP)
+

@@ -10,10 +10,7 @@ function handleChangePollState(socket, pollManager, io) {
   socket.on(CHANGE_POLL_STATE, (data, callback) => {
     const { roomCode, newState } = data;
 
-    logger.info(
-      { socketId: socket.id, roomCode, newState },
-      'Received change-poll-state event'
-    );
+    logger.info({ socketId: socket.id, roomCode, newState }, 'Received change-poll-state event');
 
     // Validate required fields
     if (!roomCode || !newState) {

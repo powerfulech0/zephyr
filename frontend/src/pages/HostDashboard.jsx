@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPoll } from '../services/apiService';
-import { changePollState, onPollStateChanged, onVoteUpdate, onParticipantJoined, onParticipantLeft, disconnect } from '../services/socketService';
+import { joinSocketRoom, changePollState, onPollStateChanged, onVoteUpdate, onParticipantJoined, onParticipantLeft, onConnectionStatus, onReconnecting, disconnect } from '../services/socketService';
 import PollControls from '../components/PollControls';
 import PollResults from '../components/PollResults';
 import ParticipantCounter from '../components/ParticipantCounter';
@@ -18,6 +18,8 @@ function HostDashboard() {
   const [pollState, setPollState] = useState('waiting');
   const [participantCount, setParticipantCount] = useState(0);
   const [voteResults, setVoteResults] = useState({ counts: [], percentages: [] });
+  const [isReconnecting, setIsReconnecting] = useState(false); // T091
+  const [connectionStatus, setConnectionStatus] = useState('connected'); // T092
 
   useEffect(() => {
     // Setup Socket.io event listeners
@@ -49,9 +51,22 @@ function HostDashboard() {
     onParticipantJoined(handleParticipantJoined);
     onParticipantLeft(handleParticipantLeft);
 
-    // Cleanup on unmount
+    // Connection status listener (T092)
+    onConnectionStatus(status => {
+      setConnectionStatus(status.status);
+      if (status.status === 'connected') {
+        setIsReconnecting(false);
+      }
+    });
+
+    // Reconnecting listener (T091)
+    onReconnecting(data => {
+      setIsReconnecting(data.attempting);
+    });
+
+    // Cleanup on unmount - DO NOT disconnect socket (it's a singleton)
     return () => {
-      disconnect();
+      // Socket should persist across components, so no disconnect here
     };
   }, []);
 
@@ -122,6 +137,9 @@ function HostDashboard() {
         counts: new Array(filteredOptions.length).fill(0),
         percentages: new Array(filteredOptions.length).fill(0),
       });
+
+      // Join the Socket.io room to receive state change broadcasts
+      joinSocketRoom(response.poll.roomCode);
     } catch (err) {
       console.error('Failed to create poll:', err);
       setError(err.message || 'Failed to create poll. Please try again.');
@@ -204,6 +222,21 @@ function HostDashboard() {
 
   return (
     <div className="host-dashboard">
+      {/* Connection Status Indicator (T092) */}
+      <div className={`connection-status ${connectionStatus}`}>
+        {connectionStatus === 'connected' && '🟢 Connected'}
+        {connectionStatus === 'disconnected' && '🔴 Disconnected'}
+        {connectionStatus === 'failed' && '⚠️ Connection Failed'}
+      </div>
+
+      {/* Reconnecting UI State (T091) */}
+      {isReconnecting && (
+        <div className="reconnecting-banner">
+          <span className="reconnecting-spinner">⟳</span>
+          Reconnecting to server...
+        </div>
+      )}
+
       <div className="poll-header">
         <h2>{poll.question}</h2>
         <div className="room-code">
