@@ -22,24 +22,24 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create backend directory structure (models, services, api, sockets, config, tests)
-- [ ] T002 Create frontend directory structure (pages, components, services, utils, tests)
-- [ ] T003 Create shared directory for event type constants
-- [ ] T004 Initialize backend package.json with dependencies (express, socket.io, nanoid, pino, pino-http, cors)
-- [ ] T005 [P] Install backend dev dependencies (jest, supertest, socket.io-client, eslint, eslint-config-airbnb-base, eslint-plugin-import, eslint-plugin-jest, eslint-config-prettier, prettier, husky, lint-staged, nodemon)
-- [ ] T006 [P] Configure backend ESLint with Airbnb style guide in backend/.eslintrc.js
-- [ ] T007 [P] Configure backend Prettier in backend/.prettierrc
-- [ ] T008 [P] Configure Jest for backend in backend/jest.config.js
-- [ ] T009 [P] Setup Husky pre-commit hooks in backend/.husky/pre-commit
-- [ ] T010 [P] Configure lint-staged in backend/package.json
-- [ ] T011 [P] Add npm scripts (start, test, test:watch, lint, format) to backend/package.json
-- [ ] T012 Initialize frontend with Create React App or manual setup
-- [ ] T013 [P] Install frontend dependencies (react, react-dom, react-router-dom, socket.io-client, chart.js or recharts)
-- [ ] T014 [P] Install frontend dev dependencies (@testing-library/react, @testing-library/jest-dom, eslint-config-airbnb, eslint-plugin-react, eslint-plugin-react-hooks, prettier)
-- [ ] T015 [P] Configure frontend ESLint with React plugins in frontend/.eslintrc.js
-- [ ] T016 [P] Configure frontend Prettier in frontend/.prettierrc
-- [ ] T017 Create backend/.env with PORT, NODE_ENV, LOG_LEVEL, FRONTEND_URL
-- [ ] T018 Create frontend/.env with REACT_APP_API_URL
+- [X] T001 Create backend directory structure (models, services, api, sockets, config, tests)
+- [X] T002 Create frontend directory structure (pages, components, services, utils, tests)
+- [X] T003 Create shared directory for event type constants
+- [X] T004 Initialize backend package.json with dependencies (express, socket.io, nanoid, pino, pino-http, cors)
+- [X] T005 [P] Install backend dev dependencies (jest, supertest, socket.io-client, eslint, eslint-config-airbnb-base, eslint-plugin-import, eslint-plugin-jest, eslint-config-prettier, prettier, husky, lint-staged, nodemon)
+- [X] T006 [P] Configure backend ESLint with Airbnb style guide in backend/.eslintrc.js
+- [X] T007 [P] Configure backend Prettier in backend/.prettierrc
+- [X] T008 [P] Configure Jest for backend in backend/jest.config.js
+- [X] T009 [P] Setup Husky pre-commit hooks in backend/.husky/pre-commit
+- [X] T010 [P] Configure lint-staged in backend/package.json
+- [X] T011 [P] Add npm scripts (start, test, test:watch, lint, format) to backend/package.json
+- [X] T012 Initialize frontend with Create React App or manual setup
+- [X] T013 [P] Install frontend dependencies (react, react-dom, react-router-dom, socket.io-client, chart.js or recharts)
+- [X] T014 [P] Install frontend dev dependencies (@testing-library/react, @testing-library/jest-dom, eslint-config-airbnb, eslint-plugin-react, eslint-plugin-react-hooks, prettier)
+- [X] T015 [P] Configure frontend ESLint with React plugins in frontend/.eslintrc.js
+- [X] T016 [P] Configure frontend Prettier in frontend/.prettierrc
+- [X] T017 Create backend/.env with PORT, NODE_ENV, LOG_LEVEL, FRONTEND_URL
+- [X] T018 Create frontend/.env with REACT_APP_API_URL
 
 ---
 
@@ -49,19 +49,19 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T019 Create pino logger configuration in backend/src/config/logger.js with pino-pretty for development
-- [ ] T020 Create environment config loader in backend/src/config/index.js
-- [ ] T021 [P] Create Socket.io event name constants in shared/eventTypes.js (join-room, submit-vote, change-poll-state, participant-joined, participant-left, vote-update, poll-state-changed)
-- [ ] T022 [P] Create room code generator service in backend/src/services/roomCodeGenerator.js using nanoid with custom alphabet
-- [ ] T023 [P] Create PollManager class in backend/src/models/PollManager.js with Map-based storage
-- [ ] T024 Create centralized error handler middleware in backend/src/api/middleware/errorHandler.js with pino logging
-- [ ] T025 [P] Create request validator middleware in backend/src/api/middleware/validator.js for question, options, room codes
-- [ ] T026 Create Express server initialization in backend/src/server.js with pino-http, CORS, and Socket.io integration
-- [ ] T027 Create health check route in backend/src/api/routes/healthRoutes.js (GET /api/health)
-- [ ] T028 Create main Socket.io connection handler in backend/src/sockets/socketHandler.js
-- [ ] T029 [P] Create socketService for frontend in frontend/src/services/socketService.js with auto-reconnection config
-- [ ] T030 [P] Create apiService for HTTP requests in frontend/src/services/apiService.js
-- [ ] T031 Create React routing structure in frontend/src/App.js with routes for host, join, vote pages
+- [X] T019 Create pino logger configuration in backend/src/config/logger.js with pino-pretty for development
+- [X] T020 Create environment config loader in backend/src/config/index.js
+- [X] T021 [P] Create Socket.io event name constants in shared/eventTypes.js (join-room, submit-vote, change-poll-state, participant-joined, participant-left, vote-update, poll-state-changed)
+- [X] T022 [P] Create room code generator service in backend/src/services/roomCodeGenerator.js using nanoid with custom alphabet
+- [X] T023 [P] Create PollManager class in backend/src/models/PollManager.js with Map-based storage
+- [X] T024 Create centralized error handler middleware in backend/src/api/middleware/errorHandler.js with pino logging
+- [X] T025 [P] Create request validator middleware in backend/src/api/middleware/validator.js for question, options, room codes
+- [X] T026 Create Express server initialization in backend/src/server.js with pino-http, CORS, and Socket.io integration
+- [X] T027 Create health check route in backend/src/api/routes/healthRoutes.js (GET /api/health)
+- [X] T028 Create main Socket.io connection handler in backend/src/sockets/socketHandler.js
+- [X] T029 [P] Create socketService for frontend in frontend/src/services/socketService.js with auto-reconnection config
+- [X] T030 [P] Create apiService for HTTP requests in frontend/src/services/apiService.js
+- [X] T031 Create React routing structure in frontend/src/App.js with routes for host, join, vote pages
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
