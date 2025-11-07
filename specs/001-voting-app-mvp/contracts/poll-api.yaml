@@ -1,0 +1,215 @@
+openapi: 3.0.3
+info:
+  title: Zephyr Voting App API
+  description: HTTP REST API for poll creation and validation (MVP)
+  version: 1.0.0
+  contact:
+    name: Zephyr Team
+
+servers:
+  - url: http://localhost:4000/api
+    description: Local development server
+  - url: https://api.zephyr.example.com/api
+    description: Production server (future)
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Verify server is running
+      operationId: getHealth
+      tags:
+        - System
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-11-07T10:30:00Z"
+
+  /polls:
+    post:
+      summary: Create a new poll
+      description: Host creates a poll with question and answer options, receives unique room code
+      operationId: createPoll
+      tags:
+        - Polls
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - options
+              properties:
+                question:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  description: Poll question text
+                  example: "What is your favorite programming language?"
+                options:
+                  type: array
+                  minItems: 2
+                  maxItems: 5
+                  items:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                  description: Answer choices (2-5 options)
+                  example: ["JavaScript", "Python", "Go", "Rust"]
+      responses:
+        '201':
+          description: Poll created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  roomCode:
+                    type: string
+                    pattern: '^[2-9A-HJ-NP-Z]{6}$'
+                    description: Unique 6-character room code (no ambiguous chars)
+                    example: "AB3K9T"
+                  poll:
+                    $ref: '#/components/schemas/Poll'
+        '400':
+          description: Invalid request (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidOptions:
+                  summary: Too few options
+                  value:
+                    success: false
+                    error: "Options array must contain 2-5 elements"
+                questionTooLong:
+                  summary: Question exceeds max length
+                  value:
+                    success: false
+                    error: "Question must be 500 characters or less"
+
+  /polls/{roomCode}:
+    get:
+      summary: Get poll by room code
+      description: Retrieve poll details for validation (e.g., check if room code exists before joining)
+      operationId: getPoll
+      tags:
+        - Polls
+      parameters:
+        - name: roomCode
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[2-9A-HJ-NP-Z]{6}$'
+          description: 6-character room code
+          example: "AB3K9T"
+      responses:
+        '200':
+          description: Poll found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  poll:
+                    $ref: '#/components/schemas/Poll'
+        '404':
+          description: Poll not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: "Poll not found"
+
+components:
+  schemas:
+    Poll:
+      type: object
+      required:
+        - roomCode
+        - question
+        - options
+        - state
+        - createdAt
+      properties:
+        roomCode:
+          type: string
+          pattern: '^[2-9A-HJ-NP-Z]{6}$'
+          description: Unique 6-character room identifier
+          example: "AB3K9T"
+        question:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Poll question text
+          example: "What is your favorite programming language?"
+        options:
+          type: array
+          minItems: 2
+          maxItems: 5
+          items:
+            type: string
+            minLength: 1
+            maxLength: 100
+          description: Answer choices
+          example: ["JavaScript", "Python", "Go", "Rust"]
+        state:
+          type: string
+          enum: [waiting, open, closed]
+          description: Poll lifecycle state
+          example: "waiting"
+        participantCount:
+          type: integer
+          minimum: 0
+          maximum: 20
+          description: Number of currently connected participants
+          example: 0
+        createdAt:
+          type: string
+          format: date-time
+          description: Poll creation timestamp
+          example: "2025-11-07T10:30:00Z"
+
+    Error:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Human-readable error message
+          example: "Invalid room code format"
+
+tags:
+  - name: System
+    description: Health and status endpoints
+  - name: Polls
+    description: Poll creation and retrieval
