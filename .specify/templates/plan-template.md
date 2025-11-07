@@ -31,7 +31,42 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Answer each question based on the current feature requirements:
+
+**I. Real-time First** ✅ / ⚠️ / N/A
+- Does this feature require real-time state synchronization?
+- If yes, are WebSocket events planned for all state changes?
+- Are connection/disconnection events tracked?
+
+**II. Simplicity & MVP Focus** ✅ / ⚠️
+- Is in-memory storage sufficient for this feature?
+- Are all external dependencies necessary and justified?
+- Are there any architectural patterns (repositories, ORMs) being introduced? If yes, documented in Complexity Tracking?
+
+**III. Component Isolation** ✅ / ⚠️ / N/A
+- Are Host and Participant responsibilities clearly separated?
+- Does this feature maintain role-based permission boundaries?
+- Are room isolation requirements satisfied?
+
+**IV. Test-Driven Development** ✅ / ⚠️
+- Are acceptance scenarios defined in Given-When-Then format in spec.md?
+- Are integration tests planned for WebSocket flows?
+- Are contract tests planned for APIs?
+- Is TDD workflow (write tests → fail → implement → pass) reflected in tasks.md?
+
+**V. Code Quality Standards** ✅ / ⚠️
+- Are linting and formatting tools configured (ESLint, Prettier)?
+- Is TypeScript strict mode enabled (if applicable)?
+- Are pre-commit hooks configured for quality gates?
+
+**VI. Incremental Delivery** ✅ / ⚠️
+- Are user stories prioritized (P1, P2, P3) in spec.md?
+- Is each story independently testable?
+- Is MVP (P1) clearly defined and demonstrable?
+
+**Overall Status**: ✅ PASS / ⚠️ NEEDS ATTENTION / ❌ BLOCKED
+
+*If any check is ⚠️ or ❌, document justification in Complexity Tracking table below.*
 
 ## Project Structure
 
