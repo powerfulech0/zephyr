@@ -44,14 +44,20 @@ class PollManager {
       return { success: false, error: 'Poll not found' };
     }
     if (poll.hostSocketId !== hostSocketId) {
-      return { success: false, error: 'Only host can change poll state' };
+      return { success: false, error: 'Only the host can change poll state' };
     }
     if (!['waiting', 'open', 'closed'].includes(newState)) {
       return { success: false, error: 'Invalid state' };
     }
 
+    // Prevent reopening closed polls
+    if (poll.state === 'closed' && newState === 'open') {
+      return { success: false, error: 'Cannot reopen a closed poll' };
+    }
+
+    const previousState = poll.state;
     poll.state = newState;
-    return { success: true, state: newState };
+    return { success: true, poll, previousState };
   }
 
   /**

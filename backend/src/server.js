@@ -7,6 +7,7 @@ const config = require('./config/index.js');
 const logger = require('./config/logger.js');
 const PollManager = require('./models/PollManager.js');
 const healthRoutes = require('./api/routes/healthRoutes.js');
+const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
 const initializeSocketHandler = require('./sockets/socketHandler.js');
 const errorHandler = require('./api/middleware/errorHandler.js');
 
@@ -31,6 +32,7 @@ app.use(pinoHttp({ logger }));
 
 // Routes
 app.use('/api', healthRoutes);
+app.use('/api', initializePollRoutes(pollManager));
 
 // Socket.io handler
 initializeSocketHandler(io, pollManager);

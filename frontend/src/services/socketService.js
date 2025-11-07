@@ -95,4 +95,9 @@ export const offPollStateChanged = callback => {
   socket.off('poll-state-changed', callback);
 };
 
+// Disconnect socket
+export const disconnect = () => {
+  socket.disconnect();
+};
+
 export default socket;

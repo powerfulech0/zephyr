@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
+import HostDashboard from './pages/HostDashboard';
 
-// Pages will be implemented in Phase 3+
-// import HostDashboard from './pages/HostDashboard';
+// Pages for future phases
 // import JoinPage from './pages/JoinPage';
 // import VotePage from './pages/VotePage';
 
@@ -38,7 +38,7 @@ function App() {
                 </div>
               }
             />
-            <Route path="/host" element={<div>Host Dashboard (Coming in Phase 3)</div>} />
+            <Route path="/host" element={<HostDashboard />} />
             <Route path="/join" element={<div>Join Page (Coming in Phase 4)</div>} />
             <Route path="/vote" element={<div>Vote Page (Coming in Phase 4)</div>} />
           </Routes>

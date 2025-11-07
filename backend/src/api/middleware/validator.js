@@ -1,14 +1,14 @@
 const validatePollCreation = (req, res, next) => {
   const { question, options } = req.body;
 
-  if (!question || typeof question !== 'string') {
+  if (typeof question !== 'string') {
     return res.status(400).json({
       success: false,
       error: 'Question is required and must be a string',
     });
   }
 
-  if (question.length < 1 || question.length > 500) {
+  if (question.trim().length < 1 || question.length > 500) {
     return res.status(400).json({
       success: false,
       error: 'Question must be between 1 and 500 characters',
@@ -31,10 +31,10 @@ const validatePollCreation = (req, res, next) => {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const option of options) {
-    if (typeof option !== 'string' || option.length < 1 || option.length > 100) {
+    if (typeof option !== 'string' || option.trim().length < 1 || option.length > 100) {
       return res.status(400).json({
         success: false,
-        error: 'Each option must be a string between 1 and 100 characters',
+        error: 'Option must be between 1 and 100 characters',
       });
     }
   }
@@ -45,7 +45,21 @@ const validatePollCreation = (req, res, next) => {
 const validateRoomCode = (req, res, next) => {
   const { roomCode } = req.params;
 
-  if (!roomCode || !/^[2-9A-HJ-NP-Z]{6}$/.test(roomCode)) {
+  if (!roomCode) {
+    return res.status(400).json({
+      success: false,
+      error: 'Room code is required',
+    });
+  }
+
+  if (roomCode.length !== 6) {
+    return res.status(400).json({
+      success: false,
+      error: 'Room code must be exactly 6 characters',
+    });
+  }
+
+  if (!/^[2-9A-HJ-NP-Z]{6}$/.test(roomCode)) {
     return res.status(400).json({
       success: false,
       error: 'Invalid room code format',
