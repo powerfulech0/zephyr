@@ -24,12 +24,12 @@
 
 **Purpose**: Development environment and Docker infrastructure
 
-- [ ] T001 Create docker-compose.yml with PostgreSQL, Redis, Prometheus, Grafana services per quickstart.md
-- [ ] T002 Create backend/prometheus.yml configuration file for metrics scraping
-- [ ] T003 [P] Create backend/grafana/datasources/prometheus.yml for auto-provisioned datasource
-- [ ] T004 [P] Create backend/.env.example with all configuration variables from quickstart.md
-- [ ] T005 [P] Update backend/package.json with new production dependencies (pg, ioredis, @socket.io/redis-adapter, prom-client, joi, xss, express-rate-limit, rate-limit-redis, helmet)
-- [ ] T006 Install dependencies with npm install in backend/
+- [X] T001 Create docker-compose.yml with PostgreSQL, Redis, Prometheus, Grafana services per quickstart.md
+- [X] T002 Create backend/prometheus.yml configuration file for metrics scraping
+- [X] T003 [P] Create backend/grafana/datasources/prometheus.yml for auto-provisioned datasource
+- [X] T004 [P] Create backend/.env.example with all configuration variables from quickstart.md
+- [X] T005 [P] Update backend/package.json with new production dependencies (pg, ioredis, @socket.io/redis-adapter, prom-client, joi, xss, express-rate-limit, rate-limit-redis, helmet)
+- [X] T006 Install dependencies with npm install in backend/
 
 ---
 
@@ -39,15 +39,15 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create backend/src/config/database.js for PostgreSQL connection pooling (20 connections max)
-- [ ] T008 [P] Create backend/src/config/cache.js for Redis client configuration with retry strategy
-- [ ] T009 [P] Install and configure db-migrate for database migrations in backend/
-- [ ] T010 Create backend/src/migrations/001_initial_schema.js with polls, participants, votes tables per data-model.md
-- [ ] T011 Run migration to create database schema: npm run migrate:up
-- [ ] T012 [P] Enhance backend/src/config/logger.js to support correlation IDs and structured logging
-- [ ] T013 [P] Create backend/src/api/middleware/correlationId.js to assign correlation IDs to all requests
-- [ ] T014 Update backend/src/server.js to initialize database connection pool at startup
-- [ ] T015 [P] Update backend/src/server.js to initialize Redis connection at startup
+- [X] T007 Create backend/src/config/database.js for PostgreSQL connection pooling (20 connections max)
+- [X] T008 [P] Create backend/src/config/cache.js for Redis client configuration with retry strategy
+- [X] T009 [P] Install and configure db-migrate for database migrations in backend/
+- [X] T010 Create backend/src/migrations/001_initial_schema.js with polls, participants, votes tables per data-model.md
+- [X] T011 Run migration to create database schema: npm run migrate:up
+- [X] T012 [P] Enhance backend/src/config/logger.js to support correlation IDs and structured logging
+- [X] T013 [P] Create backend/src/api/middleware/correlationId.js to assign correlation IDs to all requests
+- [X] T014 Update backend/src/server.js to initialize database connection pool at startup
+- [X] T015 [P] Update backend/src/server.js to initialize Redis connection at startup
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
