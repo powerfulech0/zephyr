@@ -3,6 +3,7 @@
 Auto-generated from all feature plans. Last updated: 2025-11-07
 
 ## Active Technologies
+- Node.js 18+ (LTS) / JavaScript ES6+ (002-production-ready)
 
 ### Backend (001-voting-app-mvp)
 
@@ -182,11 +183,10 @@ npm test -- tests/performance/concurrentParticipants.test.js
 - `poll-state-changed` - Poll state changed {newState, previousState}
 
 ## Recent Changes
+- 002-production-ready: Added Node.js 18+ (LTS) / JavaScript ES6+
 
 - 001-voting-app-mvp: Implemented backend MVP with Express, Socket.io, real-time voting
 - Added performance testing for 20 concurrent participants (max latency: 13ms)
-- Achieved 95.53% test coverage (exceeds 90% requirement)
-- Configured pre-commit hooks with lint-staged
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

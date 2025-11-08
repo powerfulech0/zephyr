@@ -1,28 +1,31 @@
 <!--
 SYNC IMPACT REPORT
 
-Version Change: [TEMPLATE] → 1.0.0 (Initial ratification)
-Bump Rationale: MINOR - Initial constitution establishment with 6 core principles
+Version Change: 1.0.0 → 2.0.0
+Bump Rationale: MAJOR - Principle II redefined to allow production infrastructure (backward-incompatible governance change) + 6 new production principles added
 
-Modified Principles: N/A (initial creation)
-Added Sections:
-  - I. Real-time First (WebSocket-driven architecture)
-  - II. Simplicity & MVP Focus (In-memory, no premature optimization)
-  - III. Component Isolation (Host/Participant separation)
-  - IV. Test-Driven Development (TDD mandatory)
-  - V. Code Quality Standards (Linting, formatting, type safety)
-  - VI. Incremental Delivery (Story-based implementation)
-  - Development Workflow section with pre-commit requirements
-  - Governance section
+Modified Principles:
+  - II. Simplicity & MVP Focus → II. Simplicity & Production Readiness
+    - Removed database prohibition
+    - Added production infrastructure allowances with justification requirement
+    - Maintains simplicity principle while enabling production deployment
 
-Removed Sections: N/A (initial creation)
+Added Principles:
+  - VII. Data Persistence & Reliability (Production-critical)
+  - VIII. Security First (Production-critical)
+  - IX. Observability & Monitoring (Operational excellence)
+  - X. Deployment Excellence (Automation & safety)
+  - XI. Scalability & Performance (Growth enablement)
+  - XII. Resilience & Error Handling (Reliability patterns)
+
+Removed Principles: None
 
 Templates Status:
-  ✅ plan-template.md - Constitution Check section updated with specific principle checks
-  ✅ spec-template.md - User story prioritization aligns with Incremental Delivery
-  ✅ tasks-template.md - Story-based organization aligns with Incremental Delivery
-  ✅ checklist-template.md - Generic template, no updates needed
-  ✅ agent-file-template.md - Generic template, no principle-specific references
+  ✅ plan-template.md - Constitution Check section updated with 12 principles (MVP + Production)
+  ✅ spec-template.md - No changes required (user story prioritization remains valid)
+  ✅ tasks-template.md - No changes required (story-based organization remains valid)
+  ✅ checklist-template.md - No changes required
+  ✅ agent-file-template.md - No changes required
 
 Follow-up TODOs: None
 -->
@@ -31,7 +34,9 @@ Follow-up TODOs: None
 
 ## Core Principles
 
-### I. Real-time First
+### MVP Principles (Established v1.0.0)
+
+#### I. Real-time First
 
 WebSocket communication is the architectural foundation of this project. All features MUST leverage Socket.io for state synchronization and real-time updates.
 
@@ -43,19 +48,20 @@ WebSocket communication is the architectural foundation of this project. All fea
 
 **Rationale:** Real-time feedback is the core value proposition for live polling. HTTP polling or delayed updates would degrade user experience below acceptable thresholds for the 5-20 person target audience.
 
-### II. Simplicity & MVP Focus
+#### II. Simplicity & Production Readiness
 
-Start with the simplest viable implementation. Complexity must be justified against concrete user needs.
+Start with the simplest viable implementation. Complexity must be justified against concrete user needs. Production infrastructure is permitted when necessary for reliability, security, or scalability.
 
 **Rules:**
-- MVP MUST use in-memory storage (no database)
-- Feature requests outside MVP scope MUST be deferred unless blocking core functionality
-- External dependencies MUST be minimized (Node.js + Express + Socket.io core stack)
-- Architectural patterns (repositories, ORMs, microservices) are PROHIBITED in MVP unless explicitly justified in Complexity Tracking section
+- Feature requests outside current scope MUST be deferred unless blocking core functionality
+- External dependencies MUST be minimized and justified
+- Production infrastructure (databases, caching, monitoring) MUST be justified in plan.md Complexity Tracking
+- Architectural patterns (repositories, ORMs, microservices) MUST be justified against specific requirements
+- The simplest solution that meets requirements MUST be preferred over complex alternatives
 
-**Rationale:** The 2-5 day timeline and small user groups (5-20 people) do not warrant database infrastructure or complex patterns. In-memory storage handles the scale and enables rapid iteration. YAGNI principles prevent premature optimization.
+**Rationale:** YAGNI principles prevent premature optimization and maintain development velocity. However, production deployment requires infrastructure for data persistence, security, and observability. Each production component must justify its necessity against specific requirements (e.g., database for persistence, monitoring for operational visibility).
 
-### III. Component Isolation
+#### III. Component Isolation
 
 Host and Participant roles have distinct responsibilities and MUST be implemented as separate, decoupled components.
 
@@ -67,7 +73,7 @@ Host and Participant roles have distinct responsibilities and MUST be implemente
 
 **Rationale:** Role separation enables independent testing, parallel development, and prevents permission bugs. Clear boundaries reduce complexity and improve maintainability.
 
-### IV. Test-Driven Development (NON-NEGOTIABLE)
+#### IV. Test-Driven Development (NON-NEGOTIABLE)
 
 Tests MUST be written before implementation. No production code may be written until corresponding tests exist and fail.
 
@@ -75,13 +81,13 @@ Tests MUST be written before implementation. No production code may be written u
 - Red-Green-Refactor cycle strictly enforced: Write failing test → Implement → Refactor
 - User stories MUST define acceptance scenarios in Given-When-Then format
 - Integration tests MUST cover WebSocket event flows (connect, vote, broadcast)
-- Contract tests MUST validate room management and vote tracking APIs
+- Contract tests MUST validate APIs and state management
 - Tests MUST run successfully before marking any implementation task complete
 - All tests MUST pass before creating a commit
 
-**Rationale:** Real-time WebSocket applications have complex state synchronization requirements. TDD catches race conditions, connection handling bugs, and state inconsistencies early. Given the 2-5 day timeline, bugs caught early save more time than tests cost to write.
+**Rationale:** Real-time WebSocket applications have complex state synchronization requirements. TDD catches race conditions, connection handling bugs, and state inconsistencies early. Tests written before code prevent implementation bias and ensure testable design.
 
-### V. Code Quality Standards (NON-NEGOTIABLE)
+#### V. Code Quality Standards (NON-NEGOTIABLE)
 
 Code MUST adhere to consistent style, formatting, and quality standards. Quality checks MUST pass before commits.
 
@@ -94,9 +100,9 @@ Code MUST adhere to consistent style, formatting, and quality standards. Quality
 - Code MUST be free of security vulnerabilities flagged by static analysis tools
 - Unused imports, variables, and dead code MUST be removed before commit
 
-**Rationale:** Code quality issues compound rapidly in fast-paced development. Automated checks catch bugs, security issues, and inconsistencies before they enter the codebase. The 2-5 day timeline demands discipline to prevent technical debt accumulation that would slow later iterations.
+**Rationale:** Code quality issues compound rapidly in fast-paced development. Automated checks catch bugs, security issues, and inconsistencies before they enter the codebase. Quality gates prevent technical debt accumulation.
 
-### VI. Incremental Delivery
+#### VI. Incremental Delivery
 
 Features MUST be delivered as independently testable user stories, prioritized by value.
 
@@ -107,7 +113,104 @@ Features MUST be delivered as independently testable user stories, prioritized b
 - Each story completion MUST include a validation checkpoint
 - MVP (P1 story) MUST be demonstrable before expanding scope
 
-**Rationale:** Story-based delivery enables early validation with real users, reduces rework from misaligned requirements, and provides natural rollback points if timeline pressure increases. The 2-5 day timeline demands ruthless prioritization.
+**Rationale:** Story-based delivery enables early validation with real users, reduces rework from misaligned requirements, and provides natural rollback points if timeline pressure increases. Prioritization ensures critical features ship first.
+
+### Production Principles (Added v2.0.0)
+
+#### VII. Data Persistence & Reliability (NON-NEGOTIABLE)
+
+Production systems MUST persist data reliably and survive failures without data loss.
+
+**Rules:**
+- All critical data (polls, votes, participants) MUST be persisted to durable storage
+- System MUST restore complete state after server restart
+- Data retention policies MUST be defined and configurable
+- Backup and recovery mechanisms MUST be implemented and tested
+- Database migrations MUST be automated, reversible, and validated
+- Zero data loss during deployments, restarts, or failures
+
+**Rationale:** Production users cannot tolerate data loss. Poll results, participant votes, and session state represent user effort and business value. Persistence enables reliable service and supports features like rejoining polls, viewing historical results, and recovering from failures.
+
+#### VIII. Security First (NON-NEGOTIABLE)
+
+Security is not optional. All user input is untrusted. All production code must defend against common attacks.
+
+**Rules:**
+- All user inputs MUST be sanitized to prevent XSS and injection attacks
+- All inputs MUST be validated against defined constraints (length, format, allowed characters)
+- Rate limiting MUST be implemented per IP address and per resource to prevent abuse
+- CORS policies MUST restrict cross-origin requests to whitelisted domains
+- Security headers MUST be implemented (CSP, X-Frame-Options, HSTS, etc.)
+- All security-relevant events MUST be logged (failed auth, rate limit violations, invalid input)
+- Request size limits MUST be enforced to prevent resource exhaustion
+- Secrets MUST NEVER be hardcoded or stored in plain text
+
+**Rationale:** Public internet exposure invites malicious actors. Common attacks (XSS, injection, DDoS) are preventable with standard defenses. Security vulnerabilities damage user trust and can lead to data breaches. Defense-in-depth approach provides multiple security layers.
+
+#### IX. Observability & Monitoring
+
+Production systems MUST provide visibility into health, errors, and performance. Teams cannot fix what they cannot see.
+
+**Rules:**
+- Structured logs MUST be generated with consistent format (timestamp, level, message, context)
+- Correlation IDs MUST be assigned to requests and propagated through all log entries
+- Metrics MUST be exposed for request count, error rate, response time, and active connections
+- Health check endpoints MUST indicate service and dependency status
+- Error rates MUST be tracked and categorized (client errors, server errors, timeouts)
+- Centralized logging and metrics platforms MUST be integrated
+- Log levels MUST be configurable without service restart
+- Alerts MUST be configured for critical errors and performance degradation
+
+**Rationale:** Operational visibility enables proactive issue detection, rapid diagnosis, and data-driven optimization. Logs without correlation IDs are difficult to trace. Metrics without alerts are ignored. Observability is not overhead—it's essential for maintaining production services.
+
+#### X. Deployment Excellence
+
+Deployments MUST be automated, safe, and repeatable. Manual deployments are error-prone and slow.
+
+**Rules:**
+- Containerized deployment MUST be supported with isolated dependencies
+- All environment-specific configuration MUST be externalized (database URLs, ports, feature flags)
+- Secrets MUST be loaded from secure secret management systems
+- Automated CI/CD pipeline MUST include test, build, and deploy stages
+- Automated tests (unit, integration, contract) MUST run before deployment
+- Zero-downtime deployments MUST be supported with graceful shutdown
+- Configuration MUST be validated at startup and fail fast if invalid
+- Deployment rollback MUST be automated and tested
+- Deployment status MUST be visible to the team in real-time
+
+**Rationale:** Manual deployments do not scale. Automation reduces human error, accelerates deployment frequency, and enables continuous delivery. Configuration errors caught at startup prevent runtime failures. Rollback capability provides safety net for failed deployments.
+
+#### XI. Scalability & Performance
+
+Systems MUST scale to meet demand. Performance is a feature, not an afterthought.
+
+**Rules:**
+- Horizontal scaling MUST be supported with multiple concurrent instances
+- Session state MUST be shared across instances using distributed cache or database
+- Load balancers MUST distribute traffic with health checks and failover
+- WebSocket connections MUST work consistently across multiple instances
+- Connection pooling MUST be used for database access
+- Read replicas SHOULD be supported for database queries to distribute load
+- Performance targets MUST be defined and measured (response time, throughput, latency)
+- Performance regressions MUST be detected in CI pipeline
+
+**Rationale:** User bases grow. Single-instance architectures hit limits. Horizontal scaling enables growth without rewrites. Performance impacts user experience and operational costs. Measuring performance without targets is meaningless.
+
+#### XII. Resilience & Error Handling
+
+Systems MUST handle failures gracefully. Failures are inevitable; chaos is optional.
+
+**Rules:**
+- Retry logic with exponential backoff MUST be implemented for transient failures
+- Circuit breakers MUST be implemented for external dependencies
+- Timeout limits MUST be defined and enforced for all external operations
+- Graceful degradation MUST be provided when non-critical features fail
+- User-friendly error messages MUST be returned (never stack traces or internal details)
+- WebSocket reconnection MUST be attempted automatically with backoff strategy
+- Request queuing and load shedding MUST be implemented under high load
+- Error recovery paths MUST be tested (not just happy paths)
+
+**Rationale:** Distributed systems fail in complex ways. Network calls timeout. Databases disconnect. Services crash. Users tolerate failures when systems recover gracefully. Stack traces confuse users. Circuit breakers prevent cascading failures. Resilience patterns are the difference between degraded service and complete outage.
 
 ## Development Workflow
 
@@ -121,7 +224,7 @@ Features MUST be delivered as independently testable user stories, prioritized b
 - All features require `/speckit.plan` to create plan.md and design artifacts
 - Constitution Check MUST pass before Phase 0 research begins
 - Complexity violations MUST be documented in Complexity Tracking table
-- Project structure MUST be documented (backend/frontend split for this web app)
+- Project structure MUST be documented (backend/frontend split for web app)
 
 ### Task Generation
 - All features require `/speckit.tasks` to create tasks.md
@@ -164,4 +267,4 @@ Before creating any commit, the following MUST pass:
 - MINOR: New principles added or materially expanded guidance
 - PATCH: Clarifications, typo fixes, non-semantic refinements
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-07 | **Last Amended**: 2025-11-07
+**Version**: 2.0.0 | **Ratified**: 2025-11-07 | **Last Amended**: 2025-11-07

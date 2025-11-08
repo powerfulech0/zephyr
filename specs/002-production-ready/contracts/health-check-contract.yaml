@@ -1,0 +1,273 @@
+openapi: 3.0.3
+info:
+  title: Health Check API - Production-Ready
+  description: Enhanced health check endpoint with dependency status checks (FR-018)
+  version: 2.0.0
+  contact:
+    name: Zephyr Team
+
+servers:
+  - url: http://localhost:4000
+    description: Local development
+  - url: https://api.zephyr.example.com
+    description: Production
+
+paths:
+  /api/health:
+    get:
+      summary: Health check endpoint
+      description: |
+        Returns service health status and dependency connectivity.
+        Used by load balancers and monitoring systems to determine instance health.
+
+        **Status Codes**:
+        - 200: Service healthy, all dependencies reachable
+        - 503: Service unhealthy or critical dependencies unavailable
+      operationId: getHealth
+      tags:
+        - Monitoring
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                allHealthy:
+                  summary: All systems healthy
+                  value:
+                    status: "healthy"
+                    timestamp: "2025-11-07T10:45:30.123Z"
+                    uptime: 86400
+                    version: "2.0.0"
+                    dependencies:
+                      database:
+                        status: "connected"
+                        responseTime: 5
+                        details: "PostgreSQL 14.5"
+                      redis:
+                        status: "connected"
+                        responseTime: 2
+                        details: "Redis 7.0.5"
+                      socketio:
+                        status: "healthy"
+                        connectedClients: 42
+                    system:
+                      memory:
+                        used: 256000000
+                        total: 2048000000
+                        percentage: 12.5
+                      cpu:
+                        loadAverage: [1.5, 1.8, 2.1]
+        '503':
+          description: Service unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                databaseDown:
+                  summary: Database connection failed
+                  value:
+                    status: "unhealthy"
+                    timestamp: "2025-11-07T10:45:30.123Z"
+                    uptime: 86400
+                    version: "2.0.0"
+                    dependencies:
+                      database:
+                        status: "disconnected"
+                        responseTime: null
+                        error: "Connection timeout after 2000ms"
+                      redis:
+                        status: "connected"
+                        responseTime: 2
+                      socketio:
+                        status: "healthy"
+                        connectedClients: 42
+                degraded:
+                  summary: Degraded state (some dependencies slow)
+                  value:
+                    status: "degraded"
+                    timestamp: "2025-11-07T10:45:30.123Z"
+                    uptime: 86400
+                    version: "2.0.0"
+                    dependencies:
+                      database:
+                        status: "connected"
+                        responseTime: 250
+                        warning: "Response time above threshold (100ms)"
+                      redis:
+                        status: "connected"
+                        responseTime: 2
+                      socketio:
+                        status: "healthy"
+                        connectedClients: 42
+
+  /api/health/ready:
+    get:
+      summary: Readiness check
+      description: |
+        Returns whether service is ready to accept traffic.
+        Used by Kubernetes readiness probes.
+
+        Returns 200 only if:
+        - Database connection pool has available connections
+        - Redis is reachable
+        - Application initialization complete
+      operationId: getReadiness
+      tags:
+        - Monitoring
+      responses:
+        '200':
+          description: Service ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ready:
+                    type: boolean
+                    example: true
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ready:
+                    type: boolean
+                    example: false
+                  reason:
+                    type: string
+                    example: "Database connection pool exhausted"
+
+  /api/health/live:
+    get:
+      summary: Liveness check
+      description: |
+        Returns whether service is alive (not deadlocked or hung).
+        Used by Kubernetes liveness probes.
+
+        Always returns 200 unless process is completely unresponsive.
+        Does not check dependencies (fast response).
+      operationId: getLiveness
+      tags:
+        - Monitoring
+      responses:
+        '200':
+          description: Service alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  alive:
+                    type: boolean
+                    example: true
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+        - uptime
+        - version
+        - dependencies
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+          description: Overall service health status
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of health check
+        uptime:
+          type: integer
+          description: Service uptime in seconds
+          example: 86400
+        version:
+          type: string
+          description: Application version (from package.json)
+          example: "2.0.0"
+        dependencies:
+          type: object
+          description: Health status of external dependencies
+          properties:
+            database:
+              $ref: '#/components/schemas/DependencyHealth'
+            redis:
+              $ref: '#/components/schemas/DependencyHealth'
+            socketio:
+              $ref: '#/components/schemas/SocketIOHealth'
+        system:
+          type: object
+          description: System resource utilization (optional)
+          properties:
+            memory:
+              type: object
+              properties:
+                used:
+                  type: integer
+                  description: Used memory in bytes
+                total:
+                  type: integer
+                  description: Total memory in bytes
+                percentage:
+                  type: number
+                  description: Memory usage percentage
+            cpu:
+              type: object
+              properties:
+                loadAverage:
+                  type: array
+                  items:
+                    type: number
+                  description: 1, 5, 15 minute load averages
+
+    DependencyHealth:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [connected, disconnected, degraded]
+          description: Connection status
+        responseTime:
+          type: integer
+          nullable: true
+          description: Response time in milliseconds (null if disconnected)
+          example: 5
+        details:
+          type: string
+          description: Version or additional info
+          example: "PostgreSQL 14.5"
+        error:
+          type: string
+          description: Error message if disconnected
+        warning:
+          type: string
+          description: Warning message if degraded
+
+    SocketIOHealth:
+      type: object
+      required:
+        - status
+        - connectedClients
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        connectedClients:
+          type: integer
+          description: Number of active WebSocket connections
+          example: 42
+        rooms:
+          type: integer
+          description: Number of active rooms
+          example: 8
