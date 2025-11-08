@@ -339,3 +339,16 @@ shared/
 | **Input validation library (joi, validator, or similar)** | Security requirement (FR-007, FR-008). All inputs must be validated and sanitized. Complex validation rules for emails, URLs, lengths, formats. | Manual validation spreads logic across codebase, misses edge cases, and is hard to maintain. Schema-based validation (joi) provides declarative rules and consistent error messages. |
 
 **Justification Summary**: All complexity additions are directly required by production-readiness functional requirements (FR-001 through FR-041) and success criteria (SC-001 through SC-012). Each addresses specific production needs (reliability, security, observability, scalability) that cannot be met with simpler alternatives. The constitution's Principle II explicitly permits production infrastructure when justified against specific requirements, which is satisfied here.
+
+## Deferred Production Features
+
+The following functional requirements are deferred to future iterations based on YAGNI principles (Constitution Principle II) and MVP prioritization:
+
+**FR-034: Read Replica Support**
+- **Reason for Deferral**: Read replicas add operational complexity (replication lag monitoring, read-write splitting, failover logic) without immediate benefit for initial production deployment with moderate load.
+- **Current Mitigation**: Connection pooling (FR-033, implemented in T007) provides sufficient database performance optimization for initial scale.
+- **Future Implementation**: When monitoring (US3) indicates read query load approaching database capacity limits, read replicas can be added incrementally by:
+  1. Configuring PostgreSQL streaming replication or managed service read replicas (AWS RDS)
+  2. Updating `backend/src/config/database.js` to support separate read/write connection pools
+  3. Modifying repository GET methods to use read pool with automatic failover to primary
+- **Success Metrics Triggering Implementation**: Database CPU >70% sustained, read query P95 latency >100ms, or connection pool exhaustion due to read queries.
