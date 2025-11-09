@@ -3,6 +3,7 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const pinoHttp = require('pino-http');
+const cron = require('node-cron');
 const config = require('./config/index.js');
 const logger = require('./config/logger.js');
 const { initializePool, closePool, getPool } = require('./config/database.js');
@@ -20,6 +21,9 @@ const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
 const initializeSocketHandler = require('./sockets/socketHandler.js');
 const { configureRedisAdapter } = require('./sockets/adapter.js');
 const errorHandler = require('./api/middleware/errorHandler.js');
+const { executePollCleanup } = require('./jobs/pollCleanup.js');
+const { executeAuditLogCleanup } = require('./jobs/auditLogCleanup.js');
+const { executeParticipantCleanup } = require('./jobs/participantCleanup.js');
 
 const app = express();
 const httpServer = createServer(app);
@@ -100,6 +104,57 @@ async function initializeInfrastructure() {
     // Restore active polls from database on startup (zero data loss)
     const activePolls = await pollService.restoreActivePolls();
     logger.info({ count: activePolls.length }, 'Active polls restored from database');
+
+    // Initialize scheduled cleanup jobs (T137-T142)
+    if (process.env.CLEANUP_ENABLED !== 'false') {
+      const retentionDays = parseInt(process.env.POLL_RETENTION_DAYS || '30', 10);
+      const auditRetentionDays = parseInt(process.env.AUDIT_RETENTION_DAYS || '90', 10);
+      const participantTimeoutMinutes = parseInt(
+        process.env.PARTICIPANT_TIMEOUT_MINUTES || '30',
+        10,
+      );
+
+      // Poll cleanup: Daily at 2am
+      cron.schedule('0 2 * * *', async () => {
+        logger.info('Running scheduled poll cleanup job');
+        try {
+          await executePollCleanup();
+        } catch (error) {
+          logger.error({ error: error.message }, 'Scheduled poll cleanup failed');
+        }
+      });
+
+      // Audit log cleanup: Weekly on Sunday at 3am
+      cron.schedule('0 3 * * 0', async () => {
+        logger.info('Running scheduled audit log cleanup job');
+        try {
+          await executeAuditLogCleanup(auditRetentionDays);
+        } catch (error) {
+          logger.error({ error: error.message }, 'Scheduled audit log cleanup failed');
+        }
+      });
+
+      // Participant cleanup: Hourly
+      cron.schedule('0 * * * *', async () => {
+        logger.debug('Running scheduled participant cleanup job');
+        try {
+          await executeParticipantCleanup(participantTimeoutMinutes);
+        } catch (error) {
+          logger.error({ error: error.message }, 'Scheduled participant cleanup failed');
+        }
+      });
+
+      logger.info(
+        {
+          pollRetentionDays: retentionDays,
+          auditRetentionDays,
+          participantTimeoutMinutes,
+        },
+        'Scheduled cleanup jobs initialized',
+      );
+    } else {
+      logger.info('Cleanup jobs disabled via CLEANUP_ENABLED=false');
+    }
 
     // Initialize routes and socket handlers with pollService
     app.use('/api/auth', authRoutes); // Authentication routes (T054)
