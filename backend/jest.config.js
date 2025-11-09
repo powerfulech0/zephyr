@@ -8,6 +8,10 @@ module.exports = {
   testMatch: [
     '**/tests/**/*.test.js',
   ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/mvp-backup/', // Deprecated MVP tests using old PollManager
+  ],
   coverageThreshold: {
     global: {
       branches: 50,
