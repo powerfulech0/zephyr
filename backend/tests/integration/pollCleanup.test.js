@@ -6,6 +6,7 @@
 const { getPool } = require('../../src/config/database');
 const { executePollCleanup } = require('../../src/jobs/pollCleanup');
 const { initializePool, closePool } = require('../../src/config/database');
+const { itRequiresInfrastructure } = require('../helpers/infrastructure');
 
 describe('Poll Cleanup Job Integration Test', () => {
   let pool;
@@ -24,7 +25,7 @@ describe('Poll Cleanup Job Integration Test', () => {
     await pool.query('DELETE FROM polls WHERE question LIKE $1', ['%TEST_CLEANUP%']);
   });
 
-  it('should soft-delete expired polls', async () => {
+  itRequiresInfrastructure('should soft-delete expired polls', async () => {
     // Arrange: Create an expired poll
     const expiredPoll = await pool.query(
       `INSERT INTO polls (room_code, question, options, state, expires_at, is_active)
@@ -55,7 +56,7 @@ describe('Poll Cleanup Job Integration Test', () => {
     expect(deletedPollRoomCodes).toContain('TEST01');
   });
 
-  it('should not delete active polls that have not expired', async () => {
+  itRequiresInfrastructure('should not delete active polls that have not expired', async () => {
     // Arrange: Create a non-expired poll
     const activePoll = await pool.query(
       `INSERT INTO polls (room_code, question, options, state, expires_at, is_active)
@@ -76,7 +77,7 @@ describe('Poll Cleanup Job Integration Test', () => {
     expect(afterCleanup.rows[0].is_active).toBe(true);
   });
 
-  it('should not delete already inactive polls', async () => {
+  itRequiresInfrastructure('should not delete already inactive polls', async () => {
     // Arrange: Create an expired but already inactive poll
     const inactivePoll = await pool.query(
       `INSERT INTO polls (room_code, question, options, state, expires_at, is_active)
@@ -106,7 +107,7 @@ describe('Poll Cleanup Job Integration Test', () => {
     expect(processedRoomCodes).not.toContain('TEST03');
   });
 
-  it('should handle cleanup when no expired polls exist', async () => {
+  itRequiresInfrastructure('should handle cleanup when no expired polls exist', async () => {
     // Arrange: No expired polls (cleanup all test data first)
     await pool.query('DELETE FROM polls WHERE question LIKE $1', ['%TEST_CLEANUP%']);
 
