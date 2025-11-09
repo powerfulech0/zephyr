@@ -1,0 +1,343 @@
+const request = require('supertest');
+const { io: ioClient } = require('socket.io-client');
+const { Pool } = require('pg');
+const { app, httpServer, initializeInfrastructure } = require('../../src/server.js');
+const { closePool } = require('../../src/config/database');
+const { closeRedis } = require('../../src/config/cache');
+const {
+  CHANGE_POLL_STATE,
+  POLL_STATE_CHANGED,
+  JOIN_ROOM,
+  PARTICIPANT_JOINED,
+  PARTICIPANT_LEFT,
+} = require('../../../shared/eventTypes.js');
+
+/**
+ * WebSocket Contract Tests - Database-backed implementation
+ * Note: Host authentication tests deferred to User Story 2
+ */
+describe('WebSocket Contract Tests', () => {
+  let dbPool;
+  let serverPort;
+  let serverUrl;
+  let clientSocket;
+
+  beforeAll(async () => {
+    // Initialize infrastructure
+    await initializeInfrastructure();
+
+    // Initialize database connection for cleanup
+    dbPool = new Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME || 'zephyr_dev',
+      user: process.env.DB_USER || 'zephyr',
+      password: process.env.DB_PASSWORD || 'zephyr_dev_password',
+    });
+
+    // Start server
+    await new Promise((resolve) => {
+      httpServer.listen(0, () => {
+        serverPort = httpServer.address().port;
+        serverUrl = `http://localhost:${serverPort}`;
+        resolve();
+      });
+    });
+  });
+
+  afterAll(async () => {
+    await dbPool.end();
+    await closePool();
+    await closeRedis();
+
+    await new Promise((resolve) => {
+      httpServer.close(resolve);
+    });
+  });
+
+  beforeEach(async () => {
+    // Clean database before each test
+    await dbPool.query('TRUNCATE TABLE votes, participants, polls RESTART IDENTITY CASCADE');
+  });
+
+  afterEach(() => {
+    if (clientSocket?.connected) {
+      clientSocket.disconnect();
+    }
+  });
+
+  describe('change-poll-state event', () => {
+    let poll;
+
+    beforeEach(async () => {
+      // Create poll via HTTP API
+      const response = await request(app)
+        .post('/api/polls')
+        .send({
+          question: 'Test question for state change?',
+          options: ['Option A', 'Option B'],
+        });
+      poll = response.body;
+
+      // Connect socket
+      clientSocket = ioClient(serverUrl, {
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      await new Promise(resolve => {
+        clientSocket.on('connect', resolve);
+      });
+    });
+
+    it('should allow changing poll state from waiting to open', (done) => {
+      clientSocket.emit(
+        CHANGE_POLL_STATE,
+        { roomCode: poll.roomCode, newState: 'open' },
+        (response) => {
+          expect(response.success).toBe(true);
+          expect(response.poll.state).toBe('open');
+          expect(response.previousState).toBe('waiting');
+          done();
+        }
+      );
+    });
+
+    it('should allow changing poll state from open to closed', async () => {
+      // First change to open
+      await new Promise((resolve) => {
+        clientSocket.emit(
+          CHANGE_POLL_STATE,
+          { roomCode: poll.roomCode, newState: 'open' },
+          resolve
+        );
+      });
+
+      // Then change to closed
+      const response = await new Promise((resolve) => {
+        clientSocket.emit(
+          CHANGE_POLL_STATE,
+          { roomCode: poll.roomCode, newState: 'closed' },
+          resolve
+        );
+      });
+
+      expect(response.success).toBe(true);
+      expect(response.poll.state).toBe('closed');
+      expect(response.previousState).toBe('open');
+    });
+
+    it('should reject state change for non-existent room code', (done) => {
+      clientSocket.emit(
+        CHANGE_POLL_STATE,
+        { roomCode: 'FAKE99', newState: 'open' },
+        (response) => {
+          expect(response.success).toBe(false);
+          expect(response.error).toContain('Poll not found');
+          done();
+        }
+      );
+    });
+
+    it('should validate required fields (roomCode and newState)', (done) => {
+      clientSocket.emit(
+        CHANGE_POLL_STATE,
+        { roomCode: poll.roomCode },
+        (response) => {
+          expect(response.success).toBe(false);
+          expect(response.error).toContain('Missing required fields');
+          done();
+        }
+      );
+    });
+
+    it('should broadcast poll-state-changed event to participants in room', (done) => {
+      const participantSocket = ioClient(serverUrl, {
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      participantSocket.on('connect', () => {
+        // Participant joins room
+        participantSocket.emit(JOIN_ROOM, {
+          roomCode: poll.roomCode,
+          nickname: 'Alice',
+        }, () => {
+          // Listen for state change broadcast
+          participantSocket.on(POLL_STATE_CHANGED, (data) => {
+            expect(data.newState).toBe('open');
+            expect(data.previousState).toBe('waiting');
+            participantSocket.disconnect();
+            done();
+          });
+
+          // Host changes state
+          clientSocket.emit(CHANGE_POLL_STATE, {
+            roomCode: poll.roomCode,
+            newState: 'open',
+          });
+        });
+      });
+    });
+  });
+
+  describe('join-room event', () => {
+    let poll;
+
+    beforeEach(async () => {
+      // Create poll via HTTP API
+      const response = await request(app)
+        .post('/api/polls')
+        .send({
+          question: 'Test question for join?',
+          options: ['Option A', 'Option B'],
+        });
+      poll = response.body;
+
+      // Connect socket
+      clientSocket = ioClient(serverUrl, {
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      await new Promise(resolve => {
+        clientSocket.on('connect', resolve);
+      });
+    });
+
+    it('should allow participant to join with valid room code and nickname', (done) => {
+      clientSocket.emit(
+        JOIN_ROOM,
+        { roomCode: poll.roomCode, nickname: 'Alice' },
+        (response) => {
+          expect(response.success).toBe(true);
+          expect(response.poll.roomCode).toBe(poll.roomCode);
+          expect(response.poll.question).toBe(poll.question);
+          expect(response.participantCount).toBe(1);
+          done();
+        }
+      );
+    });
+
+    it('should reject join when room code is invalid', (done) => {
+      clientSocket.emit(
+        JOIN_ROOM,
+        { roomCode: 'FAKE99', nickname: 'Alice' },
+        (response) => {
+          expect(response.success).toBe(false);
+          expect(response.error).toBeDefined();
+          done();
+        }
+      );
+    });
+
+    it('should reject join when nickname is already taken', (done) => {
+      const participant1 = ioClient(serverUrl, {
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      participant1.on('connect', () => {
+        participant1.emit(
+          JOIN_ROOM,
+          { roomCode: poll.roomCode, nickname: 'Alice' },
+          (response1) => {
+            expect(response1.success).toBe(true);
+
+            // Second participant tries same nickname
+            clientSocket.emit(
+              JOIN_ROOM,
+              { roomCode: poll.roomCode, nickname: 'Alice' },
+              (response2) => {
+                expect(response2.success).toBe(false);
+                expect(response2.error).toContain('already taken');
+                participant1.disconnect();
+                done();
+              }
+            );
+          }
+        );
+      });
+    });
+
+    it('should broadcast participant-joined event to other clients in room', (done) => {
+      const participant1 = ioClient(serverUrl, {
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      participant1.on('connect', () => {
+        participant1.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' }, () => {
+          // Listen for broadcast when second participant joins
+          participant1.on(PARTICIPANT_JOINED, (data) => {
+            expect(data.nickname).toBe('Bob');
+            expect(data.count).toBe(2);
+            expect(data.timestamp).toBeDefined();
+            participant1.disconnect();
+            done();
+          });
+
+          // Second participant joins
+          clientSocket.emit(JOIN_ROOM, {
+            roomCode: poll.roomCode,
+            nickname: 'Bob',
+          });
+        });
+      });
+    });
+
+    it('should validate required fields (roomCode and nickname)', (done) => {
+      clientSocket.emit(JOIN_ROOM, { roomCode: poll.roomCode }, (response) => {
+        expect(response.success).toBe(false);
+        expect(response.error).toContain('required');
+        done();
+      });
+    });
+  });
+
+  describe('participant disconnect handling', () => {
+    let poll;
+
+    beforeEach(async () => {
+      // Create poll via HTTP API
+      const response = await request(app)
+        .post('/api/polls')
+        .send({
+          question: 'Test question for disconnect?',
+          options: ['Option A', 'Option B'],
+        });
+      poll = response.body;
+    });
+
+    it('should broadcast participant-left when participant disconnects', (done) => {
+      const participant1 = ioClient(serverUrl, {
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      const participant2 = ioClient(serverUrl, {
+        transports: ['websocket'],
+        forceNew: true,
+      });
+
+      participant1.on('connect', () => {
+        participant1.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Alice' }, () => {
+          participant2.on('connect', () => {
+            participant2.emit(JOIN_ROOM, { roomCode: poll.roomCode, nickname: 'Bob' }, () => {
+              // Listen for participant-left event
+              participant2.on(PARTICIPANT_LEFT, (data) => {
+                expect(data.nickname).toBe('Alice');
+                expect(data.count).toBe(1);
+                participant2.disconnect();
+                done();
+              });
+
+              // Disconnect participant1
+              participant1.disconnect();
+            });
+          });
+        });
+      });
+    });
+  });
+});
