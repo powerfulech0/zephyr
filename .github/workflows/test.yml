@@ -55,7 +55,7 @@ jobs:
 
       - name: Run unit tests
         working-directory: ./backend
-        run: npm test -- tests/unit --coverage
+        run: npm test -- tests/unit --coverage --detectOpenHandles
         env:
           NODE_ENV: test
 
@@ -124,7 +124,7 @@ jobs:
 
       - name: Run integration tests
         working-directory: ./backend
-        run: npm test -- tests/integration --coverage
+        run: npm test -- tests/integration --coverage --detectOpenHandles
         env:
           NODE_ENV: test
           DB_HOST: localhost
@@ -200,7 +200,7 @@ jobs:
 
       - name: Run contract tests
         working-directory: ./backend
-        run: npm test -- tests/contract --coverage
+        run: npm test -- tests/contract --coverage --detectOpenHandles
         env:
           NODE_ENV: test
           DB_HOST: localhost

@@ -14,7 +14,7 @@
     "test:integration": "jest tests/integration/ --coverage",
     "test:performance": "jest tests/performance/ --coverage",
     "test:watch": "jest --watch",
-    "test:ci": "jest --coverage --ci --maxWorkers=2",
+    "test:ci": "jest --coverage --ci --maxWorkers=2 --detectOpenHandles",
     "lint": "eslint src/ tests/",
     "format": "prettier --write 'src/**/*.js' 'tests/**/*.js'",
     "prepare": "husky",
