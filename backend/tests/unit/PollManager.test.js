@@ -45,7 +45,7 @@ describe('PollManager', () => {
 
     it('should use only uppercase letters and digits 2-9 in room code', () => {
       const poll = pollManager.createPoll('Test?', ['A', 'B'], 'socket-1');
-      const roomCode = poll.roomCode;
+      const {roomCode} = poll;
 
       // Custom alphabet: 23456789ABCDEFGHJKLMNPQRSTUVWXYZ (excludes 0, O, I, 1)
       const validChars = /^[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{6}$/;

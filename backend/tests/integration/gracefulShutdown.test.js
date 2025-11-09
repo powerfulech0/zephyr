@@ -35,8 +35,7 @@ describe('Graceful Shutdown Integration Test', () => {
   /**
    * Helper: Start server process
    */
-  const startServer = () => {
-    return new Promise((resolve, reject) => {
+  const startServer = () => new Promise((resolve, reject) => {
       const env = {
         ...process.env,
         PORT: serverPort.toString(),
@@ -78,13 +77,11 @@ describe('Graceful Shutdown Integration Test', () => {
         reject(new Error('Server failed to start within 10 seconds'));
       }, 10000);
     });
-  };
 
   /**
    * Helper: Make HTTP request
    */
-  const makeRequest = (path) => {
-    return new Promise((resolve, reject) => {
+  const makeRequest = (path) => new Promise((resolve, reject) => {
       const req = http.get(`http://localhost:${serverPort}${path}`, (res) => {
         let data = '';
         res.on('data', (chunk) => {
@@ -104,7 +101,6 @@ describe('Graceful Shutdown Integration Test', () => {
         reject(new Error('Request timeout'));
       });
     });
-  };
 
   describe('SIGTERM Handling', () => {
     it('should gracefully shutdown on SIGTERM signal', async () => {

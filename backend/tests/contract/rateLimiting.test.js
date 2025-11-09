@@ -127,7 +127,7 @@ describe('Contract: Rate Limiting', () => {
 
       if (pollResponse.status === 201) responses++;
 
-      const roomCode = pollResponse.body.roomCode;
+      const {roomCode} = pollResponse.body;
 
       // Get the poll (different endpoint)
       const getResponse = await request(app)

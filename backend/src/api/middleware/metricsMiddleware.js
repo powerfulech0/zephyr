@@ -16,8 +16,8 @@ function metricsMiddleware(req, res, next) {
   res.on('finish', () => {
     const duration = (Date.now() - start) / 1000; // Convert to seconds
     const route = req.route?.path || req.path || 'unknown';
-    const method = req.method;
-    const statusCode = res.statusCode;
+    const {method} = req;
+    const {statusCode} = res;
 
     // Record metrics
     httpRequestDuration.observe(

@@ -15,7 +15,7 @@ describe('Participant Flow Integration Tests', () => {
 
   beforeAll(done => {
     httpServer.listen(0, () => {
-      const port = httpServer.address().port;
+      const {port} = httpServer.address();
       serverUrl = `http://localhost:${port}`;
       done();
     });

@@ -280,7 +280,7 @@ describe('Integration: Security Headers', () => {
         .expect(200);
 
       // Should not reveal server software
-      expect(response.headers['server']).toBeUndefined();
+      expect(response.headers.server).toBeUndefined();
       expect(response.headers['x-powered-by']).toBeUndefined();
     });
 
@@ -289,7 +289,7 @@ describe('Integration: Security Headers', () => {
         .get('/api/health');
 
       // Check for key defensive headers
-      const headers = response.headers;
+      const {headers} = response;
 
       // XSS protection
       expect(headers['content-security-policy']).toBeDefined();

@@ -1,5 +1,5 @@
-const logger = require('../../config/logger.js');
 const jwt = require('jsonwebtoken');
+const logger = require('../../config/logger.js');
 const { CHANGE_POLL_STATE } = require('../../../../shared/eventTypes.js');
 const { broadcastStateChange } = require('../emitters/broadcastStateChange.js');
 const { websocketMessagesTotal } = require('../../services/metricsService.js');

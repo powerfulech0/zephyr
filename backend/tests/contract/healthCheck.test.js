@@ -88,7 +88,7 @@ describe('Contract: Health Check - GET /api/health', () => {
       const response = await request(app).get('/api/health');
 
       expect(response.body.dependencies).toHaveProperty('redis');
-      const redis = response.body.dependencies.redis;
+      const {redis} = response.body.dependencies;
 
       expect(redis).toHaveProperty('status');
       expect(['connected', 'disconnected']).toContain(redis.status);
@@ -97,7 +97,7 @@ describe('Contract: Health Check - GET /api/health', () => {
     it('should include Redis response time when connected', async () => {
       const response = await request(app).get('/api/health');
 
-      const redis = response.body.dependencies.redis;
+      const {redis} = response.body.dependencies;
 
       if (redis.status === 'connected') {
         expect(typeof redis.responseTime).toBe('number');
@@ -110,7 +110,7 @@ describe('Contract: Health Check - GET /api/health', () => {
     it('should include error message when Redis disconnected', async () => {
       const response = await request(app).get('/api/health');
 
-      const redis = response.body.dependencies.redis;
+      const {redis} = response.body.dependencies;
 
       if (redis.status === 'disconnected') {
         expect(redis.responseTime).toBeNull();
@@ -125,7 +125,7 @@ describe('Contract: Health Check - GET /api/health', () => {
       const response = await request(app).get('/api/health');
 
       expect(response.body.system).toHaveProperty('memory');
-      const memory = response.body.system.memory;
+      const {memory} = response.body.system;
 
       expect(typeof memory.used).toBe('number');
       expect(typeof memory.total).toBe('number');
@@ -141,7 +141,7 @@ describe('Contract: Health Check - GET /api/health', () => {
       const response = await request(app).get('/api/health');
 
       expect(response.body.system).toHaveProperty('cpu');
-      const cpu = response.body.system.cpu;
+      const {cpu} = response.body.system;
 
       expect(Array.isArray(cpu.loadAverage)).toBe(true);
       expect(cpu.loadAverage).toHaveLength(3); // 1, 5, 15 minute averages
@@ -176,7 +176,7 @@ describe('Contract: Health Check - GET /api/health', () => {
     it('should set status to unhealthy when Redis is disconnected', async () => {
       const response = await request(app).get('/api/health');
 
-      const redis = response.body.dependencies.redis;
+      const {redis} = response.body.dependencies;
 
       if (redis.status === 'disconnected') {
         expect(response.status).toBe(503);

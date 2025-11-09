@@ -25,7 +25,7 @@ describe('Performance: 20 Concurrent Participants (T097)', () => {
       done();
     } else {
       httpServer.listen(0, () => {
-        const port = httpServer.address().port;
+        const {port} = httpServer.address();
         serverUrl = `http://localhost:${port}`;
         done();
       });

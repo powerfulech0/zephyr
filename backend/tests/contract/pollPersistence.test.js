@@ -179,7 +179,7 @@ describe('Contract: Poll Persistence', () => {
         .send(pollData)
         .expect(201);
 
-      const roomCode = createResponse.body.roomCode;
+      const {roomCode} = createResponse.body;
 
       // Act - Retrieve poll
       const getResponse = await request(app)
@@ -216,7 +216,7 @@ describe('Contract: Poll Persistence', () => {
         .send(pollData)
         .expect(201);
 
-      const roomCode = createResponse.body.roomCode;
+      const {roomCode} = createResponse.body;
 
       // Soft delete the poll directly in database
       await dbPool.query(
