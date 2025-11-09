@@ -3,6 +3,9 @@
  * Prevents hanging tests when PostgreSQL or Redis aren't running
  */
 
+/* eslint-disable jest/valid-title */
+/* eslint-disable jest/no-export */
+
 const { isPostgresAvailable, isRedisAvailable } = require('./infrastructure');
 
 let infrastructureChecked = false;

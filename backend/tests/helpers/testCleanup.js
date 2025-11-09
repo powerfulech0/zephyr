@@ -36,27 +36,27 @@ function trackTimeout(timeoutId) {
  */
 async function cleanupAll() {
   // Close all clients
-  const clientPromises = Array.from(activeClients).map(client => {
-    return new Promise((resolve) => {
+  const clientPromises = Array.from(activeClients).map(client =>
+    new Promise((resolve) => {
       if (client && client.connected) {
         client.close();
       }
       resolve();
-    });
-  });
+    })
+  );
   await Promise.all(clientPromises);
   activeClients.clear();
 
   // Close all servers
-  const serverPromises = Array.from(activeServers).map(server => {
-    return new Promise((resolve) => {
+  const serverPromises = Array.from(activeServers).map(server =>
+    new Promise((resolve) => {
       if (server && server.listening) {
         server.close(() => resolve());
       } else {
         resolve();
       }
-    });
-  });
+    })
+  );
   await Promise.all(serverPromises);
   activeServers.clear();
 

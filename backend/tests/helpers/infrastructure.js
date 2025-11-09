@@ -3,6 +3,9 @@
  * Allows tests to gracefully skip when dependencies are unavailable
  */
 
+/* eslint-disable jest/valid-title */
+/* eslint-disable jest/no-export */
+
 const { Pool } = require('pg');
 const Redis = require('ioredis');
 
