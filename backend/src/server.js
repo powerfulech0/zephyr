@@ -18,6 +18,7 @@ const authRoutes = require('./api/routes/authRoutes.js');
 const configRoutes = require('./api/routes/configRoutes.js');
 const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
 const initializeSocketHandler = require('./sockets/socketHandler.js');
+const { configureRedisAdapter } = require('./sockets/adapter.js');
 const errorHandler = require('./api/middleware/errorHandler.js');
 
 const app = express();
@@ -86,6 +87,10 @@ async function initializeInfrastructure() {
     // Initialize Redis client
     initializeRedis();
     logger.info('Redis client initialized');
+
+    // Configure Socket.io Redis adapter for multi-instance support (T097, T098)
+    configureRedisAdapter(io);
+    logger.info('Socket.io Redis adapter configured');
 
     // Initialize PollService with database pool
     const dbPool = getPool();
