@@ -1,5 +1,6 @@
 const logger = require('../../config/logger.js');
 const { JOIN_ROOM, PARTICIPANT_JOINED, PARTICIPANT_REJOINED } = require('../../../../shared/eventTypes.js');
+const { websocketMessagesTotal } = require('../../services/metricsService.js');
 
 /**
  * Handle participant joining a poll room
@@ -9,6 +10,9 @@ const { JOIN_ROOM, PARTICIPANT_JOINED, PARTICIPANT_REJOINED } = require('../../.
  */
 function handleJoinRoom(socket, pollService, io) {
   socket.on(JOIN_ROOM, async (data, callback) => {
+    // Track inbound WebSocket message (T065)
+    websocketMessagesTotal.labels('inbound', JOIN_ROOM).inc();
+
     try {
       const { roomCode, nickname } = data;
 

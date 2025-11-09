@@ -81,7 +81,7 @@
 - [X] T028 [US1] Update backend/src/sockets/socketHandler.js to handle participant reconnection by updating socket_id in database
 - [X] T029 [US1] Implement poll data restoration on server startup in backend/src/server.js to load active polls from database
 - [X] T030 [US1] Add logging for all database operations in repositories (create, update, reconnect events)
-- [ ] T031 [US1] Run tests T016-T019 and verify they pass
+- [X] T031 [US1] Run tests T016-T019 and verify they pass
 
 **Checkpoint**: User Story 1 complete - polls persist across restarts with zero data loss
 

@@ -1,6 +1,7 @@
 const logger = require('../../config/logger.js');
 const { SUBMIT_VOTE } = require('../../../../shared/eventTypes.js');
 const broadcastVoteUpdate = require('../emitters/broadcastVoteUpdate.js');
+const { websocketMessagesTotal } = require('../../services/metricsService.js');
 
 /**
  * Handle vote submission from participants
@@ -9,6 +10,9 @@ const broadcastVoteUpdate = require('../emitters/broadcastVoteUpdate.js');
  */
 function handleSubmitVote(socket, pollService, io) {
   socket.on(SUBMIT_VOTE, async (data, callback) => {
+    // Track inbound WebSocket message (T065)
+    websocketMessagesTotal.labels('inbound', SUBMIT_VOTE).inc();
+
     try {
       const { roomCode, participantId, optionIndex } = data;
 

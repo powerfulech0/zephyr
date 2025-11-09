@@ -1,6 +1,7 @@
 const logger = require('../../config/logger.js');
 const { CHANGE_POLL_STATE } = require('../../../../shared/eventTypes.js');
 const { broadcastStateChange } = require('../emitters/broadcastStateChange.js');
+const { websocketMessagesTotal } = require('../../services/metricsService.js');
 
 /**
  * Handle change-poll-state Socket.io event
@@ -9,6 +10,9 @@ const { broadcastStateChange } = require('../emitters/broadcastStateChange.js');
  */
 function handleChangePollState(socket, pollService, io) {
   socket.on(CHANGE_POLL_STATE, async (data, callback) => {
+    // Track inbound WebSocket message (T065)
+    websocketMessagesTotal.labels('inbound', CHANGE_POLL_STATE).inc();
+
     try {
       const { roomCode, newState } = data;
 

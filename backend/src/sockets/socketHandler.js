@@ -3,6 +3,11 @@ const { handleChangePollState } = require('./events/changePollState.js');
 const handleJoinRoom = require('./events/joinRoom.js');
 const handleSubmitVote = require('./events/submitVote.js');
 const { PARTICIPANT_LEFT } = require('../../../shared/eventTypes.js');
+const {
+  websocketConnectionsCurrent,
+  websocketConnectionsTotal,
+  websocketMessagesTotal,
+} = require('../services/metricsService.js');
 
 /**
  * Initialize Socket.io connection handler
@@ -11,6 +16,10 @@ const { PARTICIPANT_LEFT } = require('../../../shared/eventTypes.js');
  */
 function initializeSocketHandler(io, pollService) {
   io.on('connection', (socket) => {
+    // Track WebSocket connection metrics (T065)
+    websocketConnectionsCurrent.inc();
+    websocketConnectionsTotal.inc();
+
     logger.info({ socketId: socket.id }, 'Socket connected');
 
     // Register event handlers
@@ -28,6 +37,9 @@ function initializeSocketHandler(io, pollService) {
     // Marks participant as disconnected in database (supports reconnection)
     socket.on('disconnect', async () => {
       try {
+        // Track WebSocket disconnection metrics (T065)
+        websocketConnectionsCurrent.dec();
+
         logger.info({ socketId: socket.id }, 'Socket disconnected');
 
         // Mark participant as disconnected in database (preserves data for reconnection)

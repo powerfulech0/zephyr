@@ -16,6 +16,8 @@ module.exports = {
       statements: 50,
     },
   },
+  // Run tests serially to avoid database deadlocks with TRUNCATE
+  maxWorkers: 1,
   // Handle ESM modules like nanoid
   transformIgnorePatterns: [
     'node_modules/(?!(nanoid)/)',
