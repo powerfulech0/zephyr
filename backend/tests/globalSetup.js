@@ -6,10 +6,20 @@
 const { waitForPostgres, waitForRedis } = require('./helpers/infrastructure');
 
 module.exports = async () => {
-  const isCi = process.env.CI === 'true';
+  const isCi = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 
   if (isCi) {
-    console.log('\n🔄 CI environment detected - waiting for infrastructure...\n');
+    console.log('\n🔄 CI environment detected - waiting for infrastructure...');
+    console.log('Environment:', {
+      CI: process.env.CI,
+      GITHUB_ACTIONS: process.env.GITHUB_ACTIONS,
+      DB_HOST: process.env.DB_HOST || 'localhost',
+      DB_PORT: process.env.DB_PORT || '5432',
+      DB_NAME: process.env.DB_NAME || 'zephyr_test',
+      REDIS_HOST: process.env.REDIS_HOST || 'localhost',
+      REDIS_PORT: process.env.REDIS_PORT || '6379',
+    });
+    console.log('');
 
     const startTime = Date.now();
 
@@ -21,28 +31,35 @@ module.exports = async () => {
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
+    console.log(''); // Empty line for readability
+
     if (!postgresReady) {
-      console.error('\n❌ PostgreSQL not available after 60s - integration/contract tests will fail\n');
-      console.error('Connection details:', {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER,
+      console.error('❌ PostgreSQL not available after 60s - integration/contract tests will fail');
+      console.error('Connection config:', {
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || '5432',
+        database: process.env.DB_NAME || 'zephyr_test',
+        user: process.env.DB_USER || 'zephyr',
       });
     }
 
     if (!redisReady) {
-      console.error('\n❌ Redis not available after 60s - integration/contract tests may fail\n');
-      console.error('Connection details:', {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
+      console.error('❌ Redis not available after 60s - integration/contract tests may fail');
+      console.error('Connection config:', {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || '6379',
       });
     }
 
     if (postgresReady && redisReady) {
-      console.log(`\n✅ All infrastructure services ready (${elapsed}s)\n`);
+      console.log(`✅ All infrastructure services ready (${elapsed}s)`);
     } else {
-      console.warn('\n⚠️  Some services not ready - tests requiring infrastructure will fail\n');
+      console.warn('\n⚠️  Some services not ready - tests requiring infrastructure will fail');
+      // Don't fail the setup - let individual tests fail with clear errors
     }
+
+    console.log(''); // Empty line before tests start
+  } else {
+    console.log('📍 Local environment detected - skipping infrastructure wait\n');
   }
 };

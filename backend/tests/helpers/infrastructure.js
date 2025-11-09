@@ -8,17 +8,20 @@ const Redis = require('ioredis');
 
 /**
  * Check if PostgreSQL is available
+ * @param {boolean} verbose - Log errors for debugging
  * @returns {Promise<boolean>}
  */
-async function isPostgresAvailable() {
-  const pool = new Pool({
+async function isPostgresAvailable(verbose = false) {
+  const config = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
     database: process.env.DB_NAME || 'zephyr_test',
     user: process.env.DB_USER || 'zephyr',
     password: process.env.DB_PASSWORD || 'zephyr_test_password',
     connectionTimeoutMillis: 2000,
-  });
+  };
+
+  const pool = new Pool(config);
 
   try {
     const client = await pool.connect();
@@ -27,6 +30,10 @@ async function isPostgresAvailable() {
     await pool.end();
     return true;
   } catch (error) {
+    if (verbose) {
+      console.error('PostgreSQL connection failed:', error.message);
+      console.error('Config:', { ...config, password: '***' });
+    }
     await pool.end().catch(() => {});
     return false;
   }
@@ -34,16 +41,22 @@ async function isPostgresAvailable() {
 
 /**
  * Check if Redis is available
+ * @param {boolean} verbose - Log errors for debugging
  * @returns {Promise<boolean>}
  */
-async function isRedisAvailable() {
-  const redis = new Redis({
+async function isRedisAvailable(verbose = false) {
+  const config = {
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
     connectTimeout: 2000,
     maxRetriesPerRequest: 1,
     lazyConnect: true,
-  });
+  };
+
+  const redis = new Redis(config);
+
+  // Suppress ioredis error events during health check
+  redis.on('error', () => {});
 
   try {
     await redis.connect();
@@ -51,6 +64,10 @@ async function isRedisAvailable() {
     await redis.quit();
     return true;
   } catch (error) {
+    if (verbose) {
+      console.error('Redis connection failed:', error.message);
+      console.error('Config:', config);
+    }
     await redis.quit().catch(() => {});
     return false;
   }
@@ -119,17 +136,27 @@ function itRequiresInfrastructure(testName, testFn, timeout) {
  * @returns {Promise<boolean>}
  */
 async function waitForPostgres(maxAttempts = 30, delayMs = 1000) {
+  console.log(`⏳ Waiting for PostgreSQL (max ${maxAttempts * delayMs / 1000}s)...`);
+
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const available = await isPostgresAvailable();
+    const available = await isPostgresAvailable(attempt === maxAttempts); // verbose on last attempt
+
     if (available) {
-      console.log(`✅ PostgreSQL ready after ${attempt} attempt(s)`);
+      console.log(`✅ PostgreSQL ready after ${attempt} attempt(s) (${attempt * delayMs / 1000}s)`);
       return true;
     }
+
+    // Log progress every 10 attempts
+    if (attempt % 10 === 0 && attempt < maxAttempts) {
+      console.log(`   Still waiting... (attempt ${attempt}/${maxAttempts})`);
+    }
+
     if (attempt < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, delayMs));
     }
   }
-  console.error(`❌ PostgreSQL not ready after ${maxAttempts} attempts`);
+
+  console.error(`❌ PostgreSQL not ready after ${maxAttempts} attempts (${maxAttempts * delayMs / 1000}s)`);
   return false;
 }
 
@@ -140,17 +167,27 @@ async function waitForPostgres(maxAttempts = 30, delayMs = 1000) {
  * @returns {Promise<boolean>}
  */
 async function waitForRedis(maxAttempts = 30, delayMs = 1000) {
+  console.log(`⏳ Waiting for Redis (max ${maxAttempts * delayMs / 1000}s)...`);
+
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const available = await isRedisAvailable();
+    const available = await isRedisAvailable(attempt === maxAttempts); // verbose on last attempt
+
     if (available) {
-      console.log(`✅ Redis ready after ${attempt} attempt(s)`);
+      console.log(`✅ Redis ready after ${attempt} attempt(s) (${attempt * delayMs / 1000}s)`);
       return true;
     }
+
+    // Log progress every 10 attempts
+    if (attempt % 10 === 0 && attempt < maxAttempts) {
+      console.log(`   Still waiting... (attempt ${attempt}/${maxAttempts})`);
+    }
+
     if (attempt < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, delayMs));
     }
   }
-  console.error(`❌ Redis not ready after ${maxAttempts} attempts`);
+
+  console.error(`❌ Redis not ready after ${maxAttempts} attempts (${maxAttempts * delayMs / 1000}s)`);
   return false;
 }
 
