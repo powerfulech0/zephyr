@@ -8,10 +8,10 @@ const validatePollCreation = (req, res, next) => {
     });
   }
 
-  if (question.trim().length < 1 || question.length > 500) {
+  if (question.trim().length < 5 || question.length > 200) {
     return res.status(400).json({
       success: false,
-      error: 'Question must be between 1 and 500 characters',
+      error: 'Question must be between 5 and 200 characters',
     });
   }
 

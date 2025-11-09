@@ -1,7 +1,7 @@
 const PollRepository = require('../models/repositories/PollRepository');
 const ParticipantRepository = require('../models/repositories/ParticipantRepository');
 const VoteRepository = require('../models/repositories/VoteRepository');
-const generateRoomCode = require('./roomCodeGenerator');
+const { generateRoomCode } = require('./roomCodeGenerator');
 const logger = require('../config/logger');
 
 /**

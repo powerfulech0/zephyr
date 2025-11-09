@@ -1,29 +1,38 @@
 const request = require('supertest');
 const { Pool } = require('pg');
-const app = require('../../src/server');
+const express = require('express');
+const { initializePollRoutes } = require('../../src/api/routes/pollRoutes');
+const PollService = require('../../src/services/pollService');
 
 describe('Contract: Poll Persistence', () => {
   let dbPool;
-  let server;
+  let app;
+  let pollService;
 
   beforeAll(async () => {
-    // Initialize database connection for test verification
+    // Initialize database connection for test verification (use dev database for now)
     dbPool = new Pool({
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 5432,
-      database: process.env.DB_NAME || 'zephyr_test',
+      database: process.env.DB_NAME || 'zephyr_dev',
       user: process.env.DB_USER || 'zephyr',
-      password: process.env.DB_PASSWORD || 'zephyr_test_password',
+      password: process.env.DB_PASSWORD || 'zephyr_dev_password',
     });
 
-    // Start the server
-    server = app.listen(0); // Use random port for testing
+    // Create Express app for testing
+    app = express();
+    app.use(express.json());
+
+    // Initialize PollService with test database
+    pollService = new PollService(dbPool);
+
+    // Initialize routes
+    app.use('/api', initializePollRoutes(pollService));
   });
 
   afterAll(async () => {
     // Clean up
     await dbPool.end();
-    await server.close();
   });
 
   beforeEach(async () => {
@@ -40,7 +49,7 @@ describe('Contract: Poll Persistence', () => {
       };
 
       // Act
-      const response = await request(server)
+      const response = await request(app)
         .post('/api/polls')
         .send(pollData)
         .expect('Content-Type', /json/)
@@ -77,7 +86,7 @@ describe('Contract: Poll Persistence', () => {
       };
 
       // Act - Create first poll
-      const response1 = await request(server)
+      const response1 = await request(app)
         .post('/api/polls')
         .send(pollData)
         .expect(201);
@@ -85,7 +94,7 @@ describe('Contract: Poll Persistence', () => {
       const roomCode1 = response1.body.roomCode;
 
       // Act - Create second poll (should get different room code)
-      const response2 = await request(server)
+      const response2 = await request(app)
         .post('/api/polls')
         .send(pollData)
         .expect(201);
@@ -108,7 +117,7 @@ describe('Contract: Poll Persistence', () => {
       };
 
       // Act & Assert
-      const response = await request(server)
+      const response = await request(app)
         .post('/api/polls')
         .send(invalidPoll)
         .expect(400);
@@ -128,7 +137,7 @@ describe('Contract: Poll Persistence', () => {
       };
 
       // Act & Assert
-      await request(server)
+      await request(app)
         .post('/api/polls')
         .send(invalidPoll)
         .expect(400);
@@ -146,7 +155,7 @@ describe('Contract: Poll Persistence', () => {
       };
 
       // Act & Assert
-      await request(server)
+      await request(app)
         .post('/api/polls')
         .send(invalidPoll)
         .expect(400);
@@ -165,7 +174,7 @@ describe('Contract: Poll Persistence', () => {
         options: ['A', 'B', 'C'],
       };
 
-      const createResponse = await request(server)
+      const createResponse = await request(app)
         .post('/api/polls')
         .send(pollData)
         .expect(201);
@@ -173,7 +182,7 @@ describe('Contract: Poll Persistence', () => {
       const roomCode = createResponse.body.roomCode;
 
       // Act - Retrieve poll
-      const getResponse = await request(server)
+      const getResponse = await request(app)
         .get(`/api/polls/${roomCode}`)
         .expect('Content-Type', /json/)
         .expect(200);
@@ -190,7 +199,7 @@ describe('Contract: Poll Persistence', () => {
       const nonExistentRoomCode = 'XXXXXX';
 
       // Act & Assert
-      await request(server)
+      await request(app)
         .get(`/api/polls/${nonExistentRoomCode}`)
         .expect(404);
     });
@@ -202,7 +211,7 @@ describe('Contract: Poll Persistence', () => {
         options: ['Yes', 'No'],
       };
 
-      const createResponse = await request(server)
+      const createResponse = await request(app)
         .post('/api/polls')
         .send(pollData)
         .expect(201);
@@ -216,7 +225,7 @@ describe('Contract: Poll Persistence', () => {
       );
 
       // Act & Assert
-      await request(server)
+      await request(app)
         .get(`/api/polls/${roomCode}`)
         .expect(404);
     });
@@ -231,7 +240,7 @@ describe('Contract: Poll Persistence', () => {
       };
 
       // Act
-      const response = await request(server)
+      const response = await request(app)
         .post('/api/polls')
         .send(pollData)
         .expect(201);

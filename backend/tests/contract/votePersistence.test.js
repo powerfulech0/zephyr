@@ -1,31 +1,46 @@
 const io = require('socket.io-client');
 const { Pool } = require('pg');
-const app = require('../../src/server');
+const { httpServer, initializeInfrastructure } = require('../../src/server');
+const { closePool } = require('../../src/config/database');
+const { closeRedis } = require('../../src/config/cache');
 
 describe('Contract: Vote Persistence', () => {
   let dbPool;
-  let server;
   let serverPort;
   let clientSocket;
 
   beforeAll(async () => {
-    // Initialize database connection for test verification
+    // Initialize infrastructure (database, Redis, routes, socket handlers)
+    await initializeInfrastructure();
+
+    // Initialize database connection for test verification (use dev database)
     dbPool = new Pool({
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 5432,
-      database: process.env.DB_NAME || 'zephyr_test',
+      database: process.env.DB_NAME || 'zephyr_dev',
       user: process.env.DB_USER || 'zephyr',
-      password: process.env.DB_PASSWORD || 'zephyr_test_password',
+      password: process.env.DB_PASSWORD || 'zephyr_dev_password',
     });
 
     // Start the server on a random port
-    server = app.listen(0);
-    serverPort = server.address().port;
+    await new Promise((resolve) => {
+      httpServer.listen(0, () => {
+        serverPort = httpServer.address().port;
+        resolve();
+      });
+    });
   });
 
   afterAll(async () => {
+    // Clean up connections
     await dbPool.end();
-    await server.close();
+    await closePool();
+    await closeRedis();
+
+    // Close server
+    await new Promise((resolve) => {
+      httpServer.close(resolve);
+    });
   });
 
   beforeEach(async () => {

@@ -8,13 +8,13 @@ describe('Integration: Server Restart Recovery', () => {
   let dbPool;
 
   beforeAll(async () => {
-    // Initialize database connection
+    // Initialize database connection (use dev database)
     dbPool = new Pool({
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 5432,
-      database: process.env.DB_NAME || 'zephyr_test',
+      database: process.env.DB_NAME || 'zephyr_dev',
       user: process.env.DB_USER || 'zephyr',
-      password: process.env.DB_PASSWORD || 'zephyr_test_password',
+      password: process.env.DB_PASSWORD || 'zephyr_dev_password',
     });
   });
 
