@@ -1,5 +1,6 @@
 const express = require('express');
 const { validatePollCreation, validateRoomCode } = require('../middleware/validator.js');
+const { pollCreationRateLimiter } = require('../middleware/rateLimiter.js');
 const logger = require('../../config/logger');
 
 const router = express.Router();
@@ -10,8 +11,9 @@ const router = express.Router();
 function initializePollRoutes(pollService) {
   /**
    * POST /api/polls - Create a new poll
+   * Rate limited: 5 requests per hour per IP
    */
-  router.post('/polls', validatePollCreation, async (req, res) => {
+  router.post('/polls', pollCreationRateLimiter, validatePollCreation, async (req, res) => {
     try {
       const { question, options } = req.body;
 

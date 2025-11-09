@@ -8,6 +8,8 @@ const logger = require('./config/logger.js');
 const { initializePool, closePool, getPool } = require('./config/database.js');
 const { initializeRedis, closeRedis } = require('./config/cache.js');
 const correlationIdMiddleware = require('./api/middleware/correlationId.js');
+const securityHeaders = require('./api/middleware/securityHeaders.js');
+const { globalRateLimiter } = require('./api/middleware/rateLimiter.js');
 const PollService = require('./services/pollService.js');
 const healthRoutes = require('./api/routes/healthRoutes.js');
 const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
@@ -29,16 +31,35 @@ const io = new Server(httpServer, {
 // PollService will be initialized after database connection
 let pollService;
 
-// Middleware
-app.use(correlationIdMiddleware); // Add correlation ID to all requests
+// Parse allowed origins from environment variable (comma-separated)
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
+// Middleware - Order matters!
+// 1. Security headers (must be first)
+app.use(securityHeaders);
+
+// 2. Correlation ID tracking
+app.use(correlationIdMiddleware);
+
+// 3. CORS configuration with environment-based origins (T044)
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use(express.json());
+
+// 4. Request size limits (T045) - 100kb max
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
+
+// 5. HTTP request logging
 app.use(pinoHttp({ logger }));
+
+// 6. Global rate limiting (T043) - 100 requests per 15 minutes
+app.use(globalRateLimiter);
 
 /**
  * Initialize infrastructure connections (database, Redis)
