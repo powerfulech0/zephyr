@@ -5,10 +5,10 @@ const cors = require('cors');
 const pinoHttp = require('pino-http');
 const config = require('./config/index.js');
 const logger = require('./config/logger.js');
-const { initializePool, closePool } = require('./config/database.js');
+const { initializePool, closePool, getPool } = require('./config/database.js');
 const { initializeRedis, closeRedis } = require('./config/cache.js');
 const correlationIdMiddleware = require('./api/middleware/correlationId.js');
-const PollManager = require('./models/PollManager.js');
+const PollService = require('./services/pollService.js');
 const healthRoutes = require('./api/routes/healthRoutes.js');
 const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
 const initializeSocketHandler = require('./sockets/socketHandler.js');
@@ -26,8 +26,8 @@ const io = new Server(httpServer, {
   },
 });
 
-// Initialize PollManager (singleton for MVP)
-const pollManager = new PollManager();
+// PollService will be initialized after database connection
+let pollService;
 
 // Middleware
 app.use(correlationIdMiddleware); // Add correlation ID to all requests
@@ -39,16 +39,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(pinoHttp({ logger }));
-
-// Routes
-app.use('/api', healthRoutes);
-app.use('/api', initializePollRoutes(pollManager));
-
-// Socket.io handler
-initializeSocketHandler(io, pollManager);
-
-// Error handler (must be last)
-app.use(errorHandler);
 
 /**
  * Initialize infrastructure connections (database, Redis)
@@ -64,12 +54,29 @@ async function initializeInfrastructure() {
     initializeRedis();
     logger.info('Redis client initialized');
 
+    // Initialize PollService with database pool
+    const dbPool = getPool();
+    pollService = new PollService(dbPool);
+    logger.info('PollService initialized');
+
+    // Restore active polls from database on startup (zero data loss)
+    const activePolls = await pollService.restoreActivePolls();
+    logger.info({ count: activePolls.length }, 'Active polls restored from database');
+
+    // Initialize routes and socket handlers with pollService
+    app.use('/api', healthRoutes);
+    app.use('/api', initializePollRoutes(pollService));
+    initializeSocketHandler(io, pollService);
+
     return true;
   } catch (error) {
     logger.error({ error: error.message }, 'Infrastructure initialization failed');
     throw error;
   }
 }
+
+// Error handler (must be last)
+app.use(errorHandler);
 
 /**
  * Graceful shutdown handler
@@ -132,4 +139,4 @@ if (require.main === module) {
 }
 
 // Export for testing
-module.exports = { app, httpServer, io, pollManager };
+module.exports = { app, httpServer, io, pollService };

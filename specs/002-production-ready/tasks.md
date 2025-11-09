@@ -63,24 +63,24 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T016 [P] [US1] Contract test for persisted poll creation in backend/tests/contract/pollPersistence.test.js
-- [ ] T017 [P] [US1] Contract test for vote persistence in backend/tests/contract/votePersistence.test.js
-- [ ] T018 [P] [US1] Integration test for participant reconnection in backend/tests/integration/participantReconnection.test.js
-- [ ] T019 [P] [US1] Integration test for server restart recovery in backend/tests/integration/serverRestartRecovery.test.js
+- [X] T016 [P] [US1] Contract test for persisted poll creation in backend/tests/contract/pollPersistence.test.js
+- [X] T017 [P] [US1] Contract test for vote persistence in backend/tests/contract/votePersistence.test.js
+- [X] T018 [P] [US1] Integration test for participant reconnection in backend/tests/integration/participantReconnection.test.js
+- [X] T019 [P] [US1] Integration test for server restart recovery in backend/tests/integration/serverRestartRecovery.test.js
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] Create backend/src/models/repositories/PollRepository.js with createPoll, getPollByRoomCode, updatePollState, expireOldPolls methods
-- [ ] T021 [P] [US1] Create backend/src/models/repositories/ParticipantRepository.js with addParticipant, getParticipantsByPoll, updateSocketId, markDisconnected methods
-- [ ] T022 [P] [US1] Create backend/src/models/repositories/VoteRepository.js with submitVote (upsert), getVotesByPoll, getVoteCountsByPoll methods
-- [ ] T023 [US1] Create backend/src/services/pollService.js business logic layer wrapping repository calls with error handling
-- [ ] T024 [US1] Update backend/src/api/routes/pollRoutes.js to use pollService instead of PollManager
-- [ ] T025 [US1] Update backend/src/sockets/events/joinRoom.js to persist participant to database via ParticipantRepository
-- [ ] T026 [US1] Update backend/src/sockets/events/submitVote.js to persist vote to database via VoteRepository
-- [ ] T027 [US1] Update backend/src/sockets/events/changePollState.js to persist state changes to database via PollRepository
-- [ ] T028 [US1] Update backend/src/sockets/socketHandler.js to handle participant reconnection by updating socket_id in database
-- [ ] T029 [US1] Implement poll data restoration on server startup in backend/src/server.js to load active polls from database
-- [ ] T030 [US1] Add logging for all database operations in repositories (create, update, reconnect events)
+- [X] T020 [P] [US1] Create backend/src/models/repositories/PollRepository.js with createPoll, getPollByRoomCode, updatePollState, expireOldPolls methods
+- [X] T021 [P] [US1] Create backend/src/models/repositories/ParticipantRepository.js with addParticipant, getParticipantsByPoll, updateSocketId, markDisconnected methods
+- [X] T022 [P] [US1] Create backend/src/models/repositories/VoteRepository.js with submitVote (upsert), getVotesByPoll, getVoteCountsByPoll methods
+- [X] T023 [US1] Create backend/src/services/pollService.js business logic layer wrapping repository calls with error handling
+- [X] T024 [US1] Update backend/src/api/routes/pollRoutes.js to use pollService instead of PollManager
+- [X] T025 [US1] Update backend/src/sockets/events/joinRoom.js to persist participant to database via ParticipantRepository
+- [X] T026 [US1] Update backend/src/sockets/events/submitVote.js to persist vote to database via VoteRepository
+- [X] T027 [US1] Update backend/src/sockets/events/changePollState.js to persist state changes to database via PollRepository
+- [X] T028 [US1] Update backend/src/sockets/socketHandler.js to handle participant reconnection by updating socket_id in database
+- [X] T029 [US1] Implement poll data restoration on server startup in backend/src/server.js to load active polls from database
+- [X] T030 [US1] Add logging for all database operations in repositories (create, update, reconnect events)
 - [ ] T031 [US1] Run tests T016-T019 and verify they pass
 
 **Checkpoint**: User Story 1 complete - polls persist across restarts with zero data loss

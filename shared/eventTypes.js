@@ -8,6 +8,7 @@ const CHANGE_POLL_STATE = 'change-poll-state';
 
 // Server → Client events (broadcasts)
 const PARTICIPANT_JOINED = 'participant-joined';
+const PARTICIPANT_REJOINED = 'participant-rejoined';
 const PARTICIPANT_LEFT = 'participant-left';
 const VOTE_UPDATE = 'vote-update';
 const POLL_STATE_CHANGED = 'poll-state-changed';
@@ -19,6 +20,7 @@ module.exports = {
   CHANGE_POLL_STATE,
   // Server → Client
   PARTICIPANT_JOINED,
+  PARTICIPANT_REJOINED,
   PARTICIPANT_LEFT,
   VOTE_UPDATE,
   POLL_STATE_CHANGED,

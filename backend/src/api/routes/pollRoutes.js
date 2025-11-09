@@ -1,63 +1,74 @@
 const express = require('express');
 const { validatePollCreation, validateRoomCode } = require('../middleware/validator.js');
+const logger = require('../../config/logger');
 
 const router = express.Router();
 
 /**
- * Initialize poll routes with PollManager instance
+ * Initialize poll routes with PollService instance
  */
-function initializePollRoutes(pollManager) {
+function initializePollRoutes(pollService) {
   /**
    * POST /api/polls - Create a new poll
    */
-  router.post('/polls', validatePollCreation, (req, res) => {
-    const { question, options } = req.body;
+  router.post('/polls', validatePollCreation, async (req, res) => {
+    try {
+      const { question, options } = req.body;
 
-    // Create poll with request socket as host (for HTTP, use a placeholder)
-    // The actual host socket ID will be set when they connect via WebSocket
-    const hostSocketId = `http-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Create poll via service (handles database persistence)
+      const poll = await pollService.createPoll({ question, options });
 
-    const poll = pollManager.createPoll(question, options, hostSocketId);
+      logger.info({ roomCode: poll.roomCode }, 'Poll created via API');
 
-    // Return sanitized poll data (hide internal implementation details)
-    res.status(201).json({
-      success: true,
-      poll: {
+      // Return sanitized poll data
+      res.status(201).json({
         roomCode: poll.roomCode,
         question: poll.question,
         options: poll.options,
         state: poll.state,
-        createdAt: poll.createdAt,
-      },
-    });
+      });
+    } catch (error) {
+      logger.error({ error: error.message }, 'Failed to create poll via API');
+      res.status(500).json({
+        error: 'Failed to create poll',
+      });
+    }
   });
 
   /**
    * GET /api/polls/:roomCode - Get poll by room code
    */
-  router.get('/polls/:roomCode', validateRoomCode, (req, res) => {
-    const { roomCode } = req.params;
+  router.get('/polls/:roomCode', validateRoomCode, async (req, res) => {
+    try {
+      const { roomCode } = req.params;
 
-    const poll = pollManager.getPoll(roomCode);
-    if (!poll) {
-      return res.status(404).json({
-        success: false,
-        error: 'Poll not found',
-      });
-    }
+      // Get poll with details (participants, votes) from database
+      const poll = await pollService.getPollWithDetails(roomCode);
 
-    // Return sanitized poll data (hide internal implementation details)
-    return res.status(200).json({
-      success: true,
-      poll: {
+      if (!poll) {
+        return res.status(404).json({
+          error: 'Poll not found',
+        });
+      }
+
+      logger.debug({ roomCode }, 'Poll retrieved via API');
+
+      // Return sanitized poll data
+      return res.status(200).json({
         roomCode: poll.roomCode,
         question: poll.question,
         options: poll.options,
         state: poll.state,
-        participantCount: poll.participants.size,
-        createdAt: poll.createdAt,
-      },
-    });
+        participantCount: poll.participantCount,
+        votes: poll.votes,
+        percentages: poll.percentages,
+      });
+    } catch (error) {
+      logger.error({ error: error.message, roomCode: req.params.roomCode }, 'Failed to retrieve poll via API');
+      return res.status(500).json({
+        error: 'Failed to retrieve poll',
+      });
+    }
   });
 
   return router;

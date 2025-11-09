@@ -7,66 +7,58 @@ const { PARTICIPANT_LEFT } = require('../../../shared/eventTypes.js');
 /**
  * Initialize Socket.io connection handler
  * @param {SocketIO.Server} io - Socket.io server instance
- * @param {PollManager} pollManager - Poll manager instance
+ * @param {PollService} pollService - Poll service instance
  */
-function initializeSocketHandler(io, pollManager) {
-  io.on('connection', socket => {
+function initializeSocketHandler(io, pollService) {
+  io.on('connection', (socket) => {
     logger.info({ socketId: socket.id }, 'Socket connected');
 
-    // Register event handlers for User Story 1 (Host)
-    handleChangePollState(socket, pollManager, io);
-
-    // Register event handlers for User Story 2 (Participant)
-    handleJoinRoom(socket, pollManager, io);
-    handleSubmitVote(socket, pollManager, io);
+    // Register event handlers
+    handleChangePollState(socket, pollService, io);
+    handleJoinRoom(socket, pollService, io);
+    handleSubmitVote(socket, pollService, io);
 
     // Handle simple room join (for testing and host joining)
-    socket.on('join', roomCode => {
+    socket.on('join', (roomCode) => {
       socket.join(roomCode);
       logger.info({ socketId: socket.id, roomCode }, 'Socket joined room');
-
-      // Update host socket ID when host joins via WebSocket
-      const result = pollManager.updateHostSocketId(roomCode, socket.id);
-      if (result.success) {
-        logger.info({ socketId: socket.id, roomCode }, 'Updated host socket ID');
-      }
     });
 
-    // T081: Handle disconnect with participant cleanup and broadcast
-    socket.on('disconnect', () => {
-      logger.info({ socketId: socket.id }, 'Socket disconnected');
-      // T082: Clean up participant on disconnect
-      const result = pollManager.removeParticipant(socket.id);
-      if (result) {
-        logger.info(
-          {
-            socketId: socket.id,
-            roomCode: result.roomCode,
-            cleared: result.cleared,
-            nickname: result.nickname,
-          },
-          'Participant removed on disconnect'
-        );
+    // Handle participant disconnection
+    // Marks participant as disconnected in database (supports reconnection)
+    socket.on('disconnect', async () => {
+      try {
+        logger.info({ socketId: socket.id }, 'Socket disconnected');
 
-        // T083: Broadcast participant-left event if nickname was tracked
-        if (result.nickname && !result.cleared) {
-          const poll = pollManager.getPoll(result.roomCode);
-          if (poll) {
-            io.to(result.roomCode).emit(PARTICIPANT_LEFT, {
-              nickname: result.nickname,
-              count: poll.participants.size,
-              timestamp: new Date().toISOString(),
-            });
-            logger.info(
-              {
-                roomCode: result.roomCode,
-                nickname: result.nickname,
-                remainingCount: poll.participants.size,
-              },
-              'Broadcast participant-left event'
-            );
-          }
+        // Mark participant as disconnected in database (preserves data for reconnection)
+        const participant = await pollService.handleDisconnect(socket.id);
+
+        if (participant) {
+          // Get updated participant count
+          const participants = await pollService.getParticipants(participant.poll_id, true);
+
+          // Broadcast participant-left event to room
+          io.to(socket.data?.roomCode || '').emit(PARTICIPANT_LEFT, {
+            nickname: participant.nickname,
+            count: participants.length,
+            timestamp: new Date().toISOString(),
+          });
+
+          logger.info(
+            {
+              socketId: socket.id,
+              participantId: participant.id,
+              nickname: participant.nickname,
+              remainingCount: participants.length,
+            },
+            'Participant marked as disconnected and broadcast sent'
+          );
         }
+      } catch (error) {
+        logger.error(
+          { socketId: socket.id, error: error.message },
+          'Error handling disconnect'
+        );
       }
     });
   });
