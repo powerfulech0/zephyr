@@ -45,7 +45,7 @@ function initializePool() {
 
       // Track query metrics
       dbQueryDuration.labels(operation, table).observe(duration);
-      dbQueriesTotal.labels(operation, table).inc();
+      dbQueriesTotal.labels(operation, table, 'success').inc();
 
       logger.debug(
         {
@@ -61,6 +61,7 @@ function initializePool() {
       return result;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
+      dbQueriesTotal.labels(operation, table, 'error').inc();
       errorsTotal.labels('database_error', 'database').inc();
 
       logger.error(
