@@ -217,7 +217,8 @@ async function getMetrics() {
     return await register.metrics();
   } catch (error) {
     logger.error({ error: error.message }, 'Failed to generate metrics');
-    throw error;
+    // Graceful degradation: return empty metrics instead of failing
+    return '# Failed to generate metrics\n';
   }
 }
 
@@ -229,10 +230,29 @@ function getContentType() {
   return register.contentType;
 }
 
+/**
+ * Safely record a metric with graceful degradation
+ * Wraps metric recording in try-catch to prevent failures from breaking application
+ * @param {Function} metricOperation - Function that records the metric
+ * @param {string} metricName - Name of the metric for logging
+ */
+function safeRecordMetric(metricOperation, metricName) {
+  try {
+    metricOperation();
+  } catch (error) {
+    // Graceful degradation: log error but don't throw
+    logger.warn(
+      { error: error.message, metricName },
+      'Failed to record metric (non-critical, continuing operation)'
+    );
+  }
+}
+
 module.exports = {
   register,
   getMetrics,
   getContentType,
+  safeRecordMetric,
 
   // HTTP metrics
   httpRequestDuration,

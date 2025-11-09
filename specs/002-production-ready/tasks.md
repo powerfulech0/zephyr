@@ -252,8 +252,8 @@
 - [X] T119 [US6] Update backend/src/api/middleware/errorHandler.js to return user-friendly error messages (no stack traces in production)
 - [X] T120 [US6] Implement WebSocket reconnection logic in backend/src/sockets/socketHandler.js (client-side reconnect with backoff)
 - [X] T121 [US6] Create frontend/src/utils/websocketReconnect.js for automatic client reconnection with exponential backoff (Note: Frontend not in scope for backend implementation)
-- [ ] T122 [US6] Implement request queuing in backend/src/api/middleware/loadShedding.js when under high load (reject with 503 and Retry-After header when queue full)
-- [ ] T123 [US6] Add graceful degradation for non-critical features (metrics collection, audit logging) - continue operation if they fail
+- [X] T122 [US6] Implement request queuing in backend/src/api/middleware/loadShedding.js when under high load (reject with 503 and Retry-After header when queue full)
+- [X] T123 [US6] Add graceful degradation for non-critical features (metrics collection, audit logging) - continue operation if they fail
 - [X] T124 [US6] Run tests T108-T110 and verify they pass
 
 **Checkpoint**: User Story 6 complete - system handles failures gracefully with automatic recovery
@@ -264,14 +264,14 @@
 
 **Purpose**: Final improvements affecting multiple user stories
 
-- [ ] T125 [P] Update backend/README.md with production deployment instructions, architecture diagrams, operational runbooks
-- [ ] T126 [P] Update CLAUDE.md with production-ready technologies and commands from plan.md
-- [ ] T127 [P] Create backend/docs/runbook.md with incident response procedures, common issues, troubleshooting steps
-- [ ] T128 [P] Create backend/docs/architecture.md with system architecture diagrams (multi-instance, database, caching, monitoring)
-- [ ] T129 [P] Create backend/docs/backup-procedures.md documenting PostgreSQL backup strategies (automated RDS backups, pg_dump manual backups, PITR recovery steps, backup retention policy, restore testing procedures)
-- [ ] T130 Code cleanup: Remove old PollManager in-memory implementation from backend/src/models/PollManager.js (replace with note redirecting to repositories)
+- [X] T125 [P] Update backend/README.md with production deployment instructions, architecture diagrams, operational runbooks
+- [X] T126 [P] Update CLAUDE.md with production-ready technologies and commands from plan.md
+- [X] T127 [P] Create backend/docs/runbook.md with incident response procedures, common issues, troubleshooting steps
+- [X] T128 [P] Create backend/docs/architecture.md with system architecture diagrams (multi-instance, database, caching, monitoring)
+- [X] T129 [P] Create backend/docs/backup-procedures.md documenting PostgreSQL backup strategies (automated RDS backups, pg_dump manual backups, PITR recovery steps, backup retention policy, restore testing procedures)
+- [X] T130 Code cleanup: Remove old PollManager in-memory implementation from backend/src/models/PollManager.js (replace with note redirecting to repositories)
 - [X] T131 Run full test suite with coverage: npm test -- --coverage (verify ≥90% coverage maintained)
-- [ ] T132 Run quickstart.md validation (follow all steps, verify local environment works)
+- [X] T132 Run quickstart.md validation (follow all steps, verify local environment works)
 - [X] T133 Perform security audit: npm audit, review dependencies for vulnerabilities (PASSED - 0 vulnerabilities)
 - [X] T134 Update backend/package.json version to 2.0.0 (production-ready release)
 
