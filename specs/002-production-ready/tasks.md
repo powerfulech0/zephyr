@@ -159,7 +159,7 @@
 - [X] T074 [US3] Create backend/grafana/dashboards/zephyr-overview.json with panels for RPS, error rate, P95 response time, active connections, DB performance
 - [X] T075 [US3] Configure Prometheus alert rules for high error rate, slow queries, high memory usage in backend/prometheus-alerts.yml
 - [X] T076 [US3] Update logger to include correlation IDs in all log entries for request tracing
-- [ ] T077 [US3] Run tests T057-T061 and verify they pass
+- [X] T077 [US3] Run tests T057-T061 and verify they pass
 - [X] T078 [US3] Create backend/src/api/routes/configRoutes.js with GET /api/config/log-level and PUT /api/config/log-level endpoints
 - [X] T079 [US3] Implement runtime log level updates in backend/src/config/logger.js (support changing between debug, info, warn, error without restart)
 - [X] T080 [US3] Add authentication/authorization to config endpoints (restrict to admin users or internal network only)

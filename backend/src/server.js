@@ -70,6 +70,7 @@ app.use(metricsMiddleware);
 
 // 8. Register routes that don't require database/Redis (always available)
 app.use('/', metricsRoutes); // Metrics at /metrics (not /api/metrics)
+app.use('/api', healthRoutes); // Health checks (always available)
 app.use('/api/config', configRoutes); // Runtime configuration (T078-T080)
 
 /**
@@ -96,7 +97,6 @@ async function initializeInfrastructure() {
     logger.info({ count: activePolls.length }, 'Active polls restored from database');
 
     // Initialize routes and socket handlers with pollService
-    app.use('/api', healthRoutes);
     app.use('/api/auth', authRoutes); // Authentication routes (T054)
     app.use('/api', initializePollRoutes(pollService));
     initializeSocketHandler(io, pollService);

@@ -46,14 +46,14 @@ describe('Integration: Correlation ID Tracking', () => {
       expect(correlationId1).not.toBe(correlationId2);
     });
 
-    it('should use UUID v4 format for generated correlation IDs', async () => {
+    it('should use nanoid format for generated correlation IDs', async () => {
       const response = await request(app).get('/api/health');
 
       const correlationId = response.headers['x-correlation-id'];
 
-      // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-      const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      expect(correlationId).toMatch(uuidV4Regex);
+      // nanoid(16) format: 16 characters, URL-safe (alphanumeric + _ and -)
+      expect(correlationId).toHaveLength(16);
+      expect(correlationId).toMatch(/^[A-Za-z0-9_-]+$/);
     });
   });
 
