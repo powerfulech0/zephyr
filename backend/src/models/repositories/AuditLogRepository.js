@@ -82,13 +82,13 @@ class AuditLogRepository {
       if (startDate) {
         query += ` AND created_at >= $${paramIndex}`;
         params.push(startDate);
-        paramIndex++;
+        paramIndex += 1;
       }
 
       if (endDate) {
         query += ` AND created_at <= $${paramIndex}`;
         params.push(endDate);
-        paramIndex++;
+        paramIndex += 1;
       }
 
       query += ` ORDER BY created_at DESC LIMIT $${paramIndex}`;

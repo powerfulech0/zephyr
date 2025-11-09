@@ -285,14 +285,18 @@ async function cleanupExpiredSessions() {
 
     let cleanedCount = 0;
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const key of keys) {
+      // eslint-disable-next-line no-await-in-loop
       const data = await redis.get(key);
+      // eslint-disable-next-line no-continue
       if (!data) continue;
 
       const session = JSON.parse(data);
       if (session.lastSeen < oneHourAgo) {
+        // eslint-disable-next-line no-await-in-loop
         await redis.del(key);
-        cleanedCount++;
+        cleanedCount += 1;
       }
     }
 

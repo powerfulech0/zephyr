@@ -1,0 +1,1679 @@
+
+> backend@2.0.0 test
+> jest --coverage
+
+FAIL tests/performance/distributedSessions.test.js (108.133 s)
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● Performance: Distributed Session State › Session Read Performance › should read session data within 50ms
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      60 |
+      61 |   describe('Session Read Performance', () => {
+    > 62 |     it('should read session data within 50ms', async () => {
+         |     ^
+      63 |       const client = io('http://localhost:4001', {
+      64 |         transports: ['websocket'],
+      65 |         forceNew: true,
+
+      at it (tests/performance/distributedSessions.test.js:62:5)
+      at describe (tests/performance/distributedSessions.test.js:61:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Session Write Performance › should write session data within 50ms
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      107 |
+      108 |   describe('Session Write Performance', () => {
+    > 109 |     it('should write session data within 50ms', async () => {
+          |     ^
+      110 |       const client = io('http://localhost:4001', {
+      111 |         transports: ['websocket'],
+      112 |         forceNew: true,
+
+      at it (tests/performance/distributedSessions.test.js:109:5)
+      at describe (tests/performance/distributedSessions.test.js:108:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Concurrent Session Access › should handle concurrent session reads from multiple instances
+
+    thrown: "Exceeded timeout of 20000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      157 |
+      158 |   describe('Concurrent Session Access', () => {
+    > 159 |     it('should handle concurrent session reads from multiple instances', async () => {
+          |     ^
+      160 |       const numClients = 20;
+      161 |       const clients = [];
+      162 |
+
+      at it (tests/performance/distributedSessions.test.js:159:5)
+      at describe (tests/performance/distributedSessions.test.js:158:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Session Consistency › should maintain consistent session state under concurrent updates
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      212 |
+      213 |   describe('Session Consistency', () => {
+    > 214 |     it('should maintain consistent session state under concurrent updates', async () => {
+          |     ^
+      215 |       const client1 = io('http://localhost:4001', {
+      216 |         transports: ['websocket'],
+      217 |         forceNew: true,
+
+      at it (tests/performance/distributedSessions.test.js:214:5)
+      at describe (tests/performance/distributedSessions.test.js:213:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Session TTL and Cleanup › should handle cleanup of disconnected sessions
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      307 |     }, 5000);
+      308 |
+    > 309 |     it('should handle cleanup of disconnected sessions', async () => {
+          |     ^
+      310 |       const clients = [];
+      311 |
+      312 |       // Connect 5 clients
+
+      at it (tests/performance/distributedSessions.test.js:309:5)
+      at describe (tests/performance/distributedSessions.test.js:285:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Scalability Limits › should handle 50+ concurrent participants across instances
+
+    thrown: "Exceeded timeout of 30000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      346 |
+      347 |   describe('Scalability Limits', () => {
+    > 348 |     it('should handle 50+ concurrent participants across instances', async () => {
+          |     ^
+      349 |       const numClients = 50;
+      350 |       const clients = [];
+      351 |
+
+      at it (tests/performance/distributedSessions.test.js:348:5)
+      at describe (tests/performance/distributedSessions.test.js:347:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+FAIL tests/integration/multiInstanceWebSocket.test.js (55.249 s)
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Cross-Instance Vote Broadcasting › should broadcast vote updates from instance 1 to instance 2
+
+    thrown: "Exceeded timeout of 10000 ms for a test while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      69 |
+      70 |   describe('Cross-Instance Vote Broadcasting', () => {
+    > 71 |     it('should broadcast vote updates from instance 1 to instance 2', (done) => {
+         |     ^
+      72 |       // Connect client 1 to instance 1 (port 4001)
+      73 |       client1 = io('http://localhost:4001', {
+      74 |         transports: ['websocket'],
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:71:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:70:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Cross-Instance Vote Broadcasting › should sync participant counts across instances
+
+    thrown: "Exceeded timeout of 10000 ms for a test while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      133 |     }, 10000);
+      134 |
+    > 135 |     it('should sync participant counts across instances', (done) => {
+          |     ^
+      136 |       client1 = io('http://localhost:4001', {
+      137 |         transports: ['websocket'],
+      138 |         forceNew: true,
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:135:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:70:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Cross-Instance Poll State Changes › should broadcast poll state changes across instances
+
+    thrown: "Exceeded timeout of 10000 ms for a test while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      179 |
+      180 |   describe('Cross-Instance Poll State Changes', () => {
+    > 181 |     it('should broadcast poll state changes across instances', (done) => {
+          |     ^
+      182 |       client1 = io('http://localhost:4001', {
+      183 |         transports: ['websocket'],
+      184 |         forceNew: true,
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:181:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:180:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Session State Persistence › should maintain session state when participant reconnects to different instance
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      233 |
+      234 |   describe('Session State Persistence', () => {
+    > 235 |     it('should maintain session state when participant reconnects to different instance', async () => {
+          |     ^
+      236 |       // This test verifies session data is stored in Redis, not in-memory
+      237 |       client1 = io('http://localhost:4001', {
+      238 |         transports: ['websocket'],
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:235:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:234:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Performance Under Load › should handle multiple participants across instances with low latency
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      285 |
+      286 |   describe('Performance Under Load', () => {
+    > 287 |     it('should handle multiple participants across instances with low latency', async () => {
+          |     ^
+      288 |       const numClients = 10;
+      289 |       const clients = [];
+      290 |
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:287:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:286:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+FAIL tests/mvp-backup/participantReconnection.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● Integration: Participant Reconnection › Participant Disconnect and Reconnect Flow › should preserve vote data after participant reconnects
+
+    expect(received).toHaveProperty(path, value)
+
+    Expected path: "previousVote"
+    Received path: []
+
+    Expected value: 1
+    Received value: {"count": 1, "nickname": "Bob", "timestamp": "2025-11-09T06:56:06.873Z"}
+
+      236 |
+      237 |       // Assert - Rejoined participant receives their previous vote in response
+    > 238 |       expect(rejoinData).toHaveProperty('previousVote', 1);
+          |                          ^
+      239 |     });
+      240 |
+      241 |     it('should update last_seen_at timestamp on reconnection', async () => {
+
+      at Object.toHaveProperty (tests/mvp-backup/participantReconnection.test.js:238:26)
+
+PASS tests/unit/PollManager.test.js
+FAIL tests/mvp-backup/serverRestartRecovery.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should restore poll data from database after server restart
+
+    TypeError: app.listen is not a function
+
+      46 |       // Act - Start server (simulating restart)
+      47 |       const app = require('../../src/server');
+    > 48 |       const server = app.listen(0);
+         |                          ^
+      49 |       const serverPort = server.address().port;
+      50 |
+      51 |       // Small delay to allow server initialization
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:48:26)
+
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should restore participant and vote data after server restart
+
+    TypeError: app.listen is not a function
+
+      102 |       // Act - Start server (simulating restart)
+      103 |       const app = require('../../src/server');
+    > 104 |       const server = app.listen(0);
+          |                          ^
+      105 |
+      106 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      107 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:104:26)
+
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should allow participants to reconnect after server restart
+
+    TypeError: app.listen is not a function
+
+      138 |       // Act - Start server
+      139 |       const app = require('../../src/server');
+    > 140 |       const server = app.listen(0);
+          |                          ^
+      141 |       const serverPort = server.address().port;
+      142 |
+      143 |       await new Promise((resolve) => setTimeout(resolve, 500));
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:140:26)
+
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should maintain poll state through restart
+
+    TypeError: app.listen is not a function
+
+      193 |       // Act - Start server
+      194 |       const app = require('../../src/server');
+    > 195 |       const server = app.listen(0);
+          |                          ^
+      196 |
+      197 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      198 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:195:26)
+
+  ● Integration: Server Restart Recovery › Multiple Polls Restoration › should restore multiple active polls after restart
+
+    TypeError: app.listen is not a function
+
+      228 |       // Act - Start server
+      229 |       const app = require('../../src/server');
+    > 230 |       const server = app.listen(0);
+          |                          ^
+      231 |
+      232 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      233 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:230:26)
+
+  ● Integration: Server Restart Recovery › Multiple Polls Restoration › should not restore inactive (soft-deleted) polls
+
+    error: value too long for type character varying(6)
+
+      254 |       );
+      255 |
+    > 256 |       await dbPool.query(
+          |       ^
+      257 |         `INSERT INTO polls (room_code, question, options, state, is_active)
+      258 |          VALUES ($1, $2, $3, $4, $5)`,
+      259 |         ['INACTIVE', 'Inactive poll?', JSON.stringify(['Yes', 'No']), 'closed', false]
+
+      at node_modules/pg-pool/index.js:45:11
+      at Object.<anonymous> (tests/mvp-backup/serverRestartRecovery.test.js:256:7)
+
+  ● Integration: Server Restart Recovery › Zero Data Loss Guarantee › should not lose any votes during restart
+
+    TypeError: app.listen is not a function
+
+      328 |       // Act - Start server (simulating restart)
+      329 |       const app = require('../../src/server');
+    > 330 |       const server = app.listen(0);
+          |                          ^
+      331 |
+      332 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      333 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:330:26)
+
+FAIL tests/mvp-backup/realTimeSync.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● User Story 3: Real-time vote synchronization › Multi-client vote synchronization (T077) › should broadcast vote updates to all clients in room in real-time
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      74 |
+      75 |       // Create poll directly with host socket ID
+    > 76 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+         |                                ^
+      77 |       roomCode = poll.roomCode;
+      78 |
+      79 |       // Host joins Socket.io room (not as participant)
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:76:32)
+
+  ● User Story 3: Real-time vote synchronization › Multi-client vote synchronization (T077) › should synchronize multiple sequential votes across all clients
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      127 |
+      128 |       // Create poll
+    > 129 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      130 |       roomCode = poll.roomCode;
+      131 |
+      132 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:129:32)
+
+  ● User Story 3: Real-time vote synchronization › Multi-client vote synchronization (T077) › should handle vote changes and broadcast updated counts
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      192 |
+      193 |       // Create poll
+    > 194 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      195 |       roomCode = poll.roomCode;
+      196 |
+      197 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:194:32)
+
+  ● User Story 3: Real-time vote synchronization › Participant count synchronization › should broadcast participant-joined events to all clients
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      246 |
+      247 |       // Create poll
+    > 248 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      249 |       roomCode = poll.roomCode;
+      250 |
+      251 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:248:32)
+
+  ● User Story 3: Real-time vote synchronization › Participant count synchronization › should broadcast participant-left events when clients disconnect
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      278 |
+      279 |       // Create poll
+    > 280 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      281 |       roomCode = poll.roomCode;
+      282 |
+      283 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:280:32)
+
+  ● User Story 3: Real-time vote synchronization › Poll state change synchronization › should broadcast poll-state-changed to all clients in room
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      315 |
+      316 |       // Create poll
+    > 317 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      318 |       roomCode = poll.roomCode;
+      319 |
+      320 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:317:32)
+
+FAIL tests/integration/gracefulShutdown.test.js (63.067 s)
+  ● Graceful Shutdown Integration Test › SIGTERM Handling › should gracefully shutdown on SIGTERM signal
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › SIGTERM Handling › should gracefully shutdown on SIGINT signal (Ctrl+C)
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Connection Draining › should stop accepting new connections after SIGTERM
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Connection Draining › should close WebSocket connections gracefully
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Forced Shutdown Timeout › should force exit after 30 seconds if graceful shutdown hangs
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Resource Cleanup › should log graceful shutdown steps
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+FAIL tests/mvp-backup/concurrentParticipants.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● Performance: 20 Concurrent Participants (T097) › should handle 20 concurrent participants joining and voting
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      72 |
+      73 |     // Create poll
+    > 74 |     const poll = pollManager.createPoll(question, options, hostSocket.id);
+         |                              ^
+      75 |     roomCode = poll.roomCode;
+      76 |
+      77 |     // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/concurrentParticipants.test.js:74:30)
+
+  ● Performance: 20 Concurrent Participants (T097) › should maintain data consistency with 20 concurrent voters
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      183 |
+      184 |     // Create poll
+    > 185 |     const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                              ^
+      186 |     roomCode = poll.roomCode;
+      187 |
+      188 |     // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/concurrentParticipants.test.js:185:30)
+
+FAIL tests/mvp-backup/participantFlow.test.js (25.259 s)
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● Participant Flow Integration Tests › should complete full participant lifecycle: join → vote → confirm → change vote
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should complete full participant lifecycle: join → vote → confirm → change vote
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should handle multiple participants voting simultaneously
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should handle multiple participants voting simultaneously
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should prevent voting before joining room
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should prevent voting before joining room
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should prevent voting when poll is closed
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should prevent voting when poll is closed
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should broadcast participant-joined event to existing participants
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should broadcast participant-joined event to existing participants
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+FAIL tests/mvp-backup/hostFlow.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  override existing env vars with { override: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  ● Host Poll Lifecycle Integration Test › should complete full host lifecycle: create → open → close poll
+
+    expected 201 "Created", got 404 "Not Found"
+
+      38 |         options: ['Jest', 'Mocha', 'Vitest', 'Jasmine'],
+      39 |       })
+    > 40 |       .expect(201);
+         |        ^
+      41 |
+      42 |     expect(createResponse.body.success).toBe(true);
+      43 |     expect(createResponse.body.poll.state).toBe('waiting');
+
+      at Object.expect (tests/mvp-backup/hostFlow.test.js:40:8)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+  ● Host Poll Lifecycle Integration Test › should broadcast state changes to all connected clients
+
+    expected 201 "Created", got 404 "Not Found"
+
+      130 |         options: ['Yes', 'No'],
+      131 |       })
+    > 132 |       .expect(201);
+          |        ^
+      133 |
+      134 |     const {poll} = createResponse.body;
+      135 |
+
+      at Object.expect (tests/mvp-backup/hostFlow.test.js:132:8)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+PASS tests/unit/roomCodeGenerator.test.js
+PASS tests/integration/securityHeaders.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/integration/databaseRetry.test.js
+PASS tests/contract/pollApi.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/integration/websocketReconnection.test.js
+PASS tests/contract/corsValidation.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  override existing env vars with { override: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/integration/circuitBreaker.test.js
+PASS tests/integration/correlationIdTracking.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/contract/inputSanitization.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/contract/pollPersistence.test.js
+PASS tests/contract/rateLimiting.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/contract/configValidation.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/contract/livenessCheck.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/contract/healthCheck.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/contract/metricsEndpoint.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+PASS tests/contract/readinessCheck.test.js
+  ● Console
+
+    console.log
+      [dotenv@17.2.3] injecting env (22) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+---------------------------|---------|----------|---------|---------|-------------------------------------------------------------------------------------
+File                       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                   
+---------------------------|---------|----------|---------|---------|-------------------------------------------------------------------------------------
+All files                  |   51.15 |    39.25 |    55.1 |   51.37 |                                                                                     
+ src                       |   66.66 |       50 |    9.09 |   68.23 |                                                                                     
+  server.js                |   66.66 |       50 |    9.09 |   68.23 | 41,111-112,124-155,165-175                                                          
+ src/api/middleware        |      48 |    21.34 |      60 |    47.7 |                                                                                     
+  correlationId.js         |     100 |      100 |     100 |     100 |                                                                                     
+  errorHandler.js          |    8.69 |        0 |       0 |    8.69 | 65-151                                                                              
+  hostAuth.js              |       0 |        0 |       0 |       0 | 1-160                                                                               
+  metricsMiddleware.js     |     100 |    66.66 |     100 |     100 | 18                                                                                  
+  rateLimiter.js           |   62.06 |       75 |   28.57 |   62.06 | 76,103-127,151-175                                                                  
+  securityHeaders.js       |     100 |      100 |     100 |     100 |                                                                                     
+  validator.js             |   95.23 |     92.3 |    87.5 |   95.12 | 32,130                                                                              
+ src/api/routes            |   55.27 |    31.57 |   64.28 |   55.27 |                                                                                     
+  authRoutes.js            |   21.73 |        0 |       0 |   21.73 | 20-116,132-183                                                                      
+  configRoutes.js          |   21.21 |        0 |       0 |   21.21 | 15-24,41-91,106-136                                                                 
+  healthRoutes.js          |   91.11 |    71.42 |     100 |   91.11 | 108-109,144-145                                                                     
+  metricsRoutes.js         |   83.33 |      100 |     100 |   83.33 | 20-21                                                                               
+  pollRoutes.js            |      84 |      100 |     100 |      84 | 33-34,69-70                                                                         
+ src/config                |   45.55 |    37.24 |   48.93 |    45.8 |                                                                                     
+  cache.js                 |   57.44 |    44.44 |      50 |   57.44 | 14,25-31,53,61,112-146                                                              
+  database.js              |   74.35 |    76.66 |   81.81 |   75.34 | 21,114-115,155-156,175-214                                                          
+  index.js                 |   49.15 |    45.65 |   71.42 |      50 | 22,42,48,64,83,96-110,118,124,130,135,140-141,213-217,222-227                       
+  logger.js                |      60 |    33.33 |      60 |      60 | 43-48,56                                                                            
+  secrets.js               |       0 |        0 |       0 |       0 | 12-234                                                                              
+ src/models                |   89.15 |    88.09 |   85.71 |    92.2 |                                                                                     
+  PollManager.js           |   89.15 |    88.09 |   85.71 |    92.2 | 43-52                                                                               
+ src/models/repositories   |   39.41 |    41.66 |   52.94 |   39.24 |                                                                                     
+  AuditLogRepository.js    |   18.86 |       40 |      25 |   18.86 | 74-164                                                                              
+  ParticipantRepository.js |   52.17 |     37.5 |      70 |   51.47 | 46-55,85-86,118-151,173,184-188,231-267                                             
+  PollRepository.js        |   34.92 |    28.57 |      50 |   34.42 | 44-45,82-179,206-259                                                                
+  VoteRepository.js        |   48.21 |       70 |      50 |   49.09 | 52-121,150-151,203-230                                                              
+ src/schemas               |     100 |      100 |     100 |     100 |                                                                                     
+  hostAuthSchemas.js       |     100 |      100 |     100 |     100 |                                                                                     
+  participantSchemas.js    |     100 |      100 |     100 |     100 |                                                                                     
+  pollSchemas.js           |     100 |      100 |     100 |     100 |                                                                                     
+  voteSchemas.js           |     100 |      100 |     100 |     100 |                                                                                     
+ src/services              |   44.12 |    37.23 |      50 |   44.04 |                                                                                     
+  metricsService.js        |    92.3 |      100 |     100 |    92.3 | 219-220                                                                             
+  pollService.js           |   59.83 |    51.28 |   72.72 |    59.5 | 42,46,65-76,102-144,160-162,207-208,224-226,230-232,237-241,267-271,313-314,329-345 
+  resilienceService.js     |   88.46 |    71.42 |      75 |      88 | 75,116,135                                                                          
+  roomCodeGenerator.js     |     100 |      100 |     100 |     100 |                                                                                     
+  sessionService.js        |       0 |        0 |       0 |       0 | 1-315                                                                               
+ src/sockets               |   63.63 |    77.77 |   36.36 |   63.63 |                                                                                     
+  adapter.js               |   35.71 |       80 |   14.28 |   35.71 | 33-101                                                                              
+  socketHandler.js         |   92.59 |       75 |      75 |   92.59 | 32-33                                                                               
+ src/sockets/emitters      |      75 |      100 |      50 |      75 |                                                                                     
+  broadcastStateChange.js  |      50 |      100 |       0 |      50 | 13-28                                                                               
+  broadcastVoteUpdate.js   |     100 |      100 |     100 |     100 |                                                                                     
+ src/sockets/events        |   31.11 |       16 |   83.33 |   31.81 |                                                                                     
+  changePollState.js       |    9.72 |        0 |      50 |    9.85 | 15-186                                                                              
+  joinRoom.js              |   63.63 |    43.75 |     100 |   65.62 | 21-24,61-62,91-112                                                                  
+  submitVote.js            |   46.66 |    29.41 |     100 |   48.27 | 21-24,40-58                                                                         
+ src/utils                 |   84.93 |    82.85 |    90.9 |   84.93 |                                                                                     
+  circuitBreaker.js        |   84.93 |    82.85 |    90.9 |   84.93 | 72-74,115,243-250                                                                   
+---------------------------|---------|----------|---------|---------|-------------------------------------------------------------------------------------
+Jest: "global" coverage threshold for branches (50%) not met: 39.25%
+
+Summary of all failing tests
+FAIL tests/performance/distributedSessions.test.js (108.133 s)
+  ● Performance: Distributed Session State › Session Read Performance › should read session data within 50ms
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      60 |
+      61 |   describe('Session Read Performance', () => {
+    > 62 |     it('should read session data within 50ms', async () => {
+         |     ^
+      63 |       const client = io('http://localhost:4001', {
+      64 |         transports: ['websocket'],
+      65 |         forceNew: true,
+
+      at it (tests/performance/distributedSessions.test.js:62:5)
+      at describe (tests/performance/distributedSessions.test.js:61:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Session Write Performance › should write session data within 50ms
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      107 |
+      108 |   describe('Session Write Performance', () => {
+    > 109 |     it('should write session data within 50ms', async () => {
+          |     ^
+      110 |       const client = io('http://localhost:4001', {
+      111 |         transports: ['websocket'],
+      112 |         forceNew: true,
+
+      at it (tests/performance/distributedSessions.test.js:109:5)
+      at describe (tests/performance/distributedSessions.test.js:108:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Concurrent Session Access › should handle concurrent session reads from multiple instances
+
+    thrown: "Exceeded timeout of 20000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      157 |
+      158 |   describe('Concurrent Session Access', () => {
+    > 159 |     it('should handle concurrent session reads from multiple instances', async () => {
+          |     ^
+      160 |       const numClients = 20;
+      161 |       const clients = [];
+      162 |
+
+      at it (tests/performance/distributedSessions.test.js:159:5)
+      at describe (tests/performance/distributedSessions.test.js:158:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Session Consistency › should maintain consistent session state under concurrent updates
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      212 |
+      213 |   describe('Session Consistency', () => {
+    > 214 |     it('should maintain consistent session state under concurrent updates', async () => {
+          |     ^
+      215 |       const client1 = io('http://localhost:4001', {
+      216 |         transports: ['websocket'],
+      217 |         forceNew: true,
+
+      at it (tests/performance/distributedSessions.test.js:214:5)
+      at describe (tests/performance/distributedSessions.test.js:213:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Session TTL and Cleanup › should handle cleanup of disconnected sessions
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      307 |     }, 5000);
+      308 |
+    > 309 |     it('should handle cleanup of disconnected sessions', async () => {
+          |     ^
+      310 |       const clients = [];
+      311 |
+      312 |       // Connect 5 clients
+
+      at it (tests/performance/distributedSessions.test.js:309:5)
+      at describe (tests/performance/distributedSessions.test.js:285:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+  ● Performance: Distributed Session State › Scalability Limits › should handle 50+ concurrent participants across instances
+
+    thrown: "Exceeded timeout of 30000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      346 |
+      347 |   describe('Scalability Limits', () => {
+    > 348 |     it('should handle 50+ concurrent participants across instances', async () => {
+          |     ^
+      349 |       const numClients = 50;
+      350 |       const clients = [];
+      351 |
+
+      at it (tests/performance/distributedSessions.test.js:348:5)
+      at describe (tests/performance/distributedSessions.test.js:347:3)
+      at Object.describe (tests/performance/distributedSessions.test.js:17:1)
+
+FAIL tests/integration/multiInstanceWebSocket.test.js (55.249 s)
+  ● Integration: Multi-Instance WebSocket Consistency › Cross-Instance Vote Broadcasting › should broadcast vote updates from instance 1 to instance 2
+
+    thrown: "Exceeded timeout of 10000 ms for a test while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      69 |
+      70 |   describe('Cross-Instance Vote Broadcasting', () => {
+    > 71 |     it('should broadcast vote updates from instance 1 to instance 2', (done) => {
+         |     ^
+      72 |       // Connect client 1 to instance 1 (port 4001)
+      73 |       client1 = io('http://localhost:4001', {
+      74 |         transports: ['websocket'],
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:71:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:70:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Cross-Instance Vote Broadcasting › should sync participant counts across instances
+
+    thrown: "Exceeded timeout of 10000 ms for a test while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      133 |     }, 10000);
+      134 |
+    > 135 |     it('should sync participant counts across instances', (done) => {
+          |     ^
+      136 |       client1 = io('http://localhost:4001', {
+      137 |         transports: ['websocket'],
+      138 |         forceNew: true,
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:135:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:70:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Cross-Instance Poll State Changes › should broadcast poll state changes across instances
+
+    thrown: "Exceeded timeout of 10000 ms for a test while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      179 |
+      180 |   describe('Cross-Instance Poll State Changes', () => {
+    > 181 |     it('should broadcast poll state changes across instances', (done) => {
+          |     ^
+      182 |       client1 = io('http://localhost:4001', {
+      183 |         transports: ['websocket'],
+      184 |         forceNew: true,
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:181:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:180:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Session State Persistence › should maintain session state when participant reconnects to different instance
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      233 |
+      234 |   describe('Session State Persistence', () => {
+    > 235 |     it('should maintain session state when participant reconnects to different instance', async () => {
+          |     ^
+      236 |       // This test verifies session data is stored in Redis, not in-memory
+      237 |       client1 = io('http://localhost:4001', {
+      238 |         transports: ['websocket'],
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:235:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:234:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+  ● Integration: Multi-Instance WebSocket Consistency › Performance Under Load › should handle multiple participants across instances with low latency
+
+    thrown: "Exceeded timeout of 15000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      285 |
+      286 |   describe('Performance Under Load', () => {
+    > 287 |     it('should handle multiple participants across instances with low latency', async () => {
+          |     ^
+      288 |       const numClients = 10;
+      289 |       const clients = [];
+      290 |
+
+      at it (tests/integration/multiInstanceWebSocket.test.js:287:5)
+      at describe (tests/integration/multiInstanceWebSocket.test.js:286:3)
+      at Object.describe (tests/integration/multiInstanceWebSocket.test.js:16:1)
+
+FAIL tests/mvp-backup/participantReconnection.test.js
+  ● Integration: Participant Reconnection › Participant Disconnect and Reconnect Flow › should preserve vote data after participant reconnects
+
+    expect(received).toHaveProperty(path, value)
+
+    Expected path: "previousVote"
+    Received path: []
+
+    Expected value: 1
+    Received value: {"count": 1, "nickname": "Bob", "timestamp": "2025-11-09T06:56:06.873Z"}
+
+      236 |
+      237 |       // Assert - Rejoined participant receives their previous vote in response
+    > 238 |       expect(rejoinData).toHaveProperty('previousVote', 1);
+          |                          ^
+      239 |     });
+      240 |
+      241 |     it('should update last_seen_at timestamp on reconnection', async () => {
+
+      at Object.toHaveProperty (tests/mvp-backup/participantReconnection.test.js:238:26)
+
+FAIL tests/mvp-backup/serverRestartRecovery.test.js
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should restore poll data from database after server restart
+
+    TypeError: app.listen is not a function
+
+      46 |       // Act - Start server (simulating restart)
+      47 |       const app = require('../../src/server');
+    > 48 |       const server = app.listen(0);
+         |                          ^
+      49 |       const serverPort = server.address().port;
+      50 |
+      51 |       // Small delay to allow server initialization
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:48:26)
+
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should restore participant and vote data after server restart
+
+    TypeError: app.listen is not a function
+
+      102 |       // Act - Start server (simulating restart)
+      103 |       const app = require('../../src/server');
+    > 104 |       const server = app.listen(0);
+          |                          ^
+      105 |
+      106 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      107 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:104:26)
+
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should allow participants to reconnect after server restart
+
+    TypeError: app.listen is not a function
+
+      138 |       // Act - Start server
+      139 |       const app = require('../../src/server');
+    > 140 |       const server = app.listen(0);
+          |                          ^
+      141 |       const serverPort = server.address().port;
+      142 |
+      143 |       await new Promise((resolve) => setTimeout(resolve, 500));
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:140:26)
+
+  ● Integration: Server Restart Recovery › Poll Data Restoration After Restart › should maintain poll state through restart
+
+    TypeError: app.listen is not a function
+
+      193 |       // Act - Start server
+      194 |       const app = require('../../src/server');
+    > 195 |       const server = app.listen(0);
+          |                          ^
+      196 |
+      197 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      198 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:195:26)
+
+  ● Integration: Server Restart Recovery › Multiple Polls Restoration › should restore multiple active polls after restart
+
+    TypeError: app.listen is not a function
+
+      228 |       // Act - Start server
+      229 |       const app = require('../../src/server');
+    > 230 |       const server = app.listen(0);
+          |                          ^
+      231 |
+      232 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      233 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:230:26)
+
+  ● Integration: Server Restart Recovery › Multiple Polls Restoration › should not restore inactive (soft-deleted) polls
+
+    error: value too long for type character varying(6)
+
+      254 |       );
+      255 |
+    > 256 |       await dbPool.query(
+          |       ^
+      257 |         `INSERT INTO polls (room_code, question, options, state, is_active)
+      258 |          VALUES ($1, $2, $3, $4, $5)`,
+      259 |         ['INACTIVE', 'Inactive poll?', JSON.stringify(['Yes', 'No']), 'closed', false]
+
+      at node_modules/pg-pool/index.js:45:11
+      at Object.<anonymous> (tests/mvp-backup/serverRestartRecovery.test.js:256:7)
+
+  ● Integration: Server Restart Recovery › Zero Data Loss Guarantee › should not lose any votes during restart
+
+    TypeError: app.listen is not a function
+
+      328 |       // Act - Start server (simulating restart)
+      329 |       const app = require('../../src/server');
+    > 330 |       const server = app.listen(0);
+          |                          ^
+      331 |
+      332 |       await new Promise((resolve) => setTimeout(resolve, 500));
+      333 |
+
+      at Object.listen (tests/mvp-backup/serverRestartRecovery.test.js:330:26)
+
+FAIL tests/mvp-backup/realTimeSync.test.js
+  ● User Story 3: Real-time vote synchronization › Multi-client vote synchronization (T077) › should broadcast vote updates to all clients in room in real-time
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      74 |
+      75 |       // Create poll directly with host socket ID
+    > 76 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+         |                                ^
+      77 |       roomCode = poll.roomCode;
+      78 |
+      79 |       // Host joins Socket.io room (not as participant)
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:76:32)
+
+  ● User Story 3: Real-time vote synchronization › Multi-client vote synchronization (T077) › should synchronize multiple sequential votes across all clients
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      127 |
+      128 |       // Create poll
+    > 129 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      130 |       roomCode = poll.roomCode;
+      131 |
+      132 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:129:32)
+
+  ● User Story 3: Real-time vote synchronization › Multi-client vote synchronization (T077) › should handle vote changes and broadcast updated counts
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      192 |
+      193 |       // Create poll
+    > 194 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      195 |       roomCode = poll.roomCode;
+      196 |
+      197 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:194:32)
+
+  ● User Story 3: Real-time vote synchronization › Participant count synchronization › should broadcast participant-joined events to all clients
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      246 |
+      247 |       // Create poll
+    > 248 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      249 |       roomCode = poll.roomCode;
+      250 |
+      251 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:248:32)
+
+  ● User Story 3: Real-time vote synchronization › Participant count synchronization › should broadcast participant-left events when clients disconnect
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      278 |
+      279 |       // Create poll
+    > 280 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      281 |       roomCode = poll.roomCode;
+      282 |
+      283 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:280:32)
+
+  ● User Story 3: Real-time vote synchronization › Poll state change synchronization › should broadcast poll-state-changed to all clients in room
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      315 |
+      316 |       // Create poll
+    > 317 |       const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                                ^
+      318 |       roomCode = poll.roomCode;
+      319 |
+      320 |       // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/realTimeSync.test.js:317:32)
+
+FAIL tests/integration/gracefulShutdown.test.js (63.067 s)
+  ● Graceful Shutdown Integration Test › SIGTERM Handling › should gracefully shutdown on SIGTERM signal
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › SIGTERM Handling › should gracefully shutdown on SIGINT signal (Ctrl+C)
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Connection Draining › should stop accepting new connections after SIGTERM
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Connection Draining › should close WebSocket connections gracefully
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Forced Shutdown Timeout › should force exit after 30 seconds if graceful shutdown hangs
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+  ● Graceful Shutdown Integration Test › Resource Cleanup › should log graceful shutdown steps
+
+    Server failed to start within 10 seconds
+
+      75 |       // Timeout if server doesn't start
+      76 |       setTimeout(() => {
+    > 77 |         reject(new Error('Server failed to start within 10 seconds'));
+         |                ^
+      78 |       }, 10000);
+      79 |     });
+      80 |
+
+      at Timeout._onTimeout (tests/integration/gracefulShutdown.test.js:77:16)
+
+FAIL tests/mvp-backup/concurrentParticipants.test.js
+  ● Performance: 20 Concurrent Participants (T097) › should handle 20 concurrent participants joining and voting
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      72 |
+      73 |     // Create poll
+    > 74 |     const poll = pollManager.createPoll(question, options, hostSocket.id);
+         |                              ^
+      75 |     roomCode = poll.roomCode;
+      76 |
+      77 |     // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/concurrentParticipants.test.js:74:30)
+
+  ● Performance: 20 Concurrent Participants (T097) › should maintain data consistency with 20 concurrent voters
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      183 |
+      184 |     // Create poll
+    > 185 |     const poll = pollManager.createPoll(question, options, hostSocket.id);
+          |                              ^
+      186 |     roomCode = poll.roomCode;
+      187 |
+      188 |     // Host joins Socket.io room
+
+      at Object.createPoll (tests/mvp-backup/concurrentParticipants.test.js:185:30)
+
+FAIL tests/mvp-backup/participantFlow.test.js (25.259 s)
+  ● Participant Flow Integration Tests › should complete full participant lifecycle: join → vote → confirm → change vote
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should complete full participant lifecycle: join → vote → confirm → change vote
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should handle multiple participants voting simultaneously
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should handle multiple participants voting simultaneously
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should prevent voting before joining room
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should prevent voting before joining room
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should prevent voting when poll is closed
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should prevent voting when poll is closed
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+  ● Participant Flow Integration Tests › should broadcast participant-joined event to existing participants
+
+    TypeError: Cannot read properties of undefined (reading 'createPoll')
+
+      34 |     hostSocket.on('connect', () => {
+      35 |       // Create poll
+    > 36 |       poll = pollManager.createPoll(
+         |                          ^
+      37 |         'What is your favorite programming language?',
+      38 |         ['JavaScript', 'Python', 'Go', 'Rust'],
+      39 |         hostSocket.id
+
+      at Socket.createPoll (tests/mvp-backup/participantFlow.test.js:36:26)
+      at Socket.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at Socket.onconnect (node_modules/socket.io-client/build/cjs/socket.js:618:14)
+      at Socket.onpacket (node_modules/socket.io-client/build/cjs/socket.js:506:26)
+      at Manager.Emitter.emit (node_modules/@socket.io/component-emitter/lib/cjs/index.js:143:20)
+      at node_modules/socket.io-client/build/cjs/manager.js:246:18
+
+  ● Participant Flow Integration Tests › should broadcast participant-joined event to existing participants
+
+    thrown: "Exceeded timeout of 5000 ms for a hook while waiting for `done()` to be called.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      26 |   });
+      27 |
+    > 28 |   beforeEach(done => {
+         |   ^
+      29 |     hostSocket = ioClient(serverUrl, {
+      30 |       transports: ['websocket'],
+      31 |       forceNew: true,
+
+      at beforeEach (tests/mvp-backup/participantFlow.test.js:28:3)
+      at Object.describe (tests/mvp-backup/participantFlow.test.js:10:1)
+
+FAIL tests/mvp-backup/hostFlow.test.js
+  ● Host Poll Lifecycle Integration Test › should complete full host lifecycle: create → open → close poll
+
+    expected 201 "Created", got 404 "Not Found"
+
+      38 |         options: ['Jest', 'Mocha', 'Vitest', 'Jasmine'],
+      39 |       })
+    > 40 |       .expect(201);
+         |        ^
+      41 |
+      42 |     expect(createResponse.body.success).toBe(true);
+      43 |     expect(createResponse.body.poll.state).toBe('waiting');
+
+      at Object.expect (tests/mvp-backup/hostFlow.test.js:40:8)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+  ● Host Poll Lifecycle Integration Test › should broadcast state changes to all connected clients
+
+    expected 201 "Created", got 404 "Not Found"
+
+      130 |         options: ['Yes', 'No'],
+      131 |       })
+    > 132 |       .expect(201);
+          |        ^
+      133 |
+      134 |     const {poll} = createResponse.body;
+      135 |
+
+      at Object.expect (tests/mvp-backup/hostFlow.test.js:132:8)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+
+Test Suites: 9 failed, 17 passed, 26 total
+Tests:       40 failed, 8 skipped, 252 passed, 300 total
+Snapshots:   0 total
+Time:        265.541 s
+Ran all test suites.
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.

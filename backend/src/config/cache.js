@@ -132,10 +132,10 @@ async function isHealthy() {
 async function executeRedisOperation(operation) {
   if (!redisCircuitBreaker) {
     // Fallback if circuit breaker not initialized (e.g., in tests)
-    return await operation();
+    return operation();
   }
 
-  return await redisCircuitBreaker.execute(operation);
+  return redisCircuitBreaker.execute(operation);
 }
 
 /**

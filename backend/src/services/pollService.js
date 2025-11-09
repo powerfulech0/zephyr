@@ -35,11 +35,13 @@ class PollService {
       let attempts = 0;
       const maxAttempts = 10;
 
+      // eslint-disable-next-line no-await-in-loop
       do {
         roomCode = generateRoomCode();
+        // eslint-disable-next-line no-await-in-loop
         const existing = await this.pollRepo.getPollByRoomCode(roomCode);
         if (!existing) break;
-        attempts++;
+        attempts += 1;
       } while (attempts < maxAttempts);
 
       if (attempts >= maxAttempts) {

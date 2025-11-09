@@ -108,7 +108,7 @@ const hostAuth = (req, res, next) => {
       'Host authentication successful'
     );
 
-    next();
+    return next();
   } catch (error) {
     // Handle JWT verification errors
     if (error.name === 'TokenExpiredError') {

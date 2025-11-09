@@ -41,6 +41,7 @@ async function getFromEnv(key) {
 async function getFromAWS(key) {
   try {
     // Lazy load AWS SDK to avoid dependency in non-AWS environments
+    // eslint-disable-next-line global-require, import/no-unresolved
     const AWS = require('aws-sdk');
 
     const client = new AWS.SecretsManager({
@@ -83,6 +84,7 @@ async function getFromAWS(key) {
 async function getFromVault(key) {
   try {
     // Lazy load node-vault to avoid dependency in non-Vault environments
+    // eslint-disable-next-line global-require, import/no-unresolved
     const vault = require('node-vault');
 
     const vaultClient = vault({

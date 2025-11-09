@@ -6,7 +6,7 @@ const { PARTICIPANT_LEFT } = require('../../../shared/eventTypes.js');
 const {
   websocketConnectionsCurrent,
   websocketConnectionsTotal,
-  websocketMessagesTotal,
+  // websocketMessagesTotal, // Reserved for future use
 } = require('../services/metricsService.js');
 
 /**

@@ -65,7 +65,7 @@ class CircuitBreaker {
    * @throws {Error} If circuit is open or function fails
    */
   async execute(func) {
-    this.totalRequests++;
+    this.totalRequests += 1;
 
     // Check if we should transition to HALF_OPEN
     if (this.state === CircuitBreakerStates.OPEN && this.shouldAttemptReset()) {
@@ -112,18 +112,20 @@ class CircuitBreaker {
    */
   async executeWithTimeout(func) {
     if (!this.timeout) {
-      return await func();
+      return func();
     }
 
     return Promise.race([
       func(),
-      new Promise((_, reject) =>
-        setTimeout(() => {
+      // eslint-disable-next-line arrow-body-style
+      new Promise((_, reject) => {
+        // eslint-disable-next-line no-promise-executor-return
+        return setTimeout(() => {
           const error = new Error('Operation timed out');
           error.code = 'ETIMEDOUT';
           reject(error);
-        }, this.timeout)
-      ),
+        }, this.timeout);
+      }),
     ]);
   }
 
@@ -132,10 +134,10 @@ class CircuitBreaker {
    */
   onSuccess() {
     this.failures = 0; // Reset failure count
-    this.successes++; // Track total successes
+    this.successes += 1; // Track total successes
 
     if (this.state === CircuitBreakerStates.HALF_OPEN) {
-      this.consecutiveSuccesses++;
+      this.consecutiveSuccesses += 1;
 
       // Close circuit if success threshold met
       if (this.consecutiveSuccesses >= this.successThreshold) {
@@ -157,7 +159,7 @@ class CircuitBreaker {
    * @param {Error} error - The error that occurred
    */
   onFailure(error) {
-    this.failures++;
+    this.failures += 1;
     this.lastFailureTime = Date.now();
 
     logger.warn(

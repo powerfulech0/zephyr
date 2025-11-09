@@ -15,13 +15,13 @@ router.get('/log-level', (req, res) => {
   try {
     const currentLevel = logger.getLevel();
 
-    res.json({
+    return res.json({
       level: currentLevel,
       validLevels: ['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'],
     });
   } catch (error) {
     logger.error({ error: error.message, correlationId: req.correlationId }, 'Failed to get log level');
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Internal Server Error',
       message: 'Failed to retrieve log level',
     });
@@ -74,7 +74,7 @@ router.put('/log-level', (req, res) => {
       'Log level changed via API'
     );
 
-    res.json({
+    return res.json({
       level,
       previousLevel,
       message: 'Log level updated successfully',
@@ -88,7 +88,7 @@ router.put('/log-level', (req, res) => {
       'Failed to update log level'
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Internal Server Error',
       message: 'Failed to update log level',
     });
@@ -119,7 +119,7 @@ router.post('/log-level/reset', (req, res) => {
       'Log level reset to default'
     );
 
-    res.json({
+    return res.json({
       level: defaultLevel,
       previousLevel,
       message: 'Log level reset to default',
@@ -133,7 +133,7 @@ router.post('/log-level/reset', (req, res) => {
       'Failed to reset log level'
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Internal Server Error',
       message: 'Failed to reset log level',
     });

@@ -94,7 +94,7 @@ describe('Integration: WebSocket Reconnection', () => {
       options: ['Yes', 'No'],
       hostId: 'host-123',
     });
-    const roomCode = poll.roomCode;
+    const {roomCode} = poll;
 
     return new Promise((resolve, reject) => {
       const client = Client(`http://localhost:${serverPort}`, {
@@ -151,7 +151,7 @@ describe('Integration: WebSocket Reconnection', () => {
       options: ['Option A', 'Option B'],
       hostId: 'host-123',
     });
-    const roomCode = poll.roomCode;
+    const {roomCode} = poll;
     await pollService.changePollState(roomCode, 'open');
 
     return new Promise((resolve, reject) => {

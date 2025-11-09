@@ -33,6 +33,17 @@ const DEFAULT_RETRYABLE_ERRORS = [
 ];
 
 /**
+ * Sleep for specified milliseconds
+ * @param {number} ms - Milliseconds to sleep
+ * @returns {Promise<void>}
+ */
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+/**
  * Retry a function with exponential backoff
  *
  * @param {Function} func - Async function to retry
@@ -58,9 +69,10 @@ async function retryWithBackoff(func, options = {}) {
   let attempt = 0;
 
   while (attempt < maxAttempts) {
-    attempt++;
+    attempt += 1;
 
     try {
+      // eslint-disable-next-line no-await-in-loop
       const result = await func();
       return result;
     } catch (error) {
@@ -87,7 +99,7 @@ async function retryWithBackoff(func, options = {}) {
       // Calculate exponential backoff delay
       // Formula: initialDelay * 2^(attempt - 1)
       // Examples: 100ms, 200ms, 400ms, 800ms, 1600ms, ...
-      let delay = initialDelay * Math.pow(2, attempt - 1);
+      let delay = initialDelay * 2**(attempt - 1);
 
       // Apply max delay cap if specified
       if (maxDelay && delay > maxDelay) {
@@ -108,21 +120,13 @@ async function retryWithBackoff(func, options = {}) {
       }
 
       // Wait before retrying
+      // eslint-disable-next-line no-await-in-loop
       await sleep(delay);
     }
   }
 
   // Should never reach here, but throw last error just in case
   throw lastError;
-}
-
-/**
- * Sleep for specified milliseconds
- * @param {number} ms - Milliseconds to sleep
- * @returns {Promise<void>}
- */
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**

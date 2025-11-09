@@ -31,6 +31,7 @@ function handleJoinRoom(socket, pollService, io) {
       socket.join(roomCode);
 
       // Store participant data on socket for later use
+      // eslint-disable-next-line no-param-reassign
       socket.data = {
         ...socket.data,
         roomCode,

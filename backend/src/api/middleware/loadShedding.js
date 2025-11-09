@@ -44,14 +44,14 @@ class LoadSheddingMiddleware {
       }
 
       // Add to queue
-      this.currentQueue++;
+      this.currentQueue += 1;
 
       // Wait for available slot
       const processRequest = new Promise((resolve) => {
         const checkSlot = () => {
           if (this.currentActive < this.maxConcurrent) {
-            this.currentActive++;
-            this.currentQueue--;
+            this.currentActive += 1;
+            this.currentQueue -= 1;
             resolve();
           } else {
             // Check again in 10ms
@@ -66,19 +66,19 @@ class LoadSheddingMiddleware {
 
         // Set up cleanup on response finish
         res.on('finish', () => {
-          this.currentActive--;
+          this.currentActive -= 1;
         });
 
         res.on('close', () => {
-          this.currentActive--;
+          this.currentActive -= 1;
         });
 
-        next();
+        return next();
       } catch (error) {
-        this.currentQueue--;
-        this.currentActive--;
+        this.currentQueue -= 1;
+        this.currentActive -= 1;
         logger.error({ error }, 'Load shedding: Error processing queued request');
-        next(error);
+        return next(error);
       }
     };
   }

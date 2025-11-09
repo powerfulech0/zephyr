@@ -44,7 +44,7 @@ function getEnvAsNumber(name, defaultValue) {
 
   const num = parseInt(value, 10);
 
-  if (isNaN(num)) {
+  if (Number.isNaN(num)) {
     throw new Error(`Environment variable ${name} must be a number, got: ${value}`);
   }
 

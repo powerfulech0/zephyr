@@ -100,7 +100,7 @@ router.post('/host/login', validateWithSchema(hostLoginSchema), async (req, res)
       'Host login successful'
     );
 
-    res.json({
+    return res.json({
       token,
       expiresAt,
     });
@@ -113,7 +113,7 @@ router.post('/host/login', validateWithSchema(hostLoginSchema), async (req, res)
       },
       'Host login error'
     );
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Internal Server Error',
       message: 'Failed to authenticate host',
     });

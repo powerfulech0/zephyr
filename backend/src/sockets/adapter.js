@@ -96,7 +96,7 @@ function configureRedisAdapter(io) {
  * @returns {Object} Adapter statistics
  */
 function getAdapterStats(io) {
-  const adapter = io.of('/').adapter;
+  const {adapter} = io.of('/');
 
   return {
     rooms: adapter.rooms.size,

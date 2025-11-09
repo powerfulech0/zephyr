@@ -1,4 +1,5 @@
 const express = require('express');
+const os = require('os');
 const { getPool } = require('../../config/database');
 const { getRedisClient } = require('../../config/cache');
 const logger = require('../../config/logger');
@@ -16,7 +17,7 @@ async function checkDatabase() {
   const start = Date.now();
   try {
     const pool = getPool();
-    const result = await pool.query('SELECT 1');
+    await pool.query('SELECT 1');
     const responseTime = Date.now() - start;
 
     return {
@@ -97,7 +98,7 @@ router.get('/health', async (req, res) => {
           percentage: ((memory.heapUsed / memory.heapTotal) * 100).toFixed(2),
         },
         cpu: {
-          loadAverage: require('os').loadavg(),
+          loadAverage: os.loadavg(),
         },
       },
     };
