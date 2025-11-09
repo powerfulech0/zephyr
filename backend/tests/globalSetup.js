@@ -15,7 +15,7 @@ module.exports = async () => {
       GITHUB_ACTIONS: process.env.GITHUB_ACTIONS,
       DB_HOST: process.env.DB_HOST || 'localhost',
       DB_PORT: process.env.DB_PORT || '5432',
-      DB_NAME: process.env.DB_NAME || 'zephyr_test',
+      DB_NAME: process.env.DB_NAME || 'zephyr_dev',
       REDIS_HOST: process.env.REDIS_HOST || 'localhost',
       REDIS_PORT: process.env.REDIS_PORT || '6379',
     });
@@ -38,7 +38,7 @@ module.exports = async () => {
       console.error('Connection config:', {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || '5432',
-        database: process.env.DB_NAME || 'zephyr_test',
+        database: process.env.DB_NAME || 'zephyr_dev',
         user: process.env.DB_USER || 'zephyr',
       });
     }
