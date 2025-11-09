@@ -14,6 +14,7 @@ const metricsMiddleware = require('./api/middleware/metricsMiddleware.js');
 const PollService = require('./services/pollService.js');
 const healthRoutes = require('./api/routes/healthRoutes.js');
 const metricsRoutes = require('./api/routes/metricsRoutes.js');
+const authRoutes = require('./api/routes/authRoutes.js');
 const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
 const initializeSocketHandler = require('./sockets/socketHandler.js');
 const errorHandler = require('./api/middleware/errorHandler.js');
@@ -92,6 +93,7 @@ async function initializeInfrastructure() {
     // Initialize routes and socket handlers with pollService
     app.use('/api', healthRoutes);
     app.use('/', metricsRoutes); // Metrics at /metrics (not /api/metrics)
+    app.use('/api/auth', authRoutes); // Authentication routes (T054)
     app.use('/api', initializePollRoutes(pollService));
     initializeSocketHandler(io, pollService);
 

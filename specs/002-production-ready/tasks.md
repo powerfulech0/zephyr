@@ -118,11 +118,11 @@
 - [X] T049 [US2] Update rate limiter middleware to log violations to audit_logs table
 - [X] T050 [US2] Update validator middleware to log invalid input attempts to audit_logs table
 - [X] T051 [US2] Run tests T032-T035 and verify they pass
-- [ ] T052 [P] [US2] Create backend/src/schemas/hostAuthSchemas.js with Joi validation for host authentication credentials
-- [ ] T053 [US2] Implement backend/src/api/middleware/hostAuth.js optional authentication middleware for poll control actions using JWT tokens
-- [ ] T054 [US2] Add host authentication endpoints (POST /api/auth/host/login, POST /api/auth/host/verify) in backend/src/api/routes/authRoutes.js
-- [ ] T055 [US2] Update backend/src/sockets/events/changePollState.js to check host authentication when HOST_AUTH_ENABLED=true
-- [ ] T056 [US2] Add HOST_AUTH_ENABLED, HOST_AUTH_SECRET environment variables to backend/.env.example
+- [X] T052 [P] [US2] Create backend/src/schemas/hostAuthSchemas.js with Joi validation for host authentication credentials
+- [X] T053 [US2] Implement backend/src/api/middleware/hostAuth.js optional authentication middleware for poll control actions using JWT tokens
+- [X] T054 [US2] Add host authentication endpoints (POST /api/auth/host/login, POST /api/auth/host/verify) in backend/src/api/routes/authRoutes.js
+- [X] T055 [US2] Update backend/src/sockets/events/changePollState.js to check host authentication when HOST_AUTH_ENABLED=true
+- [X] T056 [US2] Add HOST_AUTH_ENABLED, HOST_AUTH_SECRET environment variables to backend/.env.example
 
 **Checkpoint**: User Story 2 complete - system protected against attacks and abuse with optional host authentication
 
@@ -176,23 +176,23 @@
 
 ### Tests for User Story 4
 
-- [ ] T081 [P] [US4] Contract test for environment configuration loading in backend/tests/contract/configValidation.test.js
-- [ ] T082 [US4] Integration test for graceful shutdown in backend/tests/integration/gracefulShutdown.test.js (SIGTERM handling, connection draining)
+- [X] T081 [P] [US4] Contract test for environment configuration loading in backend/tests/contract/configValidation.test.js
+- [X] T082 [US4] Integration test for graceful shutdown in backend/tests/integration/gracefulShutdown.test.js (SIGTERM handling, connection draining)
 
 ### Implementation for User Story 4
 
-- [ ] T083 [P] [US4] Create backend/Dockerfile for containerized Node.js application (multi-stage build, production dependencies only)
-- [ ] T084 [P] [US4] Create backend/.dockerignore to exclude node_modules, tests, .env files
-- [ ] T085 [US4] Enhance backend/src/config/index.js to validate all required environment variables at startup (fail fast if invalid)
-- [ ] T086 [US4] Create backend/src/config/secrets.js abstraction layer supporting env, AWS Secrets Manager, Vault per research.md
-- [ ] T087 [US4] Update backend/src/server.js to implement graceful shutdown on SIGTERM (close connections, drain requests, timeout 30s)
-- [ ] T088 [US4] Create .github/workflows/test.yml for automated testing on push (run linter, unit tests, integration tests)
-- [ ] T089 [US4] Create .github/workflows/build.yml for Docker image builds (build multi-arch, tag with commit SHA and branch name)
-- [ ] T090 [US4] Create .github/workflows/deploy.yml for deployment automation (run migrations, deploy containers, health check validation, rollback on failure)
-- [ ] T091 [US4] Create backend/.env.production template with production configuration variables
-- [ ] T092 [US4] Update backend/package.json with scripts for migration commands (migrate:up, migrate:down, migrate:status)
-- [ ] T093 [US4] Document deployment process in backend/README.md (local, staging, production environments)
-- [ ] T094 [US4] Run tests T081-T082 and verify they pass
+- [X] T083 [P] [US4] Create backend/Dockerfile for containerized Node.js application (multi-stage build, production dependencies only)
+- [X] T084 [P] [US4] Create backend/.dockerignore to exclude node_modules, tests, .env files
+- [X] T085 [US4] Enhance backend/src/config/index.js to validate all required environment variables at startup (fail fast if invalid)
+- [X] T086 [US4] Create backend/src/config/secrets.js abstraction layer supporting env, AWS Secrets Manager, Vault per research.md
+- [X] T087 [US4] Update backend/src/server.js to implement graceful shutdown on SIGTERM (close connections, drain requests, timeout 30s)
+- [X] T088 [US4] Create .github/workflows/test.yml for automated testing on push (run linter, unit tests, integration tests)
+- [X] T089 [US4] Create .github/workflows/build.yml for Docker image builds (build multi-arch, tag with commit SHA and branch name)
+- [X] T090 [US4] Create .github/workflows/deploy.yml for deployment automation (run migrations, deploy containers, health check validation, rollback on failure)
+- [X] T091 [US4] Create backend/.env.production template with production configuration variables
+- [X] T092 [US4] Update backend/package.json with scripts for migration commands (migrate:up, migrate:down, migrate:status)
+- [X] T093 [US4] Document deployment process in backend/README.md (local, staging, production environments)
+- [X] T094 [US4] Run tests T081-T082 and verify they pass
 
 **Checkpoint**: User Story 4 complete - fully automated deployment pipeline with configuration management
 

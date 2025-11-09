@@ -1,4 +1,5 @@
 const logger = require('../../config/logger.js');
+const jwt = require('jsonwebtoken');
 const { CHANGE_POLL_STATE } = require('../../../../shared/eventTypes.js');
 const { broadcastStateChange } = require('../emitters/broadcastStateChange.js');
 const { websocketMessagesTotal } = require('../../services/metricsService.js');
@@ -14,7 +15,7 @@ function handleChangePollState(socket, pollService, io) {
     websocketMessagesTotal.labels('inbound', CHANGE_POLL_STATE).inc();
 
     try {
-      const { roomCode, newState } = data;
+      const { roomCode, newState, hostToken } = data;
 
       logger.info({ socketId: socket.id, roomCode, newState }, 'Received change-poll-state event');
 
@@ -24,6 +25,107 @@ function handleChangePollState(socket, pollService, io) {
         logger.warn({ socketId: socket.id, data }, error);
         if (callback) callback({ success: false, error });
         return;
+      }
+
+      // Host authentication check (T055) - only when HOST_AUTH_ENABLED=true
+      if (process.env.HOST_AUTH_ENABLED === 'true') {
+        if (!hostToken) {
+          logger.warn(
+            { socketId: socket.id, roomCode },
+            'Host authentication required but token missing'
+          );
+          if (callback) {
+            callback({
+              success: false,
+              error: 'Authentication required',
+            });
+          }
+          return;
+        }
+
+        try {
+          const secret = process.env.HOST_AUTH_SECRET;
+          if (!secret) {
+            logger.error('HOST_AUTH_SECRET not configured');
+            if (callback) {
+              callback({
+                success: false,
+                error: 'Authentication system misconfigured',
+              });
+            }
+            return;
+          }
+
+          // Verify token
+          const decoded = jwt.verify(hostToken, secret, {
+            algorithms: ['HS256'],
+          });
+
+          // Validate role
+          if (decoded.role !== 'host') {
+            logger.warn(
+              { socketId: socket.id, roomCode, role: decoded.role },
+              'Invalid role in token'
+            );
+            if (callback) {
+              callback({
+                success: false,
+                error: 'Insufficient permissions',
+              });
+            }
+            return;
+          }
+
+          // Validate room code matches
+          if (decoded.roomCode !== roomCode) {
+            logger.warn(
+              {
+                socketId: socket.id,
+                tokenRoomCode: decoded.roomCode,
+                requestedRoomCode: roomCode,
+              },
+              'Room code mismatch in token'
+            );
+            if (callback) {
+              callback({
+                success: false,
+                error: 'Token not valid for this poll',
+              });
+            }
+            return;
+          }
+
+          logger.debug(
+            { socketId: socket.id, roomCode },
+            'Host authentication successful for poll state change'
+          );
+        } catch (error) {
+          if (error.name === 'TokenExpiredError') {
+            logger.warn(
+              { socketId: socket.id, roomCode, expiredAt: error.expiredAt },
+              'Expired authentication token'
+            );
+            if (callback) {
+              callback({
+                success: false,
+                error: 'Authentication token expired',
+              });
+            }
+            return;
+          }
+
+          logger.warn(
+            { socketId: socket.id, roomCode, error: error.message },
+            'Invalid authentication token'
+          );
+          if (callback) {
+            callback({
+              success: false,
+              error: 'Invalid authentication token',
+            });
+          }
+          return;
+        }
       }
 
       // Get current poll state before change
