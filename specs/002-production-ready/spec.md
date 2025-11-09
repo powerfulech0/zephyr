@@ -125,6 +125,15 @@ The system gracefully handles failures, provides clear error messages to users, 
 - What happens when the system receives traffic spikes beyond capacity? Rate limiting and load shedding should protect the system while providing appropriate HTTP 429/503 responses.
 - What happens when database migrations are required? Migration process should be automated, reversible, and run before deployment with validation checks.
 
+**Edge Case Task Coverage**:
+- ✅ Database connection pool exhaustion: Handled by connection pooling config (T007) with max connections limit + queue timeout
+- ✅ Inactive poll retention: Addressed by cleanup jobs (T137-T142) with configurable retention policy
+- ✅ Zero-downtime deployment: Covered by graceful shutdown (T087, T082 test) + load balancer health checks (T104)
+- ✅ Logging system unavailable: Graceful degradation implemented (T123) - app continues with local logging
+- ✅ Missing/invalid configuration: Validated at startup (T085, T081 test) - fail-fast behavior
+- ✅ Traffic spikes beyond capacity: Protected by rate limiting (T037, T043) + load shedding (T122) with 429/503 responses
+- ✅ Database migrations required: Automated migration execution (T009-T011, T092) with reversibility and validation
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
@@ -163,7 +172,7 @@ The system gracefully handles failures, provides clear error messages to users, 
 
 - **FR-022**: System MUST support containerized deployment with isolated dependencies
 - **FR-023**: System MUST externalize all environment-specific configuration (database URLs, ports, feature flags)
-- **FR-024**: System MUST load secrets from secure secret management systems (not hardcoded or in plain text)
+- **FR-024**: System MUST load secrets from secure sources (not hardcoded or in plain text). Initial implementation uses environment variables via abstraction layer (`backend/src/config/secrets.js`) that supports future integration with AWS Secrets Manager, HashiCorp Vault, or other secret management systems.
 - **FR-025**: System MUST support automated CI/CD pipeline with test, build, and deploy stages
 - **FR-026**: System MUST run automated tests (unit, integration, contract) before deployment
 - **FR-027**: System MUST support zero-downtime deployments with graceful shutdown
@@ -205,6 +214,9 @@ The system gracefully handles failures, provides clear error messages to users, 
 - **SC-002**: Zero data loss occurs during server restarts, deployments, or failures
 - **SC-003**: Deployments complete in under 10 minutes with automated rollback on failure
 - **SC-004**: 95% of errors are detected and alerted within 2 minutes of occurrence
+  - **Detection**: Prometheus metrics + Grafana dashboards (T074-T075) track error rates in real-time
+  - **Alerting**: Prometheus alert rules configured (T075) for critical thresholds
+  - **Alert Delivery**: Integration with PagerDuty/Slack/email is deployment-environment-specific (configured during production setup, not in application code)
 - **SC-005**: Security vulnerabilities rated high or critical are identified and resolved within 48 hours
 - **SC-006**: System handles 10,000 concurrent WebSocket connections with less than 5% performance degradation
 - **SC-007**: Database query response time remains under 100ms at 95th percentile under normal load

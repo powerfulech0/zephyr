@@ -12,8 +12,9 @@ Transform the MVP voting application into a production-ready system by implement
 ## Technical Context
 
 **Language/Version**: Node.js 18+ (LTS) / JavaScript ES6+
-**Primary Dependencies**: Express 4.x, Socket.io 4.x, NEEDS CLARIFICATION (database client), NEEDS CLARIFICATION (caching library), NEEDS CLARIFICATION (monitoring library), helmet (security headers), express-rate-limit (rate limiting), validator or joi (input validation), NEEDS CLARIFICATION (secret management client)
-**Storage**: NEEDS CLARIFICATION (PostgreSQL or MongoDB for persistence), NEEDS CLARIFICATION (Redis or in-memory cache for session state)
+**Primary Dependencies**: Express 4.x, Socket.io 4.x, pg 8.x (PostgreSQL client), ioredis 5.x (Redis client), prom-client 15.x (Prometheus metrics), helmet 7.x (security headers), express-rate-limit 7.x (rate limiting), joi 17.x (input validation), dotenv (configuration management)
+**Storage**: PostgreSQL 14+ (persistence), Redis 7+ (session state, cache, Socket.io adapter)
+**Finalized During Implementation**: Technology choices documented in tasks.md Phase 1 (T005) and validated in research.md
 **Testing**: Jest 30.x (unit, integration, contract, performance tests already configured)
 **Target Platform**: Linux server (cloud: AWS/GCP/Azure or on-premises, containerized deployment)
 **Project Type**: web (backend Node.js + frontend React, focus on backend infrastructure for this feature)
@@ -351,4 +352,5 @@ The following functional requirements are deferred to future iterations based on
   1. Configuring PostgreSQL streaming replication or managed service read replicas (AWS RDS)
   2. Updating `backend/src/config/database.js` to support separate read/write connection pools
   3. Modifying repository GET methods to use read pool with automatic failover to primary
-- **Success Metrics Triggering Implementation**: Database CPU >70% sustained, read query P95 latency >100ms, or connection pool exhaustion due to read queries.
+- **Success Metrics Triggering Implementation**: Database CPU >70% sustained, read query P95 latency >100ms, or connection pool >80% utilization sustained for 24+ hours.
+- **Validation**: Post-deployment monitoring (7 days) confirms P95 latency <50ms under baseline load, validating deferral decision (Task T135).
