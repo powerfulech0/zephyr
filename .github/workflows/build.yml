@@ -48,10 +48,8 @@ jobs:
             # Tag name
             type=ref,event=tag
             # Commit SHA (short)
-            type=sha,prefix={{branch}}-,format=short
-            # Commit SHA (long)
-            type=sha,prefix={{branch}}-,format=long
-            # Semantic versioning
+            type=sha,format=short
+            # Semantic versioning (only for tags)
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
