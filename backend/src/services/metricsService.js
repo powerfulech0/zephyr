@@ -117,6 +117,16 @@ const dbPoolSize = new client.Gauge({
   registers: [register],
 });
 
+/**
+ * Database connections current gauge
+ * Tracks current number of active database connections
+ */
+const dbConnectionsCurrent = new client.Gauge({
+  name: 'database_connections_current',
+  help: 'Current number of database connections',
+  registers: [register],
+});
+
 // ===========================
 // Business Metrics
 // ===========================
@@ -169,6 +179,17 @@ const httpErrorsTotal = new client.Counter({
   name: 'http_errors_total',
   help: 'Total number of HTTP errors',
   labelNames: ['error_type', 'route'],
+  registers: [register],
+});
+
+/**
+ * General errors counter
+ * Tracks all application errors by type and source
+ */
+const errorsTotal = new client.Counter({
+  name: 'errors_total',
+  help: 'Total number of errors',
+  labelNames: ['type', 'source'], // type: client_error, server_error, database_error, timeout
   registers: [register],
 });
 
@@ -226,6 +247,7 @@ module.exports = {
   dbQueryDuration,
   dbQueriesTotal,
   dbPoolSize,
+  dbConnectionsCurrent,
 
   // Business metrics
   pollsTotal,
@@ -235,5 +257,6 @@ module.exports = {
 
   // Error metrics
   httpErrorsTotal,
+  errorsTotal,
   rateLimitExceeded,
 };

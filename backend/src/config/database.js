@@ -1,5 +1,11 @@
 const { Pool } = require('pg');
 const logger = require('./logger');
+const {
+  dbQueryDuration,
+  dbQueriesTotal,
+  dbConnectionsCurrent,
+  errorsTotal,
+} = require('../services/metricsService');
 
 let pool = null;
 
@@ -25,12 +31,64 @@ function initializePool() {
 
   pool = new Pool(config);
 
-  // Log connection events
+  // Store original query method
+  const originalPoolQuery = pool.query.bind(pool);
+
+  // Override pool.query with our instrumented wrapper (T067)
+  pool.query = async function (text, params) {
+    const start = Date.now();
+    const { operation, table } = parseQueryMetadata(text);
+
+    try {
+      const result = await originalPoolQuery(text, params);
+      const duration = (Date.now() - start) / 1000;
+
+      // Track query metrics
+      dbQueryDuration.labels(operation, table).observe(duration);
+      dbQueriesTotal.labels(operation, table).inc();
+
+      logger.debug(
+        {
+          duration: duration * 1000,
+          rows: result.rowCount,
+          operation,
+          table,
+          query: text.substring(0, 100),
+        },
+        'Database query executed'
+      );
+
+      return result;
+    } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      errorsTotal.labels('database_error', 'database').inc();
+
+      logger.error(
+        {
+          duration: duration * 1000,
+          error: error.message,
+          operation,
+          table,
+          query: text.substring(0, 100),
+        },
+        'Database query failed'
+      );
+      throw error;
+    }
+  };
+
+  // Log connection events and track metrics (T066)
   pool.on('connect', (client) => {
+    dbConnectionsCurrent.inc();
     logger.info({ host: config.host, database: config.database }, 'Database connection established');
   });
 
+  pool.on('remove', (client) => {
+    dbConnectionsCurrent.dec();
+  });
+
   pool.on('error', (err, client) => {
+    errorsTotal.labels('database_error', 'database').inc();
     logger.error({ err }, 'Unexpected error on idle database client');
   });
 
@@ -59,21 +117,55 @@ function getPool() {
 }
 
 /**
- * Query wrapper with metrics tracking (to be enhanced in US3)
+ * Extract operation type and table name from SQL query for metrics labeling
+ * @param {string} sql - SQL query text
+ * @returns {object} - { operation, table }
+ */
+function parseQueryMetadata(sql) {
+  const normalizedSql = sql.trim().toUpperCase();
+
+  // Determine operation
+  let operation = 'UNKNOWN';
+  if (normalizedSql.startsWith('SELECT')) operation = 'SELECT';
+  else if (normalizedSql.startsWith('INSERT')) operation = 'INSERT';
+  else if (normalizedSql.startsWith('UPDATE')) operation = 'UPDATE';
+  else if (normalizedSql.startsWith('DELETE')) operation = 'DELETE';
+  else if (normalizedSql.startsWith('TRUNCATE')) operation = 'TRUNCATE';
+
+  // Extract table name (simplified - handles most common cases)
+  let table = 'unknown';
+  const tableMatch = normalizedSql.match(/(?:FROM|INTO|UPDATE|TRUNCATE)\s+(\w+)/);
+  if (tableMatch) {
+    table = tableMatch[1].toLowerCase();
+  }
+
+  return { operation, table };
+}
+
+/**
+ * Query wrapper with metrics tracking (T066)
  * @param {string} text - SQL query
  * @param {Array} params - Query parameters
  * @returns {Promise<Object>} Query result
  */
 async function query(text, params) {
   const start = Date.now();
+  const { operation, table } = parseQueryMetadata(text);
+
   try {
     const result = await pool.query(text, params);
-    const duration = Date.now() - start;
+    const duration = (Date.now() - start) / 1000; // Convert to seconds for Prometheus
+
+    // Track query metrics (T066)
+    dbQueryDuration.labels(operation, table).observe(duration);
+    dbQueriesTotal.labels(operation, table).inc();
 
     logger.debug(
       {
-        duration,
+        duration: duration * 1000, // Log in ms for readability
         rows: result.rowCount,
+        operation,
+        table,
         query: text.substring(0, 100), // Log first 100 chars of query
       },
       'Database query executed'
@@ -81,11 +173,17 @@ async function query(text, params) {
 
     return result;
   } catch (error) {
-    const duration = Date.now() - start;
+    const duration = (Date.now() - start) / 1000;
+
+    // Track error metrics (T066)
+    errorsTotal.labels('database_error', 'database').inc();
+
     logger.error(
       {
-        duration,
+        duration: duration * 1000,
         error: error.message,
+        operation,
+        table,
         query: text.substring(0, 100),
       },
       'Database query failed'

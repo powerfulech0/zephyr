@@ -147,12 +147,12 @@
 - [X] T062 [P] [US3] Create backend/src/services/metricsService.js to initialize prom-client and define all metrics per metrics-contract.md
 - [X] T063 [P] [US3] Create backend/src/api/routes/metricsRoutes.js with GET /metrics endpoint exposing Prometheus metrics
 - [X] T064 [US3] Create backend/src/api/middleware/metricsMiddleware.js to instrument HTTP requests (duration, count, status codes)
-- [ ] T065 [US3] Update backend/src/sockets/socketHandler.js to track WebSocket connection metrics (current, total, messages by event)
-- [ ] T066 [US3] Create database query wrapper in backend/src/config/database.js to track query metrics (duration, count by operation/table)
-- [ ] T067 [US3] Update all repository methods to use query wrapper for automatic instrumentation
-- [ ] T068 [US3] Instrument business metrics in pollService: polls_total, polls_active, votes_total, participants_total
-- [ ] T069 [US3] Instrument rate limit exceeded counter in rateLimiter middleware
-- [ ] T070 [US3] Instrument error counters in errorHandler middleware by error type and source
+- [X] T065 [US3] Update backend/src/sockets/socketHandler.js to track WebSocket connection metrics (current, total, messages by event)
+- [X] T066 [US3] Create database query wrapper in backend/src/config/database.js to track query metrics (duration, count by operation/table)
+- [X] T067 [US3] Update all repository methods to use query wrapper for automatic instrumentation
+- [X] T068 [US3] Instrument business metrics in pollService: polls_total, polls_active, votes_total, participants_total
+- [X] T069 [US3] Instrument rate limit exceeded counter in rateLimiter middleware
+- [X] T070 [US3] Instrument error counters in errorHandler middleware by error type and source
 - [X] T071 [US3] Update backend/src/api/routes/healthRoutes.js to implement enhanced health check per health-check-contract.yaml
 - [X] T072 [US3] Add /api/health/ready endpoint checking database pool availability and Redis connectivity
 - [X] T073 [US3] Add /api/health/live endpoint with minimal checks (always returns 200 if process responsive)

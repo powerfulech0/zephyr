@@ -3,6 +3,7 @@ const RedisStore = require('rate-limit-redis');
 const { getRedisClient } = require('../../config/cache');
 const logger = require('../../config/logger');
 const AuditLogRepository = require('../../models/repositories/AuditLogRepository');
+const { rateLimitExceeded } = require('../../services/metricsService');
 
 /**
  * Rate limiting middleware using express-rate-limit with Redis store
@@ -49,6 +50,9 @@ const globalRateLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
   handler: (req, res) => {
+    // Track metrics (T069)
+    rateLimitExceeded.labels('global').inc();
+
     logger.warn(
       {
         ip: req.ip,
@@ -95,6 +99,9 @@ const voteRateLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: false, // Count all requests, even successful ones
   handler: (req, res) => {
+    // Track metrics (T069)
+    rateLimitExceeded.labels('vote').inc();
+
     logger.warn(
       {
         ip: req.ip,
@@ -140,6 +147,9 @@ const pollCreationRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
+    // Track metrics (T069)
+    rateLimitExceeded.labels('poll_creation').inc();
+
     logger.warn(
       {
         ip: req.ip,

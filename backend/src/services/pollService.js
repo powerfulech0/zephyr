@@ -3,6 +3,12 @@ const ParticipantRepository = require('../models/repositories/ParticipantReposit
 const VoteRepository = require('../models/repositories/VoteRepository');
 const { generateRoomCode } = require('./roomCodeGenerator');
 const logger = require('../config/logger');
+const {
+  pollsTotal,
+  pollsActive,
+  votesTotal,
+  participantsTotal,
+} = require('./metricsService');
 
 /**
  * PollService - Business logic layer for poll operations
@@ -47,6 +53,10 @@ class PollService {
         options,
         state: 'waiting',
       });
+
+      // Track business metrics (T068)
+      pollsTotal.inc();
+      pollsActive.inc(); // New polls start in 'waiting' state (counted as active)
 
       logger.info({ pollId: poll.id, roomCode: poll.roomCode }, 'Poll created via service');
 
@@ -108,10 +118,24 @@ class PollService {
         throw new Error(`Invalid poll state: ${newState}`);
       }
 
+      // Get current state before update to track metrics
+      const poll = await this.pollRepo.getPollByRoomCode(roomCode);
+      const previousState = poll?.state;
+
       const result = await this.pollRepo.updatePollState(roomCode, newState);
 
       if (result) {
-        logger.info({ roomCode, newState }, 'Poll state changed via service');
+        // Track business metrics (T068)
+        // Decrement active polls when moving to 'closed' state
+        if (newState === 'closed' && previousState !== 'closed') {
+          pollsActive.dec();
+        }
+        // Increment active polls when moving from 'closed' to active state
+        if (newState !== 'closed' && previousState === 'closed') {
+          pollsActive.inc();
+        }
+
+        logger.info({ roomCode, newState, previousState }, 'Poll state changed via service');
       }
 
       return result;
@@ -170,6 +194,9 @@ class PollService {
         socketId,
       });
 
+      // Track business metrics (T068)
+      participantsTotal.inc();
+
       logger.info({ participantId: participant.id, nickname, roomCode }, 'New participant added');
 
       return {
@@ -214,13 +241,22 @@ class PollService {
         throw error;
       }
 
+      // Check if this is a new vote or vote change
+      const existingVote = await this.voteRepo.getVoteByParticipant(participantId);
+      const isNewVote = !existingVote;
+
       // Submit vote
       await this.voteRepo.submitVote({ participantId, optionIndex });
+
+      // Track business metrics (T068)
+      if (isNewVote) {
+        votesTotal.inc(); // Only increment for new votes, not vote changes
+      }
 
       // Get updated vote statistics
       const voteStatistics = await this.voteRepo.getVoteStatistics(poll.id);
 
-      logger.info({ participantId, optionIndex, roomCode }, 'Vote submitted via service');
+      logger.info({ participantId, optionIndex, roomCode, isNewVote }, 'Vote submitted via service');
 
       return {
         voteCounts: voteStatistics.voteCounts,
