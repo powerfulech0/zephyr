@@ -205,7 +205,7 @@ npm audit              # Security vulnerability scan
 ```bash
 npm run migrate:up     # Run all pending migrations
 npm run migrate:down   # Rollback last migration
-npm run migrate:status # Check migration status
+npm run migrate:status # Check pending migrations
 npm run migrate:create <name> # Create new migration
 ```
 

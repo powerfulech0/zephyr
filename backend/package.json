@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "nodemon src/server.js",
+    "dev": "nodemon src/server.js",
     "test": "jest --coverage",
     "test:unit": "jest tests/unit/ --coverage",
     "test:contract": "jest tests/contract/ --coverage",
@@ -20,7 +21,7 @@
     "prepare": "husky",
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down",
-    "migrate:status": "db-migrate status"
+    "migrate:status": "db-migrate check"
   },
   "lint-staged": {
     "*.js": [

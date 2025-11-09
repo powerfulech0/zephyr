@@ -82,7 +82,7 @@ zephyr-pgadmin          Up 10 seconds       0.0.0.0:5050->80/tcp
 # Create database schema
 npm run migrate:up
 
-# Verify migration success
+# Verify migration success (shows pending migrations)
 npm run migrate:status
 ```
 
@@ -322,7 +322,7 @@ npm run migrate:up
 # Down: Rollback last migration
 npm run migrate:down
 
-# Status: View migration history
+# Check: View pending migrations
 npm run migrate:status
 
 # Create: Generate new migration
@@ -482,7 +482,7 @@ cat .env.development | grep DB_
 ### Migration Failures
 
 ```bash
-# View migration error details
+# Check pending migrations
 npm run migrate:status
 
 # Rollback failed migration
