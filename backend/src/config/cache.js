@@ -1,7 +1,9 @@
 const Redis = require('ioredis');
 const logger = require('./logger');
+const { CircuitBreaker } = require('../utils/circuitBreaker');
 
 let redisClient = null;
+let redisCircuitBreaker = null;
 
 /**
  * Initialize Redis client with retry strategy
@@ -59,12 +61,21 @@ function initializeRedis() {
     logger.info({ delay }, 'Redis reconnecting');
   });
 
+  // Initialize circuit breaker for Redis (T116)
+  redisCircuitBreaker = new CircuitBreaker({
+    name: 'redis',
+    failureThreshold: 5,
+    successThreshold: 2,
+    resetTimeout: 30000, // 30 seconds
+    timeout: 5000, // 5 second operation timeout
+  });
+
   logger.info(
     {
       host: config.host,
       port: config.port,
     },
-    'Redis client initialized'
+    'Redis client initialized with circuit breaker protection'
   );
 
   return redisClient;
@@ -111,9 +122,36 @@ async function isHealthy() {
   }
 }
 
+/**
+ * Execute Redis operation with circuit breaker protection (T114, T116)
+ * @param {Function} operation - Redis operation function
+ * @returns {Promise<*>} Result of the operation
+ * @example
+ * await executeRedisOperation(async () => await redis.get('key'));
+ */
+async function executeRedisOperation(operation) {
+  if (!redisCircuitBreaker) {
+    // Fallback if circuit breaker not initialized (e.g., in tests)
+    return await operation();
+  }
+
+  return await redisCircuitBreaker.execute(operation);
+}
+
+/**
+ * Get the Redis circuit breaker instance (for monitoring)
+ * @returns {CircuitBreaker|null}
+ */
+function getRedisCircuitBreaker() {
+  return redisCircuitBreaker;
+}
+
 module.exports = {
   initializeRedis,
   getRedisClient,
+  getRedis: getRedisClient, // Alias for backward compatibility
   closeRedis,
   isHealthy,
+  executeRedisOperation,
+  getRedisCircuitBreaker,
 };

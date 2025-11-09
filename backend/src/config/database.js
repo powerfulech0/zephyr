@@ -6,8 +6,11 @@ const {
   dbConnectionsCurrent,
   errorsTotal,
 } = require('../services/metricsService');
+const { retryWithBackoff } = require('../services/resilienceService');
+const { CircuitBreaker } = require('../utils/circuitBreaker');
 
 let pool = null;
+let dbCircuitBreaker = null;
 
 /**
  * Initialize PostgreSQL connection pool
@@ -31,16 +34,35 @@ function initializePool() {
 
   pool = new Pool(config);
 
+  // Initialize circuit breaker for database (T115)
+  dbCircuitBreaker = new CircuitBreaker({
+    name: 'database',
+    failureThreshold: 5,
+    successThreshold: 2,
+    resetTimeout: 30000, // 30 seconds
+    timeout: 10000, // 10 second query timeout
+  });
+
   // Store original query method
   const originalPoolQuery = pool.query.bind(pool);
 
-  // Override pool.query with our instrumented wrapper (T067)
+  // Override pool.query with retry + circuit breaker wrapper (T067, T113, T115)
   pool.query = async function (text, params) {
     const start = Date.now();
     const { operation, table } = parseQueryMetadata(text);
 
     try {
-      const result = await originalPoolQuery(text, params);
+      // Wrap query with circuit breaker and retry logic (T113, T115)
+      const result = await dbCircuitBreaker.execute(async () => {
+        return await retryWithBackoff(
+          async () => await originalPoolQuery(text, params),
+          {
+            maxAttempts: 3,
+            initialDelay: 100,
+            retryableErrors: ['ETIMEDOUT', 'ECONNREFUSED', 'ECONNRESET', 'ENOTFOUND', '08P01', '53300'],
+          }
+        );
+      });
       const duration = (Date.now() - start) / 1000;
 
       // Track query metrics
