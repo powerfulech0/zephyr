@@ -33,4 +33,8 @@ module.exports = {
   ],
   // Set NODE_ENV to test to avoid pino-pretty issues
   setupFiles: ['<rootDir>/tests/setup.js'],
+  // Global teardown to close all connections
+  globalTeardown: '<rootDir>/tests/teardown.js',
+  // Force exit after tests to prevent hanging
+  testTimeout: 10000,
 };

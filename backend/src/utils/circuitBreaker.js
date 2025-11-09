@@ -115,18 +115,23 @@ class CircuitBreaker {
       return func();
     }
 
-    return Promise.race([
-      func(),
-      // eslint-disable-next-line arrow-body-style
-      new Promise((_, reject) => {
-        // eslint-disable-next-line no-promise-executor-return
-        return setTimeout(() => {
-          const error = new Error('Operation timed out');
-          error.code = 'ETIMEDOUT';
-          reject(error);
-        }, this.timeout);
-      }),
-    ]);
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        const error = new Error('Operation timed out');
+        error.code = 'ETIMEDOUT';
+        reject(error);
+      }, this.timeout);
+    });
+
+    try {
+      const result = await Promise.race([func(), timeoutPromise]);
+      clearTimeout(timeoutId); // Clear timeout if func resolves first
+      return result;
+    } catch (error) {
+      clearTimeout(timeoutId); // Clear timeout on error
+      throw error;
+    }
   }
 
   /**
