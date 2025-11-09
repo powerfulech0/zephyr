@@ -76,11 +76,11 @@ describe('Contract: Metrics Endpoint', () => {
       expect(response.text).toContain('# TYPE database_connections_current gauge');
       expect(response.text).toContain('database_connections_current');
 
-      // Verify database_queries_total counter
-      expect(response.text).toContain('# TYPE database_queries_total counter');
+      // Verify db_queries_total counter (actual metric name)
+      expect(response.text).toContain('# TYPE db_queries_total counter');
 
-      // Verify database_query_duration_seconds histogram
-      expect(response.text).toContain('# TYPE database_query_duration_seconds histogram');
+      // Verify db_query_duration_seconds histogram (actual metric name)
+      expect(response.text).toContain('# TYPE db_query_duration_seconds histogram');
     });
 
     it('should include rate limit metrics', async () => {

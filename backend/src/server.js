@@ -67,6 +67,9 @@ app.use(globalRateLimiter);
 // 7. Metrics instrumentation (T064) - Track HTTP request metrics
 app.use(metricsMiddleware);
 
+// 8. Register routes that don't require database/Redis (always available)
+app.use('/', metricsRoutes); // Metrics at /metrics (not /api/metrics)
+
 /**
  * Initialize infrastructure connections (database, Redis)
  * @returns {Promise<void>}
@@ -92,7 +95,6 @@ async function initializeInfrastructure() {
 
     // Initialize routes and socket handlers with pollService
     app.use('/api', healthRoutes);
-    app.use('/', metricsRoutes); // Metrics at /metrics (not /api/metrics)
     app.use('/api/auth', authRoutes); // Authentication routes (T054)
     app.use('/api', initializePollRoutes(pollService));
     initializeSocketHandler(io, pollService);

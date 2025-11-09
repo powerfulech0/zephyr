@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const logger = require('../../config/logger');
-const validate = require('../middleware/validator');
+const { validateWithSchema } = require('../middleware/validator');
 const { hostLoginSchema, hostTokenSchema } = require('../../schemas/hostAuthSchemas');
 const pollService = require('../../services/pollService');
 
@@ -16,7 +16,7 @@ const router = express.Router();
  * Body: { roomCode, hostSecret }
  * Response: { token, expiresAt }
  */
-router.post('/host/login', validate(hostLoginSchema), async (req, res) => {
+router.post('/host/login', validateWithSchema(hostLoginSchema), async (req, res) => {
   try {
     // Check if host authentication is enabled
     if (process.env.HOST_AUTH_ENABLED !== 'true') {
@@ -128,7 +128,7 @@ router.post('/host/login', validate(hostLoginSchema), async (req, res) => {
  * Body: { token }
  * Response: { valid: true, roomCode, expiresAt } or { valid: false, error }
  */
-router.post('/host/verify', validate(hostTokenSchema), (req, res) => {
+router.post('/host/verify', validateWithSchema(hostTokenSchema), (req, res) => {
   try {
     // Check if host authentication is enabled
     if (process.env.HOST_AUTH_ENABLED !== 'true') {
