@@ -15,6 +15,7 @@ const PollService = require('./services/pollService.js');
 const healthRoutes = require('./api/routes/healthRoutes.js');
 const metricsRoutes = require('./api/routes/metricsRoutes.js');
 const authRoutes = require('./api/routes/authRoutes.js');
+const configRoutes = require('./api/routes/configRoutes.js');
 const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
 const initializeSocketHandler = require('./sockets/socketHandler.js');
 const errorHandler = require('./api/middleware/errorHandler.js');
@@ -69,6 +70,7 @@ app.use(metricsMiddleware);
 
 // 8. Register routes that don't require database/Redis (always available)
 app.use('/', metricsRoutes); // Metrics at /metrics (not /api/metrics)
+app.use('/api/config', configRoutes); // Runtime configuration (T078-T080)
 
 /**
  * Initialize infrastructure connections (database, Redis)

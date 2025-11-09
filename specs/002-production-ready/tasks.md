@@ -136,11 +136,11 @@
 
 ### Tests for User Story 3
 
-- [ ] T057 [P] [US3] Contract test for /metrics endpoint format in backend/tests/contract/metricsEndpoint.test.js (Prometheus format validation)
-- [ ] T058 [P] [US3] Contract test for /api/health endpoint in backend/tests/contract/healthCheck.test.js per health-check-contract.yaml
-- [ ] T059 [P] [US3] Contract test for /api/health/ready endpoint in backend/tests/contract/readinessCheck.test.js
-- [ ] T060 [P] [US3] Contract test for /api/health/live endpoint in backend/tests/contract/livenessCheck.test.js
-- [ ] T061 [US3] Integration test for correlation ID propagation in backend/tests/integration/correlationIdTracking.test.js
+- [X] T057 [P] [US3] Contract test for /metrics endpoint format in backend/tests/contract/metricsEndpoint.test.js (Prometheus format validation)
+- [X] T058 [P] [US3] Contract test for /api/health endpoint in backend/tests/contract/healthCheck.test.js per health-check-contract.yaml
+- [X] T059 [P] [US3] Contract test for /api/health/ready endpoint in backend/tests/contract/readinessCheck.test.js
+- [X] T060 [P] [US3] Contract test for /api/health/live endpoint in backend/tests/contract/livenessCheck.test.js
+- [X] T061 [US3] Integration test for correlation ID propagation in backend/tests/integration/correlationIdTracking.test.js
 
 ### Implementation for User Story 3
 
@@ -156,13 +156,13 @@
 - [X] T071 [US3] Update backend/src/api/routes/healthRoutes.js to implement enhanced health check per health-check-contract.yaml
 - [X] T072 [US3] Add /api/health/ready endpoint checking database pool availability and Redis connectivity
 - [X] T073 [US3] Add /api/health/live endpoint with minimal checks (always returns 200 if process responsive)
-- [ ] T074 [US3] Create backend/grafana/dashboards/zephyr-overview.json with panels for RPS, error rate, P95 response time, active connections, DB performance
-- [ ] T075 [US3] Configure Prometheus alert rules for high error rate, slow queries, high memory usage in backend/prometheus-alerts.yml
-- [ ] T076 [US3] Update logger to include correlation IDs in all log entries for request tracing
+- [X] T074 [US3] Create backend/grafana/dashboards/zephyr-overview.json with panels for RPS, error rate, P95 response time, active connections, DB performance
+- [X] T075 [US3] Configure Prometheus alert rules for high error rate, slow queries, high memory usage in backend/prometheus-alerts.yml
+- [X] T076 [US3] Update logger to include correlation IDs in all log entries for request tracing
 - [ ] T077 [US3] Run tests T057-T061 and verify they pass
-- [ ] T078 [US3] Create backend/src/api/routes/configRoutes.js with GET /api/config/log-level and PUT /api/config/log-level endpoints
-- [ ] T079 [US3] Implement runtime log level updates in backend/src/config/logger.js (support changing between debug, info, warn, error without restart)
-- [ ] T080 [US3] Add authentication/authorization to config endpoints (restrict to admin users or internal network only)
+- [X] T078 [US3] Create backend/src/api/routes/configRoutes.js with GET /api/config/log-level and PUT /api/config/log-level endpoints
+- [X] T079 [US3] Implement runtime log level updates in backend/src/config/logger.js (support changing between debug, info, warn, error without restart)
+- [X] T080 [US3] Add authentication/authorization to config endpoints (restrict to admin users or internal network only)
 
 **Checkpoint**: User Story 3 complete - full operational visibility with metrics, health checks, and runtime configuration
 
