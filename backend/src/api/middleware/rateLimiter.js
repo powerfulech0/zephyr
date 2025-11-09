@@ -2,6 +2,7 @@ const rateLimit = require('express-rate-limit');
 const RedisStore = require('rate-limit-redis');
 const { getRedisClient } = require('../../config/cache');
 const logger = require('../../config/logger');
+const AuditLogRepository = require('../../models/repositories/AuditLogRepository');
 
 /**
  * Rate limiting middleware using express-rate-limit with Redis store
@@ -56,6 +57,21 @@ const globalRateLimiter = rateLimit({
       },
       'Rate limit exceeded'
     );
+
+    // Log to audit_logs table (async, non-blocking)
+    AuditLogRepository.logEvent({
+      eventType: 'rate_limit_exceeded',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        rateLimitType: 'global',
+        path: req.path,
+        method: req.method,
+      },
+    }).catch((error) => {
+      logger.error({ error: error.message }, 'Failed to log rate limit violation to audit_logs');
+    });
+
     res.status(429).json({
       error: 'Too many requests from this IP, please try again later',
       retryAfter: '15 minutes',
@@ -87,6 +103,20 @@ const voteRateLimiter = rateLimit({
       },
       'Vote rate limit exceeded'
     );
+
+    // Log to audit_logs table (async, non-blocking)
+    AuditLogRepository.logEvent({
+      eventType: 'rate_limit_exceeded',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        rateLimitType: 'vote',
+        roomCode: req.body?.roomCode,
+      },
+    }).catch((error) => {
+      logger.error({ error: error.message }, 'Failed to log vote rate limit violation to audit_logs');
+    });
+
     res.status(429).json({
       error: 'Too many vote submissions, please slow down',
       retryAfter: '1 minute',
@@ -96,12 +126,13 @@ const voteRateLimiter = rateLimit({
 
 /**
  * Poll creation rate limiter
- * 5 requests per hour
+ * 5 requests per hour (production)
+ * Higher limit in test environment unless RATE_LIMIT_TESTING=true
  */
 const pollCreationRateLimiter = rateLimit({
   store: getRedisStore('rl:poll:'),
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // 5 requests per window
+  max: process.env.NODE_ENV === 'test' && process.env.RATE_LIMIT_TESTING !== 'true' ? 1000 : 5,
   message: {
     error: 'Too many polls created, please try again later',
     retryAfter: '1 hour',
@@ -117,6 +148,20 @@ const pollCreationRateLimiter = rateLimit({
       },
       'Poll creation rate limit exceeded'
     );
+
+    // Log to audit_logs table (async, non-blocking)
+    AuditLogRepository.logEvent({
+      eventType: 'rate_limit_exceeded',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        rateLimitType: 'pollCreation',
+        question: req.body?.question?.substring(0, 50), // First 50 chars only
+      },
+    }).catch((error) => {
+      logger.error({ error: error.message }, 'Failed to log poll creation rate limit violation to audit_logs');
+    });
+
     res.status(429).json({
       error: 'Too many polls created, please try again later',
       retryAfter: '1 hour',

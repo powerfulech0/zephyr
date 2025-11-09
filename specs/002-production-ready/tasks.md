@@ -95,29 +95,29 @@
 
 ### Tests for User Story 2
 
-- [ ] T032 [P] [US2] Contract test for input sanitization in backend/tests/contract/inputSanitization.test.js (XSS, script tags, SQL injection patterns)
-- [ ] T033 [P] [US2] Contract test for rate limiting in backend/tests/contract/rateLimiting.test.js (global, vote, poll creation limits)
-- [ ] T034 [P] [US2] Contract test for CORS validation in backend/tests/contract/corsValidation.test.js
-- [ ] T035 [P] [US2] Integration test for security headers in backend/tests/integration/securityHeaders.test.js
+- [X] T032 [P] [US2] Contract test for input sanitization in backend/tests/contract/inputSanitization.test.js (XSS, script tags, SQL injection patterns)
+- [X] T033 [P] [US2] Contract test for rate limiting in backend/tests/contract/rateLimiting.test.js (global, vote, poll creation limits)
+- [X] T034 [P] [US2] Contract test for CORS validation in backend/tests/contract/corsValidation.test.js
+- [X] T035 [P] [US2] Integration test for security headers in backend/tests/integration/securityHeaders.test.js
 
 ### Implementation for User Story 2
 
-- [ ] T036 [P] [US2] Create backend/src/api/middleware/securityHeaders.js using helmet.js for CSP, X-Frame-Options, HSTS headers
-- [ ] T037 [P] [US2] Create backend/src/api/middleware/rateLimiter.js with express-rate-limit and Redis store for distributed rate limiting
-- [ ] T038 [P] [US2] Create backend/src/schemas/pollSchemas.js with Joi validation schemas for poll creation (question 5-200 chars, 2-5 options)
-- [ ] T039 [P] [US2] Create backend/src/schemas/participantSchemas.js with Joi validation schemas for nickname (2-50 chars, alphanumeric)
-- [ ] T040 [P] [US2] Create backend/src/schemas/voteSchemas.js with Joi validation schema for vote submission (option_index 0-4)
-- [ ] T041 [US2] Update backend/src/api/middleware/validator.js to use Joi schemas and xss library for sanitization
-- [ ] T042 [US2] Apply security headers middleware to all routes in backend/src/server.js
-- [ ] T043 [US2] Apply rate limiting middleware: global (100 req/15min), vote (10/min), poll creation (5/hour) in backend/src/server.js
-- [ ] T044 [US2] Update CORS configuration in backend/src/server.js to whitelist allowed origins from environment variable
-- [ ] T045 [US2] Add request size limits (100kb) to Express in backend/src/server.js
-- [ ] T046 [US2] Create backend/src/migrations/002_audit_logs.js for security event logging per data-model.md
-- [ ] T047 [US2] Run migration: npm run migrate:up
-- [ ] T048 [US2] Create backend/src/models/repositories/AuditLogRepository.js for logging security events
-- [ ] T049 [US2] Update rate limiter middleware to log violations to audit_logs table
-- [ ] T050 [US2] Update validator middleware to log invalid input attempts to audit_logs table
-- [ ] T051 [US2] Run tests T032-T035 and verify they pass
+- [X] T036 [P] [US2] Create backend/src/api/middleware/securityHeaders.js using helmet.js for CSP, X-Frame-Options, HSTS headers
+- [X] T037 [P] [US2] Create backend/src/api/middleware/rateLimiter.js with express-rate-limit and Redis store for distributed rate limiting
+- [X] T038 [P] [US2] Create backend/src/schemas/pollSchemas.js with Joi validation schemas for poll creation (question 5-200 chars, 2-5 options)
+- [X] T039 [P] [US2] Create backend/src/schemas/participantSchemas.js with Joi validation schemas for nickname (2-50 chars, alphanumeric)
+- [X] T040 [P] [US2] Create backend/src/schemas/voteSchemas.js with Joi validation schema for vote submission (option_index 0-4)
+- [X] T041 [US2] Update backend/src/api/middleware/validator.js to use Joi schemas and xss library for sanitization
+- [X] T042 [US2] Apply security headers middleware to all routes in backend/src/server.js
+- [X] T043 [US2] Apply rate limiting middleware: global (100 req/15min), vote (10/min), poll creation (5/hour) in backend/src/server.js
+- [X] T044 [US2] Update CORS configuration in backend/src/server.js to whitelist allowed origins from environment variable
+- [X] T045 [US2] Add request size limits (100kb) to Express in backend/src/server.js
+- [X] T046 [US2] Create backend/src/migrations/002_audit_logs.js for security event logging per data-model.md
+- [X] T047 [US2] Run migration: npm run migrate:up
+- [X] T048 [US2] Create backend/src/models/repositories/AuditLogRepository.js for logging security events
+- [X] T049 [US2] Update rate limiter middleware to log violations to audit_logs table
+- [X] T050 [US2] Update validator middleware to log invalid input attempts to audit_logs table
+- [X] T051 [US2] Run tests T032-T035 and verify they pass
 - [ ] T052 [P] [US2] Create backend/src/schemas/hostAuthSchemas.js with Joi validation for host authentication credentials
 - [ ] T053 [US2] Implement backend/src/api/middleware/hostAuth.js optional authentication middleware for poll control actions using JWT tokens
 - [ ] T054 [US2] Add host authentication endpoints (POST /api/auth/host/login, POST /api/auth/host/verify) in backend/src/api/routes/authRoutes.js

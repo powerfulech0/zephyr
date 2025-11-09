@@ -1,5 +1,6 @@
 const xss = require('xss');
 const logger = require('../../config/logger');
+const AuditLogRepository = require('../../models/repositories/AuditLogRepository');
 const { createPollSchema, roomCodeSchema } = require('../../schemas/pollSchemas');
 const { joinRoomSchema } = require('../../schemas/participantSchemas');
 const { submitVoteSchema } = require('../../schemas/voteSchemas');
@@ -62,6 +63,22 @@ function validateWithSchema(schema, source = 'body') {
         'Validation failed'
       );
 
+      // Log to audit_logs table (async, non-blocking)
+      AuditLogRepository.logEvent({
+        eventType: 'invalid_input',
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        details: {
+          source,
+          errors,
+          path: req.path,
+          method: req.method,
+          inputData: sanitized, // Log sanitized data (XSS-safe)
+        },
+      }).catch((logError) => {
+        logger.error({ error: logError.message }, 'Failed to log invalid input to audit_logs');
+      });
+
       return res.status(400).json({
         error: errors[0], // Return first error for backward compatibility
         errors, // All errors for detailed debugging
@@ -97,6 +114,21 @@ const validateRoomCode = (req, res, next) => {
       },
       'Room code validation failed'
     );
+
+    // Log to audit_logs table (async, non-blocking)
+    AuditLogRepository.logEvent({
+      eventType: 'invalid_input',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        validationType: 'room_code',
+        roomCode,
+        error: error.message,
+        path: req.path,
+      },
+    }).catch((logError) => {
+      logger.error({ error: logError.message }, 'Failed to log invalid room code to audit_logs');
+    });
 
     return res.status(400).json({
       error: error.message,
