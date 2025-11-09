@@ -10,8 +10,10 @@ const { initializeRedis, closeRedis } = require('./config/cache.js');
 const correlationIdMiddleware = require('./api/middleware/correlationId.js');
 const securityHeaders = require('./api/middleware/securityHeaders.js');
 const { globalRateLimiter } = require('./api/middleware/rateLimiter.js');
+const metricsMiddleware = require('./api/middleware/metricsMiddleware.js');
 const PollService = require('./services/pollService.js');
 const healthRoutes = require('./api/routes/healthRoutes.js');
+const metricsRoutes = require('./api/routes/metricsRoutes.js');
 const { initializePollRoutes } = require('./api/routes/pollRoutes.js');
 const initializeSocketHandler = require('./sockets/socketHandler.js');
 const errorHandler = require('./api/middleware/errorHandler.js');
@@ -61,6 +63,9 @@ app.use(pinoHttp({ logger }));
 // 6. Global rate limiting (T043) - 100 requests per 15 minutes
 app.use(globalRateLimiter);
 
+// 7. Metrics instrumentation (T064) - Track HTTP request metrics
+app.use(metricsMiddleware);
+
 /**
  * Initialize infrastructure connections (database, Redis)
  * @returns {Promise<void>}
@@ -86,6 +91,7 @@ async function initializeInfrastructure() {
 
     // Initialize routes and socket handlers with pollService
     app.use('/api', healthRoutes);
+    app.use('/', metricsRoutes); // Metrics at /metrics (not /api/metrics)
     app.use('/api', initializePollRoutes(pollService));
     initializeSocketHandler(io, pollService);
 
