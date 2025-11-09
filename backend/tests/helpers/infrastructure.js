@@ -18,9 +18,9 @@ async function isPostgresAvailable(verbose = false) {
   const config = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
-    database: process.env.DB_NAME || 'zephyr_test',
+    database: process.env.DB_NAME || 'zephyr_dev',
     user: process.env.DB_USER || 'zephyr',
-    password: process.env.DB_PASSWORD || 'zephyr_test_password',
+    password: process.env.DB_PASSWORD || 'zephyr_dev_password',
     connectionTimeoutMillis: 2000,
   };
 
