@@ -3,6 +3,8 @@
  * Validates that expired polls are soft-deleted (is_active = false)
  */
 
+/* eslint-disable jest/no-standalone-expect */
+
 const { getPool } = require('../../src/config/database');
 const { executePollCleanup } = require('../../src/jobs/pollCleanup');
 const { initializePool, closePool } = require('../../src/config/database');
