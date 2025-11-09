@@ -1,5 +1,6 @@
 const logger = require('../../config/logger.js');
 const { POLL_STATE_CHANGED } = require('../../../../shared/eventTypes.js');
+const { websocketMessagesTotal } = require('../../services/metricsService.js');
 
 /**
  * Broadcast poll state change to all clients in room
@@ -22,6 +23,9 @@ function broadcastStateChange(io, roomCode, poll, previousState) {
   );
 
   io.to(roomCode).emit(POLL_STATE_CHANGED, payload);
+
+  // Track outbound WebSocket message (T065)
+  websocketMessagesTotal.labels('outbound', POLL_STATE_CHANGED).inc();
 }
 
 module.exports = { broadcastStateChange };

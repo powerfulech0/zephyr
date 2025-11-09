@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "directories": {
@@ -8,11 +8,20 @@
   },
   "scripts": {
     "start": "nodemon src/server.js",
+    "dev": "nodemon src/server.js",
     "test": "jest --coverage",
+    "test:unit": "jest tests/unit/ --coverage",
+    "test:contract": "jest tests/contract/ --coverage",
+    "test:integration": "jest tests/integration/ --coverage",
+    "test:performance": "jest tests/performance/ --coverage",
     "test:watch": "jest --watch",
+    "test:ci": "jest --coverage --ci --maxWorkers=2 --detectOpenHandles",
     "lint": "eslint src/ tests/",
     "format": "prettier --write 'src/**/*.js' 'tests/**/*.js'",
-    "prepare": "husky"
+    "prepare": "husky",
+    "migrate:up": "db-migrate up",
+    "migrate:down": "db-migrate down",
+    "migrate:status": "db-migrate check"
   },
   "lint-staged": {
     "*.js": [
@@ -26,15 +35,28 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.2.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^7.2.0",
+    "ioredis": "^5.3.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
     "nanoid": "^3.3.11",
+    "node-cron": "^4.2.1",
+    "pg": "^8.11.3",
     "pino": "^10.1.0",
     "pino-http": "^11.0.0",
-    "socket.io": "^4.8.1"
+    "prom-client": "^15.1.0",
+    "rate-limit-redis": "^4.2.3",
+    "socket.io": "^4.8.1",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
+    "db-migrate": "^0.11.14",
+    "db-migrate-pg": "^1.5.2",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.1.8",

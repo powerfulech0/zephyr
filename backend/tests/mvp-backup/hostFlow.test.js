@@ -15,7 +15,7 @@ describe('Host Poll Lifecycle Integration Test', () => {
       done();
     } else {
       httpServer.listen(0, () => {
-        const port = httpServer.address().port;
+        const {port} = httpServer.address();
         serverUrl = `http://localhost:${port}`;
         done();
       });
@@ -131,7 +131,7 @@ describe('Host Poll Lifecycle Integration Test', () => {
       })
       .expect(201);
 
-    const poll = createResponse.body.poll;
+    const {poll} = createResponse.body;
 
     // Connect host socket
     hostSocket = ioClient(serverUrl, {

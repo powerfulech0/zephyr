@@ -33,15 +33,18 @@
 
 Answer each question based on the current feature requirements:
 
+### MVP Principles (v1.0.0)
+
 **I. Real-time First** ✅ / ⚠️ / N/A
 - Does this feature require real-time state synchronization?
 - If yes, are WebSocket events planned for all state changes?
 - Are connection/disconnection events tracked?
 
-**II. Simplicity & MVP Focus** ✅ / ⚠️
-- Is in-memory storage sufficient for this feature?
+**II. Simplicity & Production Readiness** ✅ / ⚠️
+- Is the simplest viable solution proposed?
 - Are all external dependencies necessary and justified?
 - Are there any architectural patterns (repositories, ORMs) being introduced? If yes, documented in Complexity Tracking?
+- Is production infrastructure (databases, caching, monitoring) justified against specific requirements?
 
 **III. Component Isolation** ✅ / ⚠️ / N/A
 - Are Host and Participant responsibilities clearly separated?
@@ -58,11 +61,59 @@ Answer each question based on the current feature requirements:
 - Are linting and formatting tools configured (ESLint, Prettier)?
 - Is TypeScript strict mode enabled (if applicable)?
 - Are pre-commit hooks configured for quality gates?
+- Are security vulnerability scans configured?
 
 **VI. Incremental Delivery** ✅ / ⚠️
 - Are user stories prioritized (P1, P2, P3) in spec.md?
 - Is each story independently testable?
-- Is MVP (P1) clearly defined and demonstrable?
+- Are P1 stories planned for completion before P2 stories?
+
+### Production Principles (v2.0.0)
+
+**VII. Data Persistence & Reliability** ✅ / ⚠️ / N/A
+- Is data persistence required for this feature?
+- If yes, are all critical data entities identified for persistence?
+- Are backup and recovery mechanisms planned?
+- Are database migrations planned and reversible?
+- Is zero data loss requirement addressed?
+
+**VIII. Security First** ✅ / ⚠️
+- Are all user inputs sanitized and validated?
+- Is rate limiting planned to prevent abuse?
+- Are CORS policies configured?
+- Are security headers planned (CSP, X-Frame-Options, HSTS)?
+- Are security events logged?
+- Are secrets externalized (not hardcoded)?
+
+**IX. Observability & Monitoring** ✅ / ⚠️ / N/A
+- Are structured logs with correlation IDs planned?
+- Are metrics exposed (request count, error rate, response time)?
+- Are health check endpoints planned?
+- Is centralized logging integration planned?
+- Are alerts configured for critical errors?
+
+**X. Deployment Excellence** ✅ / ⚠️ / N/A
+- Is containerized deployment planned?
+- Is configuration externalized?
+- Are secrets loaded from secure vault?
+- Is CI/CD pipeline configured (test, build, deploy)?
+- Is zero-downtime deployment supported?
+- Is automated rollback capability planned?
+
+**XI. Scalability & Performance** ✅ / ⚠️ / N/A
+- Does this feature require horizontal scaling?
+- If yes, is session state shared across instances?
+- Are load balancers with health checks planned?
+- Is connection pooling configured for database access?
+- Are performance targets defined and measurable?
+
+**XII. Resilience & Error Handling** ✅ / ⚠️
+- Is retry logic with exponential backoff planned for transient failures?
+- Are circuit breakers planned for external dependencies?
+- Are timeout limits defined for all external operations?
+- Is graceful degradation planned for non-critical features?
+- Are user-friendly error messages planned (no stack traces)?
+- Is automatic WebSocket reconnection planned?
 
 **Overall Status**: ✅ PASS / ⚠️ NEEDS ATTENTION / ❌ BLOCKED
 

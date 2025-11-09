@@ -400,8 +400,385 @@ npm run test:watch
 
 See root repository LICENSE file.
 
+## 🚢 Deployment
+
+### Production Deployment Overview
+
+The application supports containerized deployment with automated CI/CD pipelines, database migrations, and zero-downtime deployments.
+
+**Deployment Environments:**
+- **Local**: Docker Compose for development
+- **Staging**: Automated deployment on push to `main` branch
+- **Production**: Manual workflow dispatch with approval gates
+
+### Prerequisites
+
+**Infrastructure Requirements:**
+- PostgreSQL 14+ (managed service recommended: AWS RDS, GCP Cloud SQL)
+- Redis 7+ (managed service recommended: AWS ElastiCache, GCP Memorystore)
+- Container orchestration (Kubernetes, AWS ECS, Docker Swarm)
+- Secret management (AWS Secrets Manager, HashiCorp Vault, or similar)
+
+**CI/CD Requirements:**
+- GitHub Actions (workflows in `.github/workflows/`)
+- Container registry (GitHub Container Registry or AWS ECR)
+- Deployment credentials configured in GitHub Secrets
+
+### Local Development with Docker
+
+```bash
+# Start all services (PostgreSQL, Redis, Prometheus, Grafana)
+docker compose up -d
+
+# Run database migrations
+npm run migrate:up
+
+# Start backend
+npm run dev
+
+# View logs
+docker compose logs -f
+
+# Stop services
+docker compose down
+```
+
+**Access Points:**
+- Backend API: http://localhost:4000
+- Grafana: http://localhost:3001 (admin/admin)
+- Prometheus: http://localhost:9090
+- pgAdmin: http://localhost:5050
+
+### Building Docker Image
+
+```bash
+# Build production image
+docker build -t zephyr-backend:latest ./backend
+
+# Build with specific tag
+docker build -t zephyr-backend:v2.0.0 ./backend
+
+# Multi-architecture build
+docker buildx build --platform linux/amd64,linux/arm64 -t zephyr-backend:latest ./backend
+```
+
+**Image Details:**
+- Base: Node.js 18 Alpine (multi-stage build)
+- Size: ~150MB (production dependencies only)
+- Non-root user: `nodejs`
+- Health check: `/api/health/live` endpoint
+- Signal handling: `dumb-init` for proper SIGTERM handling
+
+### Environment Configuration
+
+#### Production Environment Variables
+
+Create `.env.production` with required variables (see `.env.production` template):
+
+```bash
+# Required variables
+NODE_ENV=production
+DB_HOST=<database-host>
+DB_PASSWORD=<from-secrets-manager>
+REDIS_HOST=<redis-host>
+ALLOWED_ORIGINS=https://app.example.com
+
+# Optional variables
+HOST_AUTH_ENABLED=true
+SECRET_BACKEND=aws
+```
+
+**Configuration Validation:**
+- Application validates all required variables at startup
+- Fails fast with descriptive errors if misconfigured
+- Production mode requires explicit DB_PASSWORD, REDIS_HOST, ALLOWED_ORIGINS
+
+**Secret Management:**
+- Development: `.env` files (git-ignored)
+- Staging/Production: AWS Secrets Manager, Vault, or cloud provider secrets
+- Configure via `SECRET_BACKEND` environment variable
+
+### Database Migrations
+
+```bash
+# Run all pending migrations
+npm run migrate:up
+
+# Rollback last migration
+npm run migrate:down
+
+# Check migration status
+npm run migrate:status
+
+# Create new migration
+npm run migrate:create <migration_name>
+```
+
+**Migration Strategy:**
+- Automated in CI/CD pipeline (runs before deployment)
+- Reversible migrations for safe rollbacks
+- Version-controlled in `src/migrations/`
+- Transactional execution (PostgreSQL)
+
+### Deployment Workflows
+
+#### 1. Test Workflow (`.github/workflows/test.yml`)
+
+**Triggers**: Push to any branch, PRs to main/develop
+
+**Steps:**
+1. Lint code (ESLint, Prettier)
+2. Run unit tests
+3. Run integration tests (with PostgreSQL, Redis services)
+4. Run contract tests
+5. Security audit (npm audit)
+6. Upload coverage reports
+
+#### 2. Build Workflow (`.github/workflows/build.yml`)
+
+**Triggers**: Push to main/develop, tags
+
+**Steps:**
+1. Build multi-arch Docker image (amd64, arm64)
+2. Push to GitHub Container Registry
+3. Generate SBOM (Software Bill of Materials)
+4. Scan for vulnerabilities (Trivy)
+5. Upload security scan results
+
+**Image Tags:**
+- `latest`: Latest build from main branch
+- `<branch>-<sha>`: Branch-specific builds
+- `v<version>`: Semantic version tags
+
+#### 3. Deploy Workflow (`.github/workflows/deploy.yml`)
+
+**Triggers**: Manual workflow dispatch
+
+**Steps:**
+1. Pull Docker image from registry
+2. Run database migrations
+3. Deploy to target environment (ECS/EKS/EC2)
+4. Wait for deployment to stabilize
+5. Run smoke tests (health checks)
+6. Rollback on failure
+7. Send deployment notifications
+
+**Deployment Environments:**
+- **Staging**: Auto-deploy from main branch
+- **Production**: Manual approval required
+
+### Manual Deployment (SSH/Docker Compose)
+
+```bash
+# SSH to server
+ssh user@production-server
+
+# Pull latest code
+cd /opt/zephyr
+git pull origin main
+
+# Copy environment configuration
+cp .env.production .env
+
+# Pull latest Docker images
+docker compose -f docker-compose.prod.yml pull
+
+# Run database migrations
+docker compose run --rm backend npm run migrate:up
+
+# Deploy with zero-downtime
+docker compose -f docker-compose.prod.yml up -d --no-deps backend
+
+# Verify deployment
+curl https://api.example.com/api/health
+```
+
+### Kubernetes Deployment
+
+```bash
+# Apply Kubernetes manifests
+kubectl apply -f k8s/
+
+# Check deployment status
+kubectl rollout status deployment/zephyr-backend
+
+# View pods
+kubectl get pods -l app=zephyr-backend
+
+# View logs
+kubectl logs -f deployment/zephyr-backend
+
+# Rollback deployment
+kubectl rollout undo deployment/zephyr-backend
+```
+
+**Kubernetes Resources:**
+- Deployment: `k8s/deployment.yaml`
+- Service: `k8s/service.yaml`
+- ConfigMap: `k8s/configmap.yaml`
+- Secrets: Use External Secrets Operator or Sealed Secrets
+
+### Health Checks
+
+**Endpoints:**
+- `/api/health`: Overall health with dependency status
+- `/api/health/ready`: Readiness probe (database/Redis available)
+- `/api/health/live`: Liveness probe (process responsive)
+
+**Load Balancer Configuration:**
+```yaml
+healthCheck:
+  path: /api/health/ready
+  interval: 30s
+  timeout: 5s
+  healthyThreshold: 2
+  unhealthyThreshold: 3
+```
+
+### Monitoring & Observability
+
+**Metrics:**
+- Endpoint: `/metrics` (Prometheus format)
+- Collection: Prometheus scrapes every 15 seconds
+- Visualization: Grafana dashboards (see `backend/grafana/dashboards/`)
+
+**Logging:**
+- Format: Structured JSON (Pino)
+- Correlation IDs: Tracked across all requests
+- Log Levels: debug, info, warn, error
+- Aggregation: CloudWatch Logs, Loki, or similar
+
+**Alerts:**
+- High error rate (>5% for 2 minutes)
+- Slow database queries (P95 >100ms)
+- High memory usage (>90% for 5 minutes)
+- Configuration: `backend/prometheus-alerts.yml`
+
+### Graceful Shutdown
+
+The application handles SIGTERM/SIGINT signals gracefully:
+
+1. Stop accepting new connections
+2. Close WebSocket connections cleanly
+3. Drain in-flight requests
+4. Close database connections
+5. Close Redis connections
+6. Exit within 30 seconds (forced timeout)
+
+**Testing Graceful Shutdown:**
+```bash
+# Send SIGTERM
+kill -TERM <process_id>
+
+# Verify clean shutdown in logs
+# Should see: "Graceful shutdown complete"
+```
+
+### Rollback Procedures
+
+**Automated Rollback:**
+- Deployment workflow automatically rolls back on health check failure
+- Kubernetes rollback: `kubectl rollout undo deployment/zephyr-backend`
+
+**Manual Rollback:**
+```bash
+# Revert to previous image tag
+docker tag zephyr-backend:v1.9.0 zephyr-backend:latest
+docker compose up -d backend
+
+# Or revert database migration
+npm run migrate:down
+```
+
+### Production Checklist
+
+Before deploying to production:
+
+- [ ] Environment variables configured in secret manager
+- [ ] Database backups enabled (automated RDS backups)
+- [ ] Redis persistence configured (AOF enabled)
+- [ ] HTTPS/TLS certificates configured
+- [ ] CORS origins whitelisted (no wildcards)
+- [ ] Rate limiting enabled
+- [ ] Monitoring and alerting configured
+- [ ] Log aggregation configured
+- [ ] Deployment runbook documented
+- [ ] Incident response plan in place
+- [ ] Database migrations tested in staging
+- [ ] Load testing completed
+- [ ] Security audit passed (npm audit)
+
+### Troubleshooting
+
+**Common Issues:**
+
+1. **Database connection failed**
+   - Check DB_HOST, DB_PORT, DB_PASSWORD in environment
+   - Verify security group allows connections
+   - Check database is running: `pg_isready -h <host>`
+
+2. **Redis connection failed**
+   - Verify REDIS_HOST, REDIS_PORT configuration
+   - Check Redis authentication (REDIS_PASSWORD)
+   - Test connection: `redis-cli -h <host> ping`
+
+3. **Migration failed**
+   - Check database permissions (CREATE, ALTER tables)
+   - Review migration logs: `npm run migrate:status`
+   - Rollback failed migration: `npm run migrate:down`
+
+4. **Container won't start**
+   - Check logs: `docker logs <container>`
+   - Verify environment variables loaded
+   - Check port conflicts: `lsof -i :4000`
+
+5. **Health checks failing**
+   - Check `/api/health/ready` endpoint
+   - Verify database and Redis connectivity
+   - Review application logs for errors
+
+### Performance Optimization
+
+**Production Settings:**
+- Node.js memory: `NODE_OPTIONS=--max-old-space-size=2048`
+- Database pool size: `DB_POOL_MAX=20`
+- Redis connection timeout: `REDIS_TIMEOUT=1000`
+- Rate limit window: `RATE_LIMIT_WINDOW_MS=900000` (15 min)
+
+**Scaling:**
+- Horizontal: Multiple backend instances with Redis adapter (User Story 5)
+- Vertical: Increase container resources (CPU, memory)
+- Database: Connection pooling (already configured)
+- Redis: Clustered mode for high availability
+
+### Security Best Practices
+
+1. **Secrets Management**
+   - Never commit `.env.production` with real credentials
+   - Use AWS Secrets Manager, Vault, or cloud provider secrets
+   - Rotate credentials every 90 days
+
+2. **Network Security**
+   - Use VPC/security groups to restrict access
+   - Database and Redis should NOT be publicly accessible
+   - Enable encryption in transit (TLS)
+
+3. **Container Security**
+   - Run as non-root user (already configured)
+   - Scan images for vulnerabilities (Trivy in CI/CD)
+   - Use minimal base images (Alpine)
+
+4. **Application Security**
+   - Rate limiting enabled (100 req/15min default)
+   - Input validation and sanitization (Joi + XSS)
+   - Security headers (helmet.js)
+   - CORS whitelist (no wildcards in production)
+
 ## 🔗 Related Documentation
 
 - [Frontend README](../frontend/README.md)
 - [Project README](../README.md)
 - [Feature Specification](../specs/001-voting-app-mvp/spec.md)
+- [Quickstart Guide](../specs/002-production-ready/quickstart.md)
+- [Data Model](../specs/002-production-ready/data-model.md)
+- [API Contracts](../specs/002-production-ready/contracts/)

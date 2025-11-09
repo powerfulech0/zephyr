@@ -1,0 +1,257 @@
+groups:
+  - name: zephyr_alerts
+    interval: 30s
+    rules:
+      # ========================================
+      # Critical Alerts (Immediate Action Required)
+      # ========================================
+
+      - alert: HighServerErrorRate
+        expr: |
+          (
+            rate(errors_total{type="server_error"}[5m])
+            /
+            rate(http_requests_total[5m])
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: backend
+          team: engineering
+        annotations:
+          summary: "High server error rate detected"
+          description: "Server error rate is {{ $value | humanizePercentage }} (threshold: 5%). This indicates critical application failures."
+          impact: "Users experiencing 5xx errors, service degraded"
+          runbook: "https://docs.zephyr.example.com/runbooks/high-error-rate"
+
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+          team: infrastructure
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "Database has been unreachable for 1 minute"
+          impact: "Complete service outage - no data persistence"
+          runbook: "https://docs.zephyr.example.com/runbooks/database-down"
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: cache
+          team: infrastructure
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been unreachable for 1 minute"
+          impact: "Session state lost, real-time updates may fail in multi-instance deployments"
+          runbook: "https://docs.zephyr.example.com/runbooks/redis-down"
+
+      - alert: ServiceDown
+        expr: up{job="zephyr-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: backend
+          team: engineering
+        annotations:
+          summary: "Zephyr backend service is down"
+          description: "Backend service has been unreachable for 1 minute"
+          impact: "Complete service outage"
+          runbook: "https://docs.zephyr.example.com/runbooks/service-down"
+
+      # ========================================
+      # High Priority Alerts (Action Within Hours)
+      # ========================================
+
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95,
+            rate(db_query_duration_seconds_bucket[5m])
+          ) > 0.1
+        for: 5m
+        labels:
+          severity: high
+          component: database
+          team: engineering
+        annotations:
+          summary: "Slow database queries detected"
+          description: "P95 query time is {{ $value }}s (threshold: 100ms). Database performance degraded."
+          impact: "Increased response times, potential timeout errors"
+          runbook: "https://docs.zephyr.example.com/runbooks/slow-queries"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            nodejs_heap_size_used_bytes
+            /
+            nodejs_heap_size_total_bytes
+          ) > 0.9
+        for: 5m
+        labels:
+          severity: high
+          component: backend
+          team: engineering
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanizePercentage }} (threshold: 90%)"
+          impact: "Risk of out-of-memory crashes, garbage collection pauses"
+          runbook: "https://docs.zephyr.example.com/runbooks/high-memory"
+
+      - alert: DatabaseConnectionPoolExhausted
+        expr: database_connections_current >= 18
+        for: 2m
+        labels:
+          severity: high
+          component: database
+          team: engineering
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "{{ $value }} of 20 connections in use (threshold: 18)"
+          impact: "New requests may timeout waiting for connections"
+          runbook: "https://docs.zephyr.example.com/runbooks/connection-pool"
+
+      - alert: HighEventLoopLag
+        expr: nodejs_eventloop_lag_seconds > 0.1
+        for: 3m
+        labels:
+          severity: high
+          component: backend
+          team: engineering
+        annotations:
+          summary: "High Node.js event loop lag"
+          description: "Event loop lag is {{ $value }}s (threshold: 100ms)"
+          impact: "Slow request processing, degraded real-time WebSocket performance"
+          runbook: "https://docs.zephyr.example.com/runbooks/event-loop-lag"
+
+      # ========================================
+      # Medium Priority Alerts (Monitor)
+      # ========================================
+
+      - alert: HighRateLimitRejections
+        expr: |
+          (
+            rate(rate_limit_exceeded_total[5m])
+            /
+            rate(http_requests_total[5m])
+          ) > 0.01
+        for: 10m
+        labels:
+          severity: medium
+          component: backend
+          team: engineering
+        annotations:
+          summary: "High rate of rate limit rejections"
+          description: "{{ $value | humanizePercentage }} of requests are being rate limited (threshold: 1%)"
+          impact: "Some users experiencing 429 errors, potential abuse or legitimate high traffic"
+          runbook: "https://docs.zephyr.example.com/runbooks/rate-limiting"
+
+      - alert: ElevatedClientErrors
+        expr: |
+          (
+            rate(errors_total{type="client_error"}[5m])
+            /
+            rate(http_requests_total[5m])
+          ) > 0.1
+        for: 10m
+        labels:
+          severity: medium
+          component: backend
+          team: engineering
+        annotations:
+          summary: "Elevated client error rate (4xx)"
+          description: "Client error rate is {{ $value | humanizePercentage }} (threshold: 10%)"
+          impact: "Users experiencing validation errors or invalid requests, check API changes or client bugs"
+          runbook: "https://docs.zephyr.example.com/runbooks/client-errors"
+
+      - alert: SlowHTTPResponses
+        expr: |
+          histogram_quantile(0.95,
+            rate(http_request_duration_seconds_bucket[5m])
+          ) > 1
+        for: 5m
+        labels:
+          severity: medium
+          component: backend
+          team: engineering
+        annotations:
+          summary: "Slow HTTP response times"
+          description: "P95 response time is {{ $value }}s (threshold: 1s)"
+          impact: "Degraded user experience, slow page loads"
+          runbook: "https://docs.zephyr.example.com/runbooks/slow-responses"
+
+      - alert: HighWebSocketConnectionCount
+        expr: websocket_connections_current > 8000
+        for: 5m
+        labels:
+          severity: medium
+          component: backend
+          team: engineering
+        annotations:
+          summary: "High number of WebSocket connections"
+          description: "{{ $value }} active connections (threshold: 8000 of 10000 max)"
+          impact: "Approaching connection limit, may need horizontal scaling"
+          runbook: "https://docs.zephyr.example.com/runbooks/websocket-scaling"
+
+      # ========================================
+      # Low Priority Alerts (Informational)
+      # ========================================
+
+      - alert: DatabaseConnectionPoolLow
+        expr: database_connections_current < 2
+        for: 30m
+        labels:
+          severity: low
+          component: database
+          team: engineering
+        annotations:
+          summary: "Very few database connections in use"
+          description: "Only {{ $value }} connections in use for 30+ minutes"
+          impact: "Possible indication of low traffic or connection leak cleanup"
+          runbook: "https://docs.zephyr.example.com/runbooks/connection-pool"
+
+      - alert: NoActivePolls
+        expr: polls_active == 0
+        for: 1h
+        labels:
+          severity: low
+          component: business
+          team: product
+        annotations:
+          summary: "No active polls for extended period"
+          description: "No polls in 'open' state for 1+ hours"
+          impact: "Low user activity or potential service issue"
+          runbook: "https://docs.zephyr.example.com/runbooks/low-activity"
+
+      # ========================================
+      # Capacity Planning Alerts
+      # ========================================
+
+      - alert: HighDatabaseQueryRate
+        expr: rate(db_queries_total[5m]) > 1000
+        for: 10m
+        labels:
+          severity: info
+          component: database
+          team: infrastructure
+        annotations:
+          summary: "High database query rate"
+          description: "Query rate is {{ $value }} queries/sec (threshold: 1000/sec)"
+          impact: "Approaching database capacity, consider read replicas or caching"
+          runbook: "https://docs.zephyr.example.com/runbooks/capacity-planning"
+
+      - alert: HighRequestRate
+        expr: rate(http_requests_total[5m]) > 500
+        for: 10m
+        labels:
+          severity: info
+          component: backend
+          team: infrastructure
+        annotations:
+          summary: "High request rate"
+          description: "Request rate is {{ $value }} req/sec (threshold: 500/sec)"
+          impact: "High traffic, consider horizontal scaling if sustained"
+          runbook: "https://docs.zephyr.example.com/runbooks/capacity-planning"

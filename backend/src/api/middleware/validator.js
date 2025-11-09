@@ -1,75 +1,158 @@
-const validatePollCreation = (req, res, next) => {
-  const { question, options } = req.body;
+const xss = require('xss');
+const logger = require('../../config/logger');
+const AuditLogRepository = require('../../models/repositories/AuditLogRepository');
+const { createPollSchema, roomCodeSchema } = require('../../schemas/pollSchemas');
+const { joinRoomSchema } = require('../../schemas/participantSchemas');
+const { submitVoteSchema } = require('../../schemas/voteSchemas');
 
-  if (typeof question !== 'string') {
-    return res.status(400).json({
-      success: false,
-      error: 'Question is required and must be a string',
-    });
+/**
+ * Enhanced validation middleware using Joi schemas and XSS sanitization
+ * Implements FR-007, FR-008: Input validation and sanitization
+ */
+
+/**
+ * Sanitize string inputs to prevent XSS attacks
+ * @param {*} value - Value to sanitize
+ * @returns {*} Sanitized value
+ */
+function sanitizeInput(value) {
+  if (typeof value === 'string') {
+    return xss(value);
   }
-
-  if (question.trim().length < 1 || question.length > 500) {
-    return res.status(400).json({
-      success: false,
-      error: 'Question must be between 1 and 500 characters',
-    });
+  if (Array.isArray(value)) {
+    return value.map(sanitizeInput);
   }
-
-  if (!Array.isArray(options)) {
-    return res.status(400).json({
-      success: false,
-      error: 'Options must be an array',
+  if (value && typeof value === 'object') {
+    const sanitized = {};
+    Object.keys(value).forEach((key) => {
+      sanitized[key] = sanitizeInput(value[key]);
     });
+    return sanitized;
   }
+  return value;
+}
 
-  if (options.length < 2 || options.length > 5) {
-    return res.status(400).json({
-      success: false,
-      error: 'Options array must contain 2-5 elements',
+/**
+ * Generic Joi validation middleware factory
+ * @param {Joi.Schema} schema - Joi schema to validate against
+ * @param {string} source - Request source ('body', 'params', 'query')
+ * @returns {Function} Express middleware function
+ */
+function validateWithSchema(schema, source = 'body') {
+  return (req, res, next) => {
+    const data = req[source];
+
+    // Sanitize input first
+    const sanitized = sanitizeInput(data);
+
+    // Validate with Joi
+    const { error, value } = schema.validate(sanitized, {
+      abortEarly: false, // Return all errors
+      stripUnknown: true, // Remove unknown fields
     });
-  }
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const option of options) {
-    if (typeof option !== 'string' || option.trim().length < 1 || option.length > 100) {
+    if (error) {
+      const errors = error.details.map((detail) => detail.message);
+      logger.warn(
+        {
+          source,
+          errors,
+          ip: req.ip,
+          path: req.path,
+        },
+        'Validation failed'
+      );
+
+      // Log to audit_logs table (async, non-blocking)
+      AuditLogRepository.logEvent({
+        eventType: 'invalid_input',
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        details: {
+          source,
+          errors,
+          path: req.path,
+          method: req.method,
+          inputData: sanitized, // Log sanitized data (XSS-safe)
+        },
+      }).catch((logError) => {
+        logger.error({ error: logError.message }, 'Failed to log invalid input to audit_logs');
+      });
+
       return res.status(400).json({
-        success: false,
-        error: 'Option must be between 1 and 100 characters',
+        error: errors[0], // Return first error for backward compatibility
+        errors, // All errors for detailed debugging
       });
     }
-  }
 
-  return next();
-};
+    // Replace request data with sanitized and validated data
+    req[source] = value;
+    next();
+  };
+}
 
+/**
+ * Poll creation validation middleware
+ */
+const validatePollCreation = validateWithSchema(createPollSchema, 'body');
+
+/**
+ * Room code validation middleware
+ */
 const validateRoomCode = (req, res, next) => {
   const { roomCode } = req.params;
 
-  if (!roomCode) {
+  const { error } = roomCodeSchema.validate(roomCode);
+
+  if (error) {
+    logger.warn(
+      {
+        roomCode,
+        error: error.message,
+        ip: req.ip,
+        path: req.path,
+      },
+      'Room code validation failed'
+    );
+
+    // Log to audit_logs table (async, non-blocking)
+    AuditLogRepository.logEvent({
+      eventType: 'invalid_input',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        validationType: 'room_code',
+        roomCode,
+        error: error.message,
+        path: req.path,
+      },
+    }).catch((logError) => {
+      logger.error({ error: logError.message }, 'Failed to log invalid room code to audit_logs');
+    });
+
     return res.status(400).json({
-      success: false,
-      error: 'Room code is required',
+      error: error.message,
     });
   }
 
-  if (roomCode.length !== 6) {
-    return res.status(400).json({
-      success: false,
-      error: 'Room code must be exactly 6 characters',
-    });
-  }
-
-  if (!/^[2-9A-HJ-NP-Z]{6}$/.test(roomCode)) {
-    return res.status(400).json({
-      success: false,
-      error: 'Invalid room code format',
-    });
-  }
-
-  return next();
+  next();
 };
+
+/**
+ * Join room validation middleware (for WebSocket events)
+ */
+const validateJoinRoom = validateWithSchema(joinRoomSchema, 'body');
+
+/**
+ * Vote submission validation middleware (for WebSocket events)
+ */
+const validateVoteSubmission = validateWithSchema(submitVoteSchema, 'body');
 
 module.exports = {
   validatePollCreation,
   validateRoomCode,
+  validateJoinRoom,
+  validateVoteSubmission,
+  sanitizeInput,
+  validateWithSchema,
 };

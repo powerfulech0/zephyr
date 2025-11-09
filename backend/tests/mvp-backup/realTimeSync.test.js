@@ -15,7 +15,7 @@ describe('User Story 3: Real-time vote synchronization', () => {
       done();
     } else {
       httpServer.listen(0, () => {
-        const port = httpServer.address().port;
+        const {port} = httpServer.address();
         serverUrl = `http://localhost:${port}`;
         done();
       });

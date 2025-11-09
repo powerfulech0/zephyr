@@ -1,194 +1,64 @@
-const { generateRoomCode } = require('../services/roomCodeGenerator.js');
+/**
+ * @deprecated This class is DEPRECATED as of v2.0.0 (Production-Ready Infrastructure)
+ *
+ * **Do NOT use PollManager for new code.**
+ *
+ * # Migration Guide
+ *
+ * The in-memory PollManager has been replaced with a database-backed repository pattern
+ * to support data persistence, horizontal scaling, and production reliability.
+ *
+ * ## Use Instead:
+ *
+ * ### For Poll Operations:
+ * - `backend/src/services/pollService.js` - Business logic layer
+ * - `backend/src/models/repositories/PollRepository.js` - Database operations
+ *
+ * ### For Participant Operations:
+ * - `backend/src/models/repositories/ParticipantRepository.js`
+ *
+ * ### For Vote Operations:
+ * - `backend/src/models/repositories/VoteRepository.js`
+ *
+ * ## Migration Examples:
+ *
+ * ### Before (PollManager):
+ * ```javascript
+ * const pollManager = new PollManager();
+ * const poll = pollManager.createPoll(question, options, hostSocketId);
+ * const existingPoll = pollManager.getPoll(roomCode);
+ * ```
+ *
+ * ### After (Repository Pattern):
+ * ```javascript
+ * const pollService = require('../services/pollService');
+ * const PollRepository = require('../models/repositories/PollRepository');
+ *
+ * // Create poll
+ * const poll = await pollService.createPoll({ question, options });
+ *
+ * // Get poll
+ * const existingPoll = await PollRepository.getPollByRoomCode(roomCode);
+ * ```
+ *
+ * ## Why This Changed:
+ *
+ * 1. **Data Persistence**: In-memory storage loses all data on server restart
+ * 2. **Horizontal Scaling**: Map-based storage doesn't work across multiple instances
+ * 3. **Durability**: No backup/recovery for in-memory data
+ * 4. **Production Requirements**: FR-003 requires zero data loss during restarts
+ *
+ * ## References:
+ * - Architecture: `backend/docs/architecture.md`
+ * - Data Model: `specs/002-production-ready/data-model.md`
+ * - Feature Spec: `specs/002-production-ready/spec.md`
+ *
+ * ## Note:
+ * This file is kept for reference only. It will be removed in a future version.
+ * All routes and socket handlers have been migrated to use repositories.
+ */
 
-class PollManager {
-  constructor() {
-    this.polls = new Map(); // roomCode → Poll object
-    this.socketRoomMap = new Map(); // socketId → roomCode
-    this.socketNicknameMap = new Map(); // socketId → nickname
-  }
+// No implementation - file kept for documentation purposes only
+// See migration guide above for new approach
 
-  /**
-   * Create new poll and return poll object
-   */
-  createPoll(question, options, hostSocketId) {
-    const roomCode = this._generateUniqueRoomCode();
-    const poll = {
-      roomCode,
-      question,
-      options,
-      state: 'waiting',
-      votes: new Map(),
-      participants: new Set(),
-      hostSocketId,
-      createdAt: new Date(),
-    };
-
-    this.polls.set(roomCode, poll);
-    this.socketRoomMap.set(hostSocketId, roomCode);
-
-    return poll;
-  }
-
-  /**
-   * Get poll by room code
-   */
-  getPoll(roomCode) {
-    return this.polls.get(roomCode);
-  }
-
-  /**
-   * Update host socket ID when host joins via WebSocket
-   */
-  updateHostSocketId(roomCode, newHostSocketId) {
-    const poll = this.polls.get(roomCode);
-    if (!poll) {
-      return { success: false, error: 'Poll not found' };
-    }
-
-    // Update host socket ID
-    poll.hostSocketId = newHostSocketId;
-    this.socketRoomMap.set(newHostSocketId, roomCode);
-
-    return { success: true, poll };
-  }
-
-  /**
-   * Change poll state (host only)
-   */
-  changePollState(roomCode, newState, hostSocketId) {
-    const poll = this.polls.get(roomCode);
-    if (!poll) {
-      return { success: false, error: 'Poll not found' };
-    }
-    if (poll.hostSocketId !== hostSocketId) {
-      return { success: false, error: 'Only the host can change poll state' };
-    }
-    if (!['waiting', 'open', 'closed'].includes(newState)) {
-      return { success: false, error: 'Invalid state' };
-    }
-
-    // Prevent reopening closed polls
-    if (poll.state === 'closed' && newState === 'open') {
-      return { success: false, error: 'Cannot reopen a closed poll' };
-    }
-
-    const previousState = poll.state;
-    poll.state = newState;
-    return { success: true, poll, previousState };
-  }
-
-  /**
-   * Add participant to poll
-   * @returns {success, error, poll}
-   */
-  addParticipant(roomCode, nickname, socketId) {
-    const poll = this.polls.get(roomCode);
-    if (!poll) {
-      return { success: false, error: 'Poll not found' };
-    }
-    if (poll.participants.has(nickname)) {
-      return { success: false, error: 'Nickname already taken' };
-    }
-    if (poll.participants.size >= 20) {
-      return { success: false, error: 'Room is full (20 participants max)' };
-    }
-
-    poll.participants.add(nickname);
-    this.socketRoomMap.set(socketId, roomCode);
-    this.socketNicknameMap.set(socketId, nickname);
-
-    return { success: true, poll };
-  }
-
-  /**
-   * Record or update vote
-   * @returns {success, error, votes, percentages}
-   */
-  recordVote(roomCode, nickname, optionIndex) {
-    const poll = this.polls.get(roomCode);
-    if (!poll) {
-      return { success: false, error: 'Poll not found' };
-    }
-    if (poll.state !== 'open') {
-      return { success: false, error: 'Voting is not open' };
-    }
-    if (!poll.participants.has(nickname)) {
-      return { success: false, error: 'Participant not in room' };
-    }
-    if (optionIndex < 0 || optionIndex >= poll.options.length) {
-      return { success: false, error: 'Invalid option index' };
-    }
-
-    poll.votes.set(nickname, optionIndex);
-
-    const counts = this._calculateVoteCounts(poll);
-    const percentages = this._calculatePercentages(counts);
-
-    return {
-      success: true,
-      votes: counts,
-      percentages,
-    };
-  }
-
-  /**
-   * Remove participant on disconnect (T082)
-   * FR-020: Clear poll from memory when all participants disconnect
-   */
-  removeParticipant(socketId) {
-    const roomCode = this.socketRoomMap.get(socketId);
-    const nickname = this.socketNicknameMap.get(socketId);
-
-    if (!roomCode) return null;
-
-    const poll = this.polls.get(roomCode);
-    if (!poll) return null;
-
-    // Remove participant from poll
-    if (nickname) {
-      poll.participants.delete(nickname);
-    }
-
-    // Clean up socket mappings
-    this.socketRoomMap.delete(socketId);
-    this.socketNicknameMap.delete(socketId);
-
-    // FR-020: Clear poll if all participants gone and host disconnected
-    if (poll.participants.size === 0 && poll.hostSocketId === socketId) {
-      this.polls.delete(roomCode);
-      return { roomCode, cleared: true, nickname };
-    }
-
-    return { roomCode, cleared: false, nickname };
-  }
-
-  /**
-   * Generate unique room code (retry on collision)
-   */
-  _generateUniqueRoomCode() {
-    let roomCode;
-    do {
-      roomCode = generateRoomCode();
-    } while (this.polls.has(roomCode));
-    return roomCode;
-  }
-
-  _calculateVoteCounts(poll) {
-    const counts = new Array(poll.options.length).fill(0);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [nickname, optionIndex] of poll.votes.entries()) {
-      if (poll.participants.has(nickname)) {
-        counts[optionIndex] += 1;
-      }
-    }
-    return counts;
-  }
-
-  _calculatePercentages(counts) {
-    const total = counts.reduce((sum, count) => sum + count, 0);
-    if (total === 0) return counts.map(() => 0);
-    return counts.map(count => Math.round((count / total) * 100));
-  }
-}
-
-module.exports = PollManager;
+module.exports = null; // Prevent accidental use
