@@ -178,7 +178,6 @@ function HostDashboard() {
                   onChange={e => setQuestion(e.target.value)}
                   placeholder="What would you like to ask?"
                   maxLength={500}
-                  required
                 />
               </label>
               <small>{question.length}/500 characters</small>
