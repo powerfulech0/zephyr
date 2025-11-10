@@ -49,7 +49,7 @@ describe('Host Poll Creation Flow (User Story 1)', () => {
       state: 'waiting',
     };
 
-    createPoll.mockResolvedValue({ poll: mockPoll });
+    createPoll.mockResolvedValue(mockPoll);
 
     render(
       <BrowserRouter>
@@ -216,7 +216,7 @@ describe('Host Poll Control Flow', () => {
       state: 'waiting',
     };
 
-    createPoll.mockResolvedValue({ poll: mockPoll });
+    createPoll.mockResolvedValue(mockPoll);
 
     render(
       <BrowserRouter>

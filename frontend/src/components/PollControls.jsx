@@ -46,9 +46,13 @@ function PollControls({ pollState, onOpenPoll, onClosePoll }) {
 }
 
 PollControls.propTypes = {
-  pollState: PropTypes.string.isRequired,
+  pollState: PropTypes.string,
   onOpenPoll: PropTypes.func.isRequired,
   onClosePoll: PropTypes.func.isRequired,
+};
+
+PollControls.defaultProps = {
+  pollState: undefined,
 };
 
 export default PollControls;
