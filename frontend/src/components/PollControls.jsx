@@ -39,9 +39,7 @@ function PollControls({ pollState, onOpenPoll, onClosePoll }) {
       </div>
       <div className="poll-status">
         Status:{' '}
-        <span className={`status-${pollState}`}>
-          {pollState?.toUpperCase() || 'UNKNOWN'}
-        </span>
+        <span className={`status-${pollState}`}>{pollState?.toUpperCase() || 'UNKNOWN'}</span>
       </div>
     </div>
   );
