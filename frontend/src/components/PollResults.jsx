@@ -26,10 +26,7 @@ function PollResults({ options, counts, percentages, pollState }) {
                 </span>
               </div>
               <div className="result-bar-container">
-                <div
-                  className="result-bar"
-                  style={{ width: `${barWidth}%` }}
-                />
+                <div className="result-bar" style={{ width: `${barWidth}%` }} />
               </div>
             </div>
           );

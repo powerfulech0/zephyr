@@ -6,6 +6,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-07
 - Node.js 18+ (LTS) / JavaScript ES6+ (002-production-ready)
 - JavaScript ES6+ (frontend), Node.js 18+ (backend - no changes needed) + React 18.x (frontend), Vite (build tool) (003-fix-poll-creation)
 - N/A (bug fix only, no storage changes) (003-fix-poll-creation)
+- JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, ESLint, Prettier, identity-obj-proxy (CSS mocking) (004-frontend-test-infrastructure)
+- N/A (infrastructure feature, no data storage) (004-frontend-test-infrastructure)
 
 ### Backend (001-voting-app-mvp + 002-production-ready)
 
@@ -176,31 +178,57 @@ specs/
 
 ### Development
 ```bash
+# Backend
 cd backend
 npm start              # Start server with nodemon
 npm run dev            # Alias for npm start
 
+# Frontend
+cd frontend
+npm run start          # Start Vite dev server
+npm run build          # Build for production
+npm run preview        # Preview production build
+
 # With Docker Compose (includes PostgreSQL, Redis, Prometheus, Grafana)
 docker compose up -d   # Start all services
-npm run migrate:up     # Run database migrations
+cd backend && npm run migrate:up  # Run database migrations
 npm run dev            # Start backend
 docker compose down    # Stop all services
 ```
 
 ### Testing
 ```bash
+# Backend Tests
+cd backend
 npm test               # Run all tests with coverage
 npm run test:watch     # Run tests in watch mode
 npm test -- <file>     # Run specific test file
 npm test -- --verbose  # Run with verbose output
+
+# Frontend Tests (004-frontend-test-infrastructure)
+cd frontend
+npm test               # Run all tests with coverage
+npm run test:watch     # Run tests in watch mode
+npm run test:ci        # Run tests in CI mode (--ci --maxWorkers=2)
+npm test -- <file>     # Run specific test file
 ```
 
 ### Code Quality
 ```bash
+# Backend
+cd backend
 npm run lint           # Run ESLint
 npm run format         # Format code with Prettier
 git commit             # Triggers pre-commit hook (lint-staged)
 npm audit              # Security vulnerability scan
+
+# Frontend (004-frontend-test-infrastructure)
+cd frontend
+npm run lint           # Run ESLint
+npm run lint:fix       # Run ESLint with --fix
+npm run format         # Format code with Prettier
+npm run format:check   # Check formatting without modifying files
+git commit             # Triggers pre-commit hook (lint-staged for both backend and frontend)
 ```
 
 ### Database Migrations
@@ -320,10 +348,10 @@ npm run test:performance
 - `poll-state-changed` - Poll state changed {newState, previousState}
 
 ## Recent Changes
+- 004-frontend-test-infrastructure: Added JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, ESLint, Prettier, identity-obj-proxy (CSS mocking)
 - 003-fix-poll-creation: Added JavaScript ES6+ (frontend), Node.js 18+ (backend - no changes needed) + React 18.x (frontend), Vite (build tool)
 - 002-production-ready: Added Node.js 18+ (LTS) / JavaScript ES6+
 
-- 001-voting-app-mvp: Implemented backend MVP with Express, Socket.io, real-time voting
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

@@ -36,7 +36,7 @@
   color: #555;
 }
 
-.form-group input[type="text"] {
+.form-group input[type='text'] {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
@@ -44,7 +44,7 @@
   font-size: 14px;
 }
 
-.form-group input[type="text"]:focus {
+.form-group input[type='text']:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);

@@ -88,9 +88,7 @@ function JoinPage() {
               className="room-code-input"
               autoComplete="off"
             />
-            <span className="input-hint">
-              Enter the 6-character code from your host
-            </span>
+            <span className="input-hint">Enter the 6-character code from your host</span>
           </div>
 
           <div className="form-group">
@@ -105,9 +103,7 @@ function JoinPage() {
               disabled={loading}
               autoComplete="off"
             />
-            <span className="input-hint">
-              This will be visible to everyone in the poll
-            </span>
+            <span className="input-hint">This will be visible to everyone in the poll</span>
           </div>
 
           <button type="submit" disabled={loading} className="join-button">
@@ -116,9 +112,7 @@ function JoinPage() {
         </form>
 
         <div className="help-text">
-          <p>
-            Don't have a room code? Ask your host to share it with you.
-          </p>
+          <p>Don't have a room code? Ask your host to share it with you.</p>
         </div>
       </div>
     </div>
