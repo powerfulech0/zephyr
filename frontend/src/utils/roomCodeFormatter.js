@@ -35,9 +35,7 @@ export const formatRoomCode = (roomCode, separator = '-') => {
  * @param {string} roomCode - The room code to format
  * @returns {string} Formatted room code with spaces
  */
-export const formatRoomCodeWithSpaces = roomCode => {
-  return formatRoomCode(roomCode, ' ');
-};
+export const formatRoomCodeWithSpaces = roomCode => formatRoomCode(roomCode, ' ');
 
 /**
  * Validates a room code format
@@ -73,9 +71,7 @@ export const cleanRoomCode = roomCode => {
  * @param {string} roomCode - The room code
  * @returns {string} Clean room code suitable for clipboard
  */
-export const formatForClipboard = roomCode => {
-  return cleanRoomCode(roomCode);
-};
+export const formatForClipboard = roomCode => cleanRoomCode(roomCode);
 
 /**
  * Creates a shareable URL with the room code

@@ -8,7 +8,12 @@ function PollControls({ pollState, onOpenPoll, onClosePoll }) {
       case 'waiting':
         return { text: 'Open Voting', onClick: onOpenPoll, disabled: false, className: 'btn-open' };
       case 'open':
-        return { text: 'Close Voting', onClick: onClosePoll, disabled: false, className: 'btn-close' };
+        return {
+          text: 'Close Voting',
+          onClick: onClosePoll,
+          disabled: false,
+          className: 'btn-close',
+        };
       case 'closed':
         return { text: 'Voting Closed', onClick: null, disabled: true, className: 'btn-closed' };
       default:

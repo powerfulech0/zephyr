@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { createPoll } from '../services/apiService';
-import { joinSocketRoom, changePollState, onPollStateChanged, onVoteUpdate, onParticipantJoined, onParticipantLeft, onConnectionStatus, onReconnecting, disconnect } from '../services/socketService';
+import {
+  joinSocketRoom,
+  changePollState,
+  onPollStateChanged,
+  onVoteUpdate,
+  onParticipantJoined,
+  onParticipantLeft,
+  onConnectionStatus,
+  onReconnecting,
+  disconnect,
+} from '../services/socketService';
 import PollControls from '../components/PollControls';
 import PollResults from '../components/PollResults';
 import ParticipantCounter from '../components/ParticipantCounter';
@@ -23,12 +33,12 @@ function HostDashboard() {
 
   useEffect(() => {
     // Setup Socket.io event listeners
-    const handleStateChange = (data) => {
+    const handleStateChange = data => {
       console.log('Poll state changed:', data);
       setPollState(data.newState);
     };
 
-    const handleVoteUpdate = (data) => {
+    const handleVoteUpdate = data => {
       console.log('Vote update received:', data);
       setVoteResults({
         counts: data.votes,
@@ -36,14 +46,14 @@ function HostDashboard() {
       });
     };
 
-    const handleParticipantJoined = (data) => {
+    const handleParticipantJoined = data => {
       console.log('Participant joined:', data);
-      setParticipantCount((prev) => prev + 1);
+      setParticipantCount(prev => prev + 1);
     };
 
-    const handleParticipantLeft = (data) => {
+    const handleParticipantLeft = data => {
       console.log('Participant left:', data);
-      setParticipantCount((prev) => Math.max(0, prev - 1));
+      setParticipantCount(prev => Math.max(0, prev - 1));
     };
 
     onPollStateChanged(handleStateChange);
@@ -76,7 +86,7 @@ function HostDashboard() {
     }
   };
 
-  const handleRemoveOption = (index) => {
+  const handleRemoveOption = index => {
     if (options.length > 2) {
       setOptions(options.filter((_, i) => i !== index));
     }
@@ -101,7 +111,7 @@ function HostDashboard() {
       setError('You must have between 2 and 5 options');
       return false;
     }
-    const validOptions = options.filter((opt) => opt.trim().length > 0);
+    const validOptions = options.filter(opt => opt.trim().length > 0);
     if (validOptions.length < 2) {
       setError('At least 2 options must have text');
       return false;
@@ -116,7 +126,7 @@ function HostDashboard() {
     return true;
   };
 
-  const handleCreatePoll = async (e) => {
+  const handleCreatePoll = async e => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -127,7 +137,7 @@ function HostDashboard() {
     setError(null);
 
     try {
-      const filteredOptions = options.filter((opt) => opt.trim().length > 0);
+      const filteredOptions = options.filter(opt => opt.trim().length > 0);
       const response = await createPoll(question.trim(), filteredOptions);
 
       console.log('Poll created:', response);
@@ -148,7 +158,7 @@ function HostDashboard() {
     }
   };
 
-  const handleChangeState = async (newState) => {
+  const handleChangeState = async newState => {
     if (!poll) return;
 
     try {
@@ -174,7 +184,7 @@ function HostDashboard() {
                 type="text"
                 id="question"
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={e => setQuestion(e.target.value)}
                 placeholder="What would you like to ask?"
                 maxLength={500}
                 required
@@ -189,7 +199,7 @@ function HostDashboard() {
                   <input
                     type="text"
                     value={option}
-                    onChange={(e) => handleOptionChange(index, e.target.value)}
+                    onChange={e => handleOptionChange(index, e.target.value)}
                     placeholder={`Option ${index + 1}`}
                     maxLength={100}
                   />
