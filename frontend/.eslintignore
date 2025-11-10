@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.min.js
+
+# Coverage reports
+coverage/
+
+# Test artifacts
+*.test.js.snap
+
+# Configuration files (some may have non-standard syntax)
+vite.config.js
+jest.config.js
+
+# Third-party
+public/
+
+# Cache
+.eslintcache

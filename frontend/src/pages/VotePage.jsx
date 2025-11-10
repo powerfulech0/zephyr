@@ -215,11 +215,7 @@ function VotePage() {
         </div>
 
         {hasVoted && pollState === 'open' && (
-          <button
-            type="button"
-            onClick={handleChangeVote}
-            className="change-vote-button"
-          >
+          <button type="button" onClick={handleChangeVote} className="change-vote-button">
             Change Your Vote
           </button>
         )}

@@ -69,12 +69,13 @@ socket.on('reconnect_failed', () => {
 
 // Event emitters with Promise-based acknowledgments
 // Simple room join for host (no nickname tracking)
-export const joinSocketRoom = (roomCode) => {
+export const joinSocketRoom = roomCode => {
   socket.emit('join', roomCode);
   console.log('Host joined room:', roomCode);
 };
 
-export const joinRoom = (roomCode, nickname) => new Promise((resolve, reject) => {
+export const joinRoom = (roomCode, nickname) =>
+  new Promise((resolve, reject) => {
     socket.emit('join-room', { roomCode, nickname }, response => {
       if (response.success) {
         resolve(response.poll);
@@ -84,7 +85,8 @@ export const joinRoom = (roomCode, nickname) => new Promise((resolve, reject) =>
     });
   });
 
-export const submitVote = (roomCode, nickname, optionIndex) => new Promise((resolve, reject) => {
+export const submitVote = (roomCode, nickname, optionIndex) =>
+  new Promise((resolve, reject) => {
     socket.emit('submit-vote', { roomCode, nickname, optionIndex }, response => {
       if (response.success) {
         resolve();
@@ -94,8 +96,13 @@ export const submitVote = (roomCode, nickname, optionIndex) => new Promise((reso
     });
   });
 
-export const changePollState = (roomCode, newState) => new Promise((resolve, reject) => {
-    console.log('Emitting change-poll-state:', { roomCode, newState, socketConnected: socket.connected });
+export const changePollState = (roomCode, newState) =>
+  new Promise((resolve, reject) => {
+    console.log('Emitting change-poll-state:', {
+      roomCode,
+      newState,
+      socketConnected: socket.connected,
+    });
     socket.emit('change-poll-state', { roomCode, newState }, response => {
       console.log('Received response from change-poll-state:', response);
       if (response.success) {
