@@ -131,15 +131,15 @@ function HostDashboard() {
       const response = await createPoll(question.trim(), filteredOptions);
 
       console.log('Poll created:', response);
-      setPoll(response.poll);
-      setPollState(response.poll.state);
+      setPoll(response);
+      setPollState(response.state);
       setVoteResults({
         counts: new Array(filteredOptions.length).fill(0),
         percentages: new Array(filteredOptions.length).fill(0),
       });
 
       // Join the Socket.io room to receive state change broadcasts
-      joinSocketRoom(response.poll.roomCode);
+      joinSocketRoom(response.roomCode);
     } catch (err) {
       console.error('Failed to create poll:', err);
       setError(err.message || 'Failed to create poll. Please try again.');
