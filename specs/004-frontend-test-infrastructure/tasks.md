@@ -103,14 +103,14 @@
 
 > **NOTE: These tests verify existing bug fix from feature #003**
 
-- [ ] T027 [US3] Create test file frontend/tests/contract/HostDashboard.test.js with test structure
-- [ ] T028 [US3] Add test: "setPoll receives API response directly (not response.data)" in frontend/tests/contract/HostDashboard.test.js
-- [ ] T029 [US3] Add test: "setPollState receives response.state correctly" in frontend/tests/contract/HostDashboard.test.js
-- [ ] T030 [US3] Add test: "joinSocketRoom receives response.roomCode correctly" in frontend/tests/contract/HostDashboard.test.js
-- [ ] T031 [US3] Mock API service module in HostDashboard.test.js to return test response data
-- [ ] T032 [US3] Verify all retrospective tests pass with npm test
-- [ ] T033 [US3] Verify tests would fail if bug were reintroduced (manually test by reverting fix temporarily)
-- [ ] T034 [US3] Verify coverage report shows HostDashboard.jsx is covered
+- [x] T027 [US3] Create test file frontend/tests/contract/HostDashboard.test.js with test structure
+- [x] T028 [US3] Add test: "setPoll receives API response directly (not response.data)" in frontend/tests/contract/HostDashboard.test.js
+- [x] T029 [US3] Add test: "setPollState receives response.state correctly" in frontend/tests/contract/HostDashboard.test.js
+- [x] T030 [US3] Add test: "joinSocketRoom receives response.roomCode correctly" in frontend/tests/contract/HostDashboard.test.js
+- [x] T031 [US3] Mock API service module in HostDashboard.test.js to return test response data
+- [x] T032 [US3] Verify all retrospective tests pass with npm test
+- [x] T033 [US3] Verify tests would fail if bug were reintroduced (manually test by reverting fix temporarily)
+- [x] T034 [US3] Verify coverage report shows HostDashboard.jsx is covered
 
 **Checkpoint**: All retrospective tests pass and protect against regression of bug #003
 
@@ -130,10 +130,10 @@
 - [x] T038 [US4] Add "Run tests" step to frontend-tests job that runs cd frontend && npm run test:ci
 - [x] T039 [US4] Add "Check formatting" step to frontend-tests job that runs cd frontend && npm run format:check
 - [x] T040 [US4] Configure coverage upload step with codecov/codecov-action@v3 for frontend coverage
-- [ ] T041 [US4] Push branch to GitHub and verify frontend-tests job runs in Actions
-- [ ] T042 [US4] Verify CI fails if tests fail (test by temporarily breaking a test)
-- [ ] T043 [US4] Verify CI fails if linting fails (test by temporarily adding lint error)
-- [ ] T044 [US4] Verify CI passes when all checks succeed
+- [x] T041 [US4] Push branch to GitHub and verify frontend-tests job runs in Actions
+- [ ] T042 [US4] Verify CI fails if tests fail (test by temporarily breaking a test) - DEFERRED: Requires monitoring GitHub Actions
+- [ ] T043 [US4] Verify CI fails if linting fails (test by temporarily adding lint error) - DEFERRED: Requires monitoring GitHub Actions
+- [ ] T044 [US4] Verify CI passes when all checks succeed - DEFERRED: Requires monitoring GitHub Actions
 
 **Checkpoint**: All user stories should now be independently functional - CI validates quality automatically
 
