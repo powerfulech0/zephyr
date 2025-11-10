@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './PollControls.css';
 
 function PollControls({ pollState, onOpenPoll, onClosePoll }) {
@@ -28,6 +29,7 @@ function PollControls({ pollState, onOpenPoll, onClosePoll }) {
       <h3>Poll Controls</h3>
       <div className="control-buttons">
         <button
+          type="button"
           onClick={buttonConfig.onClick}
           disabled={buttonConfig.disabled}
           className={buttonConfig.className}
@@ -41,5 +43,11 @@ function PollControls({ pollState, onOpenPoll, onClosePoll }) {
     </div>
   );
 }
+
+PollControls.propTypes = {
+  pollState: PropTypes.string.isRequired,
+  onOpenPoll: PropTypes.func.isRequired,
+  onClosePoll: PropTypes.func.isRequired,
+};
 
 export default PollControls;

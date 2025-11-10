@@ -76,33 +76,37 @@ function JoinPage() {
           {error && <div className="error-message">{error}</div>}
 
           <div className="form-group">
-            <label htmlFor="roomCode">Room Code</label>
-            <input
-              type="text"
-              id="roomCode"
-              value={roomCode}
-              onChange={e => setRoomCode(e.target.value.toUpperCase())}
-              placeholder="ABC123"
-              maxLength={6}
-              disabled={loading}
-              className="room-code-input"
-              autoComplete="off"
-            />
+            <label htmlFor="join-room-code">
+              Room Code
+              <input
+                type="text"
+                id="join-room-code"
+                value={roomCode}
+                onChange={e => setRoomCode(e.target.value.toUpperCase())}
+                placeholder="ABC123"
+                maxLength={6}
+                disabled={loading}
+                className="room-code-input"
+                autoComplete="off"
+              />
+            </label>
             <span className="input-hint">Enter the 6-character code from your host</span>
           </div>
 
           <div className="form-group">
-            <label htmlFor="nickname">Your Nickname</label>
-            <input
-              type="text"
-              id="nickname"
-              value={nickname}
-              onChange={e => setNickname(e.target.value)}
-              placeholder="Your name"
-              maxLength={20}
-              disabled={loading}
-              autoComplete="off"
-            />
+            <label htmlFor="join-nickname">
+              Your Nickname
+              <input
+                type="text"
+                id="join-nickname"
+                value={nickname}
+                onChange={e => setNickname(e.target.value)}
+                placeholder="Your name"
+                maxLength={20}
+                disabled={loading}
+                autoComplete="off"
+              />
+            </label>
             <span className="input-hint">This will be visible to everyone in the poll</span>
           </div>
 
@@ -112,7 +116,7 @@ function JoinPage() {
         </form>
 
         <div className="help-text">
-          <p>Don't have a room code? Ask your host to share it with you.</p>
+          <p>Don&apos;t have a room code? Ask your host to share it with you.</p>
         </div>
       </div>
     </div>

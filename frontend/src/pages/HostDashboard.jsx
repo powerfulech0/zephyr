@@ -9,7 +9,6 @@ import {
   onParticipantLeft,
   onConnectionStatus,
   onReconnecting,
-  disconnect,
 } from '../services/socketService';
 import PollControls from '../components/PollControls';
 import PollResults from '../components/PollResults';
@@ -34,25 +33,21 @@ function HostDashboard() {
   useEffect(() => {
     // Setup Socket.io event listeners
     const handleStateChange = data => {
-      console.log('Poll state changed:', data);
       setPollState(data.newState);
     };
 
     const handleVoteUpdate = data => {
-      console.log('Vote update received:', data);
       setVoteResults({
         counts: data.votes,
         percentages: data.percentages,
       });
     };
 
-    const handleParticipantJoined = data => {
-      console.log('Participant joined:', data);
+    const handleParticipantJoined = () => {
       setParticipantCount(prev => prev + 1);
     };
 
-    const handleParticipantLeft = data => {
-      console.log('Participant left:', data);
+    const handleParticipantLeft = () => {
       setParticipantCount(prev => Math.max(0, prev - 1));
     };
 
@@ -116,11 +111,10 @@ function HostDashboard() {
       setError('At least 2 options must have text');
       return false;
     }
-    for (const option of options) {
-      if (option.trim().length > 0 && option.length > 100) {
-        setError('Each option must be 100 characters or less');
-        return false;
-      }
+    const hasLongOption = options.some(option => option.trim().length > 0 && option.length > 100);
+    if (hasLongOption) {
+      setError('Each option must be 100 characters or less');
+      return false;
     }
     setError(null);
     return true;
@@ -140,7 +134,6 @@ function HostDashboard() {
       const filteredOptions = options.filter(opt => opt.trim().length > 0);
       const response = await createPoll(question.trim(), filteredOptions);
 
-      console.log('Poll created:', response);
       setPoll(response);
       setPollState(response.state);
       setVoteResults({
@@ -151,7 +144,6 @@ function HostDashboard() {
       // Join the Socket.io room to receive state change broadcasts
       joinSocketRoom(response.roomCode);
     } catch (err) {
-      console.error('Failed to create poll:', err);
       setError(err.message || 'Failed to create poll. Please try again.');
     } finally {
       setLoading(false);
@@ -162,11 +154,9 @@ function HostDashboard() {
     if (!poll) return;
 
     try {
-      console.log(`Changing poll state to: ${newState}`);
       await changePollState(poll.roomCode, newState);
       // State will be updated via Socket.io event listener
     } catch (err) {
-      console.error('Failed to change poll state:', err);
       setError(err.message || 'Failed to change poll state');
     }
   };
@@ -179,46 +169,54 @@ function HostDashboard() {
           {error && <div className="error-message">{error}</div>}
           <form onSubmit={handleCreatePoll}>
             <div className="form-group">
-              <label htmlFor="question">Question:</label>
-              <input
-                type="text"
-                id="question"
-                value={question}
-                onChange={e => setQuestion(e.target.value)}
-                placeholder="What would you like to ask?"
-                maxLength={500}
-                required
-              />
+              <label htmlFor="poll-question">
+                Question:
+                <input
+                  type="text"
+                  id="poll-question"
+                  value={question}
+                  onChange={e => setQuestion(e.target.value)}
+                  placeholder="What would you like to ask?"
+                  maxLength={500}
+                  required
+                />
+              </label>
               <small>{question.length}/500 characters</small>
             </div>
 
             <div className="form-group">
-              <label>Options:</label>
-              {options.map((option, index) => (
-                <div key={index} className="option-input">
-                  <input
-                    type="text"
-                    value={option}
-                    onChange={e => handleOptionChange(index, e.target.value)}
-                    placeholder={`Option ${index + 1}`}
-                    maxLength={100}
-                  />
-                  {options.length > 2 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveOption(index)}
-                      className="btn-remove"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-              {options.length < 5 && (
-                <button type="button" onClick={handleAddOption} className="btn-add">
-                  Add Option
-                </button>
-              )}
+              <fieldset>
+                <legend>Options:</legend>
+                {options.map((option, index) => (
+                  <div key={option || `empty-option-${index}`} className="option-input">
+                    <label htmlFor={`poll-option-${index}`}>
+                      Option {index + 1}
+                      <input
+                        type="text"
+                        id={`poll-option-${index}`}
+                        value={option}
+                        onChange={e => handleOptionChange(index, e.target.value)}
+                        placeholder={`Option ${index + 1}`}
+                        maxLength={100}
+                      />
+                    </label>
+                    {options.length > 2 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveOption(index)}
+                        className="btn-remove"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+                {options.length < 5 && (
+                  <button type="button" onClick={handleAddOption} className="btn-add">
+                    Add Option
+                  </button>
+                )}
+              </fieldset>
             </div>
 
             <button type="submit" disabled={loading} className="btn-primary">

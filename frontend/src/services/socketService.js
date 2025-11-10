@@ -18,8 +18,6 @@ let reconnectingCallbacks = [];
 
 // Connection event handlers
 socket.on('connect', () => {
-  console.log('Connected to server:', socket.id);
-
   // Notify connection status listeners (T092)
   connectionStatusCallbacks.forEach(cb => cb({ status: 'connected', socketId: socket.id }));
 
@@ -28,41 +26,30 @@ socket.on('connect', () => {
   const nickname = sessionStorage.getItem('nickname');
 
   if (roomCode && nickname) {
-    console.log('Auto-rejoining room:', roomCode, 'as', nickname);
     socket.emit('join-room', { roomCode, nickname }, response => {
-      if (response.success) {
-        console.log('Successfully rejoined room');
-      } else {
-        console.error('Failed to rejoin room:', response.error);
+      if (!response.success) {
+        // Handle failed rejoin silently or with user notification
       }
     });
   }
 });
 
 socket.on('disconnect', reason => {
-  console.log('Disconnected from server:', reason);
-
   // Notify connection status listeners (T092)
   connectionStatusCallbacks.forEach(cb => cb({ status: 'disconnected', reason }));
 });
 
 socket.on('reconnecting', attemptNumber => {
-  console.log('Reconnecting... attempt', attemptNumber);
-
   // Notify reconnecting listeners (T091)
   reconnectingCallbacks.forEach(cb => cb({ attempting: true, attemptNumber }));
 });
 
 socket.on('reconnect', attemptNumber => {
-  console.log('Reconnected after', attemptNumber, 'attempts');
-
   // Notify reconnecting listeners (T091)
   reconnectingCallbacks.forEach(cb => cb({ attempting: false, attemptNumber }));
 });
 
 socket.on('reconnect_failed', () => {
-  console.error('Reconnection failed after maximum attempts');
-
   // Notify connection status listeners (T092)
   connectionStatusCallbacks.forEach(cb => cb({ status: 'failed', reason: 'Max attempts reached' }));
 });
@@ -71,7 +58,6 @@ socket.on('reconnect_failed', () => {
 // Simple room join for host (no nickname tracking)
 export const joinSocketRoom = roomCode => {
   socket.emit('join', roomCode);
-  console.log('Host joined room:', roomCode);
 };
 
 export const joinRoom = (roomCode, nickname) =>
@@ -98,13 +84,7 @@ export const submitVote = (roomCode, nickname, optionIndex) =>
 
 export const changePollState = (roomCode, newState) =>
   new Promise((resolve, reject) => {
-    console.log('Emitting change-poll-state:', {
-      roomCode,
-      newState,
-      socketConnected: socket.connected,
-    });
     socket.emit('change-poll-state', { roomCode, newState }, response => {
-      console.log('Received response from change-poll-state:', response);
       if (response.success) {
         resolve(response.state);
       } else {
