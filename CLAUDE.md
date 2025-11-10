@@ -4,6 +4,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-07
 
 ## Active Technologies
 - Node.js 18+ (LTS) / JavaScript ES6+ (002-production-ready)
+- JavaScript ES6+ (frontend), Node.js 18+ (backend - no changes needed) + React 18.x (frontend), Vite (build tool) (003-fix-poll-creation)
+- N/A (bug fix only, no storage changes) (003-fix-poll-creation)
 
 ### Backend (001-voting-app-mvp + 002-production-ready)
 
@@ -318,10 +320,10 @@ npm run test:performance
 - `poll-state-changed` - Poll state changed {newState, previousState}
 
 ## Recent Changes
+- 003-fix-poll-creation: Added JavaScript ES6+ (frontend), Node.js 18+ (backend - no changes needed) + React 18.x (frontend), Vite (build tool)
 - 002-production-ready: Added Node.js 18+ (LTS) / JavaScript ES6+
 
 - 001-voting-app-mvp: Implemented backend MVP with Express, Socket.io, real-time voting
-- Added performance testing for 20 concurrent participants (max latency: 13ms)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
