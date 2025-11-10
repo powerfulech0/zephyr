@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './PollResults.css';
 
 function PollResults({ options, counts, percentages, pollState }) {
@@ -18,7 +19,7 @@ function PollResults({ options, counts, percentages, pollState }) {
           const barWidth = maxCount > 0 ? (count / maxCount) * 100 : 0;
 
           return (
-            <div key={index} className="result-item">
+            <div key={option} className="result-item">
               <div className="result-label">
                 <span className="option-text">{option}</span>
                 <span className="vote-count">
@@ -38,5 +39,12 @@ function PollResults({ options, counts, percentages, pollState }) {
     </div>
   );
 }
+
+PollResults.propTypes = {
+  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  counts: PropTypes.arrayOf(PropTypes.number).isRequired,
+  percentages: PropTypes.arrayOf(PropTypes.number).isRequired,
+  pollState: PropTypes.string.isRequired,
+};
 
 export default PollResults;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './ParticipantCounter.css';
 
 function ParticipantCounter({ count }) {
@@ -11,5 +12,9 @@ function ParticipantCounter({ count }) {
     </div>
   );
 }
+
+ParticipantCounter.propTypes = {
+  count: PropTypes.number.isRequired,
+};
 
 export default ParticipantCounter;

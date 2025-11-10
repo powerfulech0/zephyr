@@ -6,7 +6,6 @@ import {
   onVoteUpdate,
   onConnectionStatus,
   onReconnecting,
-  disconnect,
 } from '../services/socketService';
 import VoteConfirmation from '../components/VoteConfirmation';
 import './VotePage.css';
@@ -193,7 +192,7 @@ function VotePage() {
 
             return (
               <button
-                key={index}
+                key={option}
                 type="button"
                 onClick={() => handleVoteSubmit(index)}
                 disabled={isDisabled}
