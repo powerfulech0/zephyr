@@ -38,7 +38,7 @@ function PollControls({ pollState, onOpenPoll, onClosePoll }) {
         </button>
       </div>
       <div className="poll-status">
-        Status: <span className={`status-${pollState}`}>{pollState.toUpperCase()}</span>
+        Status: <span className={`status-${pollState}`}>{pollState?.toUpperCase() || 'UNKNOWN'}</span>
       </div>
     </div>
   );
