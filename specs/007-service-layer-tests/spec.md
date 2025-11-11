@@ -1,6 +1,6 @@
 # Feature Specification: Service Layer Unit Tests
 
-**Feature Branch**: `006-service-layer-tests`
+**Feature Branch**: `007-service-layer-tests`
 **Created**: 2025-11-10
 **Status**: Draft
 **Input**: User description: "Frontend: Add unit tests for service layer (apiService + socketService)"

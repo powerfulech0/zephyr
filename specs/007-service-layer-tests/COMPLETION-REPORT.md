@@ -135,7 +135,7 @@ test('creates poll with valid data', async () => {
 - ✅ No console.log statements
 - ✅ Linting and formatting pass
 
-See `/specs/006-service-layer-tests/COVERAGE-NOTE.md` for detailed explanation.
+See `/specs/007-service-layer-tests/COVERAGE-NOTE.md` for detailed explanation.
 
 ---
 
@@ -203,16 +203,16 @@ These omitted tests validate module-level side effects and internal event handle
    - `frontend/tests/unit/socketService.test.js` (531 lines, 28 tests)
 
 2. **Documentation**:
-   - `specs/006-service-layer-tests/spec.md` - Feature specification
-   - `specs/006-service-layer-tests/plan.md` - Implementation plan
-   - `specs/006-service-layer-tests/research.md` - Mocking patterns research
-   - `specs/006-service-layer-tests/data-model.md` - Test structure
-   - `specs/006-service-layer-tests/tasks.md` - Task breakdown
-   - `specs/006-service-layer-tests/quickstart.md` - Quick reference
-   - `specs/006-service-layer-tests/contracts/apiService-test-contract.md`
-   - `specs/006-service-layer-tests/contracts/socketService-test-contract.md`
-   - `specs/006-service-layer-tests/COVERAGE-NOTE.md` - Coverage explanation
-   - `specs/006-service-layer-tests/COMPLETION-REPORT.md` - This document
+   - `specs/007-service-layer-tests/spec.md` - Feature specification
+   - `specs/007-service-layer-tests/plan.md` - Implementation plan
+   - `specs/007-service-layer-tests/research.md` - Mocking patterns research
+   - `specs/007-service-layer-tests/data-model.md` - Test structure
+   - `specs/007-service-layer-tests/tasks.md` - Task breakdown
+   - `specs/007-service-layer-tests/quickstart.md` - Quick reference
+   - `specs/007-service-layer-tests/contracts/apiService-test-contract.md`
+   - `specs/007-service-layer-tests/contracts/socketService-test-contract.md`
+   - `specs/007-service-layer-tests/COVERAGE-NOTE.md` - Coverage explanation
+   - `specs/007-service-layer-tests/COMPLETION-REPORT.md` - This document
 
 ---
 
@@ -314,5 +314,5 @@ The coverage reporting limitation is a known trade-off to work within the constr
 ---
 
 **Generated**: 2025-11-10
-**Feature**: 006-service-layer-tests
+**Feature**: 007-service-layer-tests
 **Status**: ✅ COMPLETE

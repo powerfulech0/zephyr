@@ -1,7 +1,7 @@
 # Implementation Plan: Service Layer Unit Tests
 
-**Branch**: `006-service-layer-tests` | **Date**: 2025-11-10 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/006-service-layer-tests/spec.md`
+**Branch**: `007-service-layer-tests` | **Date**: 2025-11-10 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/007-service-layer-tests/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
@@ -98,7 +98,7 @@ Answer each question based on the current feature requirements:
 ### Documentation (this feature)
 
 ```text
-specs/006-service-layer-tests/
+specs/007-service-layer-tests/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output - Jest mocking patterns research
 ├── data-model.md        # Phase 1 output - N/A for testing feature (will document test structure)

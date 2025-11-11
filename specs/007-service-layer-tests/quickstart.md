@@ -1,6 +1,6 @@
 # Quickstart: Service Layer Unit Tests
 
-**Feature**: 006-service-layer-tests
+**Feature**: 007-service-layer-tests
 **Purpose**: Quick reference for running and maintaining service layer unit tests
 
 ## TL;DR

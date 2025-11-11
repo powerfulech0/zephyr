@@ -1,6 +1,6 @@
 # Tasks: Service Layer Unit Tests
 
-**Input**: Design documents from `/specs/006-service-layer-tests/`
+**Input**: Design documents from `/specs/007-service-layer-tests/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/
 
 **Tests**: This feature IS about tests - TDD workflow applied
@@ -139,7 +139,7 @@ npm test -- socketService.test.js --coverage --collectCoverageFrom='src/services
 - [ ] T050 [P] Run full linting on both test files: `cd frontend && npm run lint`
 - [ ] T051 [P] Verify pre-commit hooks pass: `cd frontend && npm run lint && npm test`
 - [ ] T052 Update coverage thresholds in frontend/jest.config.js to lock in coverage gains (optional)
-- [ ] T053 Run quickstart validation from specs/006-service-layer-tests/quickstart.md
+- [ ] T053 Run quickstart validation from specs/007-service-layer-tests/quickstart.md
 
 **Final Verification**:
 ```bash

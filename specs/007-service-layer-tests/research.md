@@ -1,6 +1,6 @@
 # Research: Service Layer Unit Tests
 
-**Feature**: 006-service-layer-tests
+**Feature**: 007-service-layer-tests
 **Date**: 2025-11-10
 **Purpose**: Research best practices for mocking external dependencies in Jest unit tests
 

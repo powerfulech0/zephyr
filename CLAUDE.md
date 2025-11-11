@@ -11,8 +11,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-07
 - JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + React 18.x, prop-types (to be installed), ESLint, Prettier, Jest 30.x, @testing-library/react (005-fix-linting-errors)
 - N/A (code quality feature, no data storage changes) (005-fix-linting-errors)
 - JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + React 18.x, Jest 30.x, @testing-library/react, @testing-library/jest-dom, prop-types (006-fix-integration-tests)
-- JavaScript ES6+ (frontend) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, babel-jest (006-service-layer-tests)
-- N/A (testing infrastructure) (006-service-layer-tests)
+- JavaScript ES6+ (frontend) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, babel-jest (007-service-layer-tests)
+- N/A (testing infrastructure) (007-service-layer-tests)
 
 ### Backend (001-voting-app-mvp + 002-production-ready)
 
@@ -353,7 +353,7 @@ npm run test:performance
 - `poll-state-changed` - Poll state changed {newState, previousState}
 
 ## Recent Changes
-- 006-service-layer-tests: Added JavaScript ES6+ (frontend) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, babel-jest
+- 007-service-layer-tests: Added JavaScript ES6+ (frontend) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, babel-jest
 - 006-fix-integration-tests: Added JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + React 18.x, Jest 30.x, @testing-library/react, @testing-library/jest-dom, prop-types
 - 005-fix-linting-errors: Added JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + React 18.x, prop-types (to be installed), ESLint, Prettier, Jest 30.x, @testing-library/react
 - 004-frontend-test-infrastructure: Added JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, ESLint, Prettier, identity-obj-proxy (CSS mocking)

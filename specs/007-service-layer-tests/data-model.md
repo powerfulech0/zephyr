@@ -1,6 +1,6 @@
 # Test Structure: Service Layer Unit Tests
 
-**Feature**: 006-service-layer-tests
+**Feature**: 007-service-layer-tests
 **Date**: 2025-11-10
 **Purpose**: Document test suite structure and test case organization
 
