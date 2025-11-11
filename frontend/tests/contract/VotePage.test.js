@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import VotePage from '../../src/pages/VotePage';
 import * as socketService from '../../src/services/socketService';
@@ -259,7 +259,9 @@ describe('VotePage - Socket Event Handlers', () => {
     );
 
     // Simulate poll being closed
-    pollStateHandler({ newState: 'closed' });
+    await act(async () => {
+      pollStateHandler({ newState: 'closed' });
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/voting has been closed/i)).toBeInTheDocument();
@@ -289,9 +291,11 @@ describe('VotePage - Socket Event Handlers', () => {
     });
 
     // Simulate vote update
-    voteUpdateHandler({
-      votes: [5, 3, 2],
-      percentages: [50, 30, 20]
+    await act(async () => {
+      voteUpdateHandler({
+        votes: [5, 3, 2],
+        percentages: [50, 30, 20]
+      });
     });
 
     await waitFor(() => {
@@ -342,7 +346,9 @@ describe('VotePage - Connection Status', () => {
     expect(screen.getByText(/connected/i)).toBeInTheDocument();
 
     // Simulate disconnection
-    connectionStatusHandler({ status: 'disconnected' });
+    await act(async () => {
+      connectionStatusHandler({ status: 'disconnected' });
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/disconnected/i)).toBeInTheDocument();
@@ -364,7 +370,9 @@ describe('VotePage - Connection Status', () => {
     );
 
     // Simulate reconnecting
-    reconnectingHandler({ attempting: true });
+    await act(async () => {
+      reconnectingHandler({ attempting: true });
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/reconnecting to server/i)).toBeInTheDocument();
@@ -391,14 +399,18 @@ describe('VotePage - Connection Status', () => {
     );
 
     // Start reconnecting
-    reconnectingHandler({ attempting: true });
+    await act(async () => {
+      reconnectingHandler({ attempting: true });
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/reconnecting to server/i)).toBeInTheDocument();
     });
 
     // Connection restored
-    connectionStatusHandler({ status: 'connected' });
+    await act(async () => {
+      connectionStatusHandler({ status: 'connected' });
+    });
 
     await waitFor(() => {
       expect(screen.queryByText(/reconnecting to server/i)).not.toBeInTheDocument();

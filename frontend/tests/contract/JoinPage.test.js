@@ -54,6 +54,9 @@ describe('JoinPage - Form Validation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
+
+    // Set up default mock for joinRoom (needed for async tests)
+    socketService.joinRoom = jest.fn();
   });
 
   test('validates room code is required', () => {
@@ -231,6 +234,9 @@ describe('JoinPage - API Integration', () => {
     jest.clearAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
     sessionStorage.clear();
+
+    // Set up default mock for joinRoom
+    socketService.joinRoom = jest.fn();
   });
 
   test('calls joinRoom API with correct parameters on valid submission', async () => {
@@ -303,6 +309,9 @@ describe('JoinPage - Loading States', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
+
+    // Set up default mock for joinRoom
+    socketService.joinRoom = jest.fn();
   });
 
   test('displays loading state during API call (button disabled)', async () => {
@@ -382,6 +391,9 @@ describe('JoinPage - Error Handling', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
+
+    // Set up default mock for joinRoom
+    socketService.joinRoom = jest.fn();
   });
 
   test('handles API error: room not found', async () => {
