@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import HostDashboard from '../../src/pages/HostDashboard';
 import * as apiService from '../../src/services/apiService';
 import * as socketService from '../../src/services/socketService';
@@ -170,5 +170,422 @@ describe('HostDashboard - API Response Handling Contract Tests (Feature #003 Bug
     expect(response.roomCode).toBe('ABC123');
     expect(response.state).toBe('waiting');
     expect(response.question).toBe('What is your favorite color?');
+  });
+});
+
+describe('HostDashboard - Form Validation', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    apiService.createPoll.mockResolvedValue({
+      roomCode: 'TEST12',
+      question: 'Test',
+      options: ['A', 'B'],
+      state: 'waiting'
+    });
+  });
+
+  test('validates question length (max 500 characters)', async () => {
+    render(<HostDashboard />);
+
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    // Create a question longer than 500 characters
+    const longQuestion = 'a'.repeat(501);
+    fireEvent.change(questionInput, { target: { value: longQuestion } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/question must be 500 characters or less/i)).toBeInTheDocument();
+    });
+
+    expect(apiService.createPoll).not.toHaveBeenCalled();
+  });
+
+  test('validates minimum 2 options required', async () => {
+    render(<HostDashboard />);
+
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Only one option' } });
+    // Leave option 2 empty
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/at least 2 options must have text/i)).toBeInTheDocument();
+    });
+
+    expect(apiService.createPoll).not.toHaveBeenCalled();
+  });
+
+  test('validates option length (max 100 characters)', async () => {
+    render(<HostDashboard />);
+
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    const longOption = 'a'.repeat(101);
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: longOption } });
+    fireEvent.change(option2Input, { target: { value: 'Normal option' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/each option must be 100 characters or less/i)).toBeInTheDocument();
+    });
+
+    expect(apiService.createPoll).not.toHaveBeenCalled();
+  });
+});
+
+describe('HostDashboard - Socket Event Handlers', () => {
+  const mockPollResponse = {
+    roomCode: 'ABC123',
+    question: 'Test question?',
+    options: ['Option A', 'Option B'],
+    state: 'waiting'
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    apiService.createPoll.mockResolvedValue(mockPollResponse);
+
+    socketService.joinSocketRoom = jest.fn();
+    socketService.changePollState = jest.fn().mockResolvedValue('open');
+    socketService.onPollStateChanged = jest.fn();
+    socketService.onVoteUpdate = jest.fn();
+    socketService.onParticipantJoined = jest.fn();
+    socketService.onParticipantLeft = jest.fn();
+    socketService.onConnectionStatus = jest.fn();
+    socketService.onReconnecting = jest.fn();
+    socketService.disconnect = jest.fn();
+  });
+
+  test('handles poll-state-changed event', async () => {
+    let stateChangeHandler;
+    socketService.onPollStateChanged.mockImplementation(handler => {
+      stateChangeHandler = handler;
+    });
+
+    render(<HostDashboard />);
+
+    // Create poll first
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/open voting/i)).toBeInTheDocument();
+    });
+
+    // Simulate socket event
+    await act(async () => {
+      stateChangeHandler({ newState: 'open' });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /close voting/i })).toBeInTheDocument();
+    });
+  });
+
+  test('handles vote-update event', async () => {
+    let voteUpdateHandler;
+    socketService.onVoteUpdate.mockImplementation(handler => {
+      voteUpdateHandler = handler;
+    });
+
+    render(<HostDashboard />);
+
+    // Create poll
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(mockPollResponse.roomCode)).toBeInTheDocument();
+    });
+
+    // Simulate vote update
+    await act(async () => {
+      voteUpdateHandler({
+        votes: [5, 3],
+        percentages: [62.5, 37.5]
+      });
+    });
+
+    // PollResults component should display the updated counts
+    await waitFor(() => {
+      expect(screen.getByText(/5 votes/i)).toBeInTheDocument();
+      expect(screen.getByText(/3 votes/i)).toBeInTheDocument();
+    });
+  });
+
+  test('handles participant-joined event', async () => {
+    let participantJoinedHandler;
+    socketService.onParticipantJoined.mockImplementation(handler => {
+      participantJoinedHandler = handler;
+    });
+
+    render(<HostDashboard />);
+
+    // Create poll
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/0 participants/i)).toBeInTheDocument();
+    });
+
+    // Simulate participant joining
+    await act(async () => {
+      participantJoinedHandler();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/1 participant/i)).toBeInTheDocument();
+    });
+  });
+
+  test('handles participant-left event', async () => {
+    let participantLeftHandler;
+    socketService.onParticipantLeft.mockImplementation(handler => {
+      participantLeftHandler = handler;
+    });
+
+    let participantJoinedHandler;
+    socketService.onParticipantJoined.mockImplementation(handler => {
+      participantJoinedHandler = handler;
+    });
+
+    render(<HostDashboard />);
+
+    // Create poll
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/0 participants/i)).toBeInTheDocument();
+    });
+
+    // Add participants first
+    await act(async () => {
+      participantJoinedHandler();
+      participantJoinedHandler();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/2 participants/i)).toBeInTheDocument();
+    });
+
+    // Simulate participant leaving
+    await act(async () => {
+      participantLeftHandler();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/1 participant/i)).toBeInTheDocument();
+    });
+  });
+});
+
+describe('HostDashboard - Connection Status', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    apiService.createPoll.mockResolvedValue({
+      roomCode: 'TEST12',
+      question: 'Test',
+      options: ['A', 'B'],
+      state: 'waiting'
+    });
+
+    socketService.joinSocketRoom = jest.fn();
+    socketService.changePollState = jest.fn();
+    socketService.onPollStateChanged = jest.fn();
+    socketService.onVoteUpdate = jest.fn();
+    socketService.onParticipantJoined = jest.fn();
+    socketService.onParticipantLeft = jest.fn();
+    socketService.onConnectionStatus = jest.fn();
+    socketService.onReconnecting = jest.fn();
+    socketService.disconnect = jest.fn();
+  });
+
+  test('displays connection status indicator', async () => {
+    let connectionStatusHandler;
+    socketService.onConnectionStatus.mockImplementation(handler => {
+      connectionStatusHandler = handler;
+    });
+
+    render(<HostDashboard />);
+
+    // Create poll to see the connection status
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/🟢 connected/i)).toBeInTheDocument();
+    });
+
+    // Simulate connection status change
+    await act(async () => {
+      connectionStatusHandler({ status: 'disconnected' });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/🔴 disconnected/i)).toBeInTheDocument();
+    });
+  });
+
+  test('displays reconnecting banner', async () => {
+    let reconnectingHandler;
+    socketService.onReconnecting.mockImplementation(handler => {
+      reconnectingHandler = handler;
+    });
+
+    render(<HostDashboard />);
+
+    // Create poll
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/TEST12/)).toBeInTheDocument();
+    });
+
+    // Simulate reconnecting
+    await act(async () => {
+      reconnectingHandler({ attempting: true });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/reconnecting to server/i)).toBeInTheDocument();
+    });
+  });
+});
+
+describe('HostDashboard - Poll State Changes', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    apiService.createPoll.mockResolvedValue({
+      roomCode: 'ABC123',
+      question: 'Test question?',
+      options: ['Option A', 'Option B'],
+      state: 'waiting'
+    });
+
+    socketService.joinSocketRoom = jest.fn();
+    socketService.changePollState = jest.fn().mockResolvedValue('open');
+    socketService.onPollStateChanged = jest.fn();
+    socketService.onVoteUpdate = jest.fn();
+    socketService.onParticipantJoined = jest.fn();
+    socketService.onParticipantLeft = jest.fn();
+    socketService.onConnectionStatus = jest.fn();
+    socketService.onReconnecting = jest.fn();
+    socketService.disconnect = jest.fn();
+  });
+
+  test('handles error when changing poll state', async () => {
+    socketService.changePollState = jest.fn().mockRejectedValue(new Error('Failed to change state'));
+
+    render(<HostDashboard />);
+
+    // Create poll
+    const questionInput = screen.getByLabelText(/question/i);
+    const option1Input = screen.getByPlaceholderText('Option 1');
+    const option2Input = screen.getByPlaceholderText('Option 2');
+    const createButton = screen.getByRole('button', { name: /create poll/i });
+
+    fireEvent.change(questionInput, { target: { value: 'Test question?' } });
+    fireEvent.change(option1Input, { target: { value: 'Option A' } });
+    fireEvent.change(option2Input, { target: { value: 'Option B' } });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /open voting/i })).toBeInTheDocument();
+    });
+
+    // Try to open voting
+    const openButton = screen.getByRole('button', { name: /open voting/i });
+    fireEvent.click(openButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/failed to change state/i)).toBeInTheDocument();
+    });
+  });
+});
+
+describe('HostDashboard - Option Management', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('removes option when clicking remove button', () => {
+    render(<HostDashboard />);
+
+    const addButton = screen.getByRole('button', { name: /add option/i });
+
+    // Add a third option
+    fireEvent.click(addButton);
+
+    const option3Input = screen.getByPlaceholderText('Option 3');
+    expect(option3Input).toBeInTheDocument();
+
+    // Should see remove buttons now (since we have 3 options)
+    const removeButtons = screen.getAllByRole('button', { name: /remove/i });
+    expect(removeButtons.length).toBeGreaterThan(0);
+
+    // Click remove on the third option
+    fireEvent.click(removeButtons[removeButtons.length - 1]);
+
+    // Option 3 should be gone
+    expect(screen.queryByPlaceholderText('Option 3')).not.toBeInTheDocument();
   });
 });
