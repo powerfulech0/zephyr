@@ -264,7 +264,7 @@ describe('VotePage - Socket Event Handlers', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/voting has been closed/i)).toBeInTheDocument();
+      expect(screen.getByText(/🔒 voting has been closed/i)).toBeInTheDocument();
     });
   });
 

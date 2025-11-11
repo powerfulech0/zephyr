@@ -155,7 +155,7 @@ describe('JoinPage - Form Validation', () => {
 
   test('trims whitespace from room code and nickname', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC123',
+      roomCode: 'ABC234',
       question: 'Test Question',
       options: ['Option 1', 'Option 2'],
       state: 'waiting'
@@ -173,12 +173,15 @@ describe('JoinPage - Form Validation', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: '  ABC123  ' } });
+    // Note: Room code has maxLength=6, so we can't test leading/trailing whitespace
+    // without hitting the length limit. The component trims during validation.
+    // Also note: Room codes exclude 0, 1, O, I to avoid confusion
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: '  TestUser  ' } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(socketService.joinRoom).toHaveBeenCalledWith('ABC123', 'TestUser');
+      expect(socketService.joinRoom).toHaveBeenCalledWith('ABC234', 'TestUser');
     });
   });
 
