@@ -194,14 +194,14 @@ describe('JoinPage - Form Validation', () => {
 
     const roomCodeInput = screen.getByLabelText(/room code/i);
 
-    fireEvent.change(roomCodeInput, { target: { value: 'abc123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'abc234' } });
 
-    expect(roomCodeInput.value).toBe('ABC123');
+    expect(roomCodeInput.value).toBe('ABC234');
   });
 
   test('validates room code format (6 characters, valid alphabet)', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC123',
+      roomCode: 'ABC234',
       question: 'Test Question',
       options: ['Option 1', 'Option 2'],
       state: 'waiting'
@@ -244,7 +244,7 @@ describe('JoinPage - API Integration', () => {
 
   test('calls joinRoom API with correct parameters on valid submission', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC123',
+      roomCode: 'ABC234',
       question: 'Test Question',
       options: ['Option 1', 'Option 2'],
       state: 'waiting'
@@ -262,18 +262,18 @@ describe('JoinPage - API Integration', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(socketService.joinRoom).toHaveBeenCalledWith('ABC123', 'TestUser');
+      expect(socketService.joinRoom).toHaveBeenCalledWith('ABC234', 'TestUser');
     });
   });
 
   test('navigates to vote page on successful join (route: /vote/:roomCode)', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC123',
+      roomCode: 'ABC234',
       question: 'Test Question',
       options: ['Option 1', 'Option 2'],
       state: 'waiting'
@@ -291,16 +291,16 @@ describe('JoinPage - API Integration', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/vote/ABC123');
+      expect(mockNavigate).toHaveBeenCalledWith('/vote/ABC234');
     });
 
     // Verify session storage was updated
-    expect(sessionStorage.getItem('roomCode')).toBe('ABC123');
+    expect(sessionStorage.getItem('roomCode')).toBe('ABC234');
     expect(sessionStorage.getItem('nickname')).toBe('TestUser');
     expect(JSON.parse(sessionStorage.getItem('poll'))).toEqual(mockPollResponse);
   });
@@ -334,7 +334,7 @@ describe('JoinPage - Loading States', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
@@ -345,7 +345,7 @@ describe('JoinPage - Loading States', () => {
 
     // Resolve the promise to cleanup
     resolveJoinRoom({
-      roomCode: 'ABC123',
+      roomCode: 'ABC234',
       question: 'Test Question',
       options: ['Option 1', 'Option 2'],
       state: 'waiting'
@@ -369,7 +369,7 @@ describe('JoinPage - Loading States', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
@@ -380,7 +380,7 @@ describe('JoinPage - Loading States', () => {
 
     // Resolve the promise to cleanup
     resolveJoinRoom({
-      roomCode: 'ABC123',
+      roomCode: 'ABC234',
       question: 'Test Question',
       options: ['Option 1', 'Option 2'],
       state: 'waiting'
@@ -412,7 +412,7 @@ describe('JoinPage - Error Handling', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
@@ -436,7 +436,7 @@ describe('JoinPage - Error Handling', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
@@ -460,7 +460,7 @@ describe('JoinPage - Error Handling', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
@@ -484,7 +484,7 @@ describe('JoinPage - Error Handling', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
@@ -501,7 +501,7 @@ describe('JoinPage - Error Handling', () => {
     socketService.joinRoom
       .mockRejectedValueOnce(new Error('Room not found'))
       .mockResolvedValueOnce({
-        roomCode: 'ABC123',
+        roomCode: 'ABC234',
         question: 'Test Question',
         options: ['Option 1', 'Option 2'],
         state: 'waiting'
@@ -517,7 +517,7 @@ describe('JoinPage - Error Handling', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
@@ -535,7 +535,7 @@ describe('JoinPage - Error Handling', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/vote/ABC123');
+      expect(mockNavigate).toHaveBeenCalledWith('/vote/ABC234');
     });
   });
 
@@ -552,7 +552,7 @@ describe('JoinPage - Error Handling', () => {
     const nicknameInput = screen.getByLabelText(/your nickname/i);
     const submitButton = screen.getByRole('button', { name: /join poll/i });
 
-    fireEvent.change(roomCodeInput, { target: { value: 'ABC123' } });
+    fireEvent.change(roomCodeInput, { target: { value: 'ABC234' } });
     fireEvent.change(nicknameInput, { target: { value: 'TestUser' } });
     fireEvent.click(submitButton);
 
