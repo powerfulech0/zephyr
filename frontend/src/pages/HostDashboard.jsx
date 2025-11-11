@@ -187,7 +187,8 @@ function HostDashboard() {
               <fieldset>
                 <legend>Options:</legend>
                 {options.map((option, index) => (
-                  <div key={option || `empty-option-${index}`} className="option-input">
+                  // eslint-disable-next-line react/no-array-index-key
+                  <div key={`option-${index}`} className="option-input">
                     <label htmlFor={`poll-option-${index}`}>
                       Option {index + 1}
                       <input
