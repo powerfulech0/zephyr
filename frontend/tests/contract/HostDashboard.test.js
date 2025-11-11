@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import HostDashboard from '../../src/pages/HostDashboard';
 import * as apiService from '../../src/services/apiService';
 import * as socketService from '../../src/services/socketService';
@@ -294,7 +294,9 @@ describe('HostDashboard - Socket Event Handlers', () => {
     });
 
     // Simulate socket event
-    stateChangeHandler({ newState: 'open' });
+    await act(async () => {
+      stateChangeHandler({ newState: 'open' });
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /close voting/i })).toBeInTheDocument();
@@ -325,14 +327,17 @@ describe('HostDashboard - Socket Event Handlers', () => {
     });
 
     // Simulate vote update
-    voteUpdateHandler({
-      votes: [5, 3],
-      percentages: [62.5, 37.5]
+    await act(async () => {
+      voteUpdateHandler({
+        votes: [5, 3],
+        percentages: [62.5, 37.5]
+      });
     });
 
     // PollResults component should display the updated counts
     await waitFor(() => {
-      expect(screen.getByText(/5/)).toBeInTheDocument();
+      expect(screen.getByText(/5 votes/i)).toBeInTheDocument();
+      expect(screen.getByText(/3 votes/i)).toBeInTheDocument();
     });
   });
 
@@ -360,7 +365,9 @@ describe('HostDashboard - Socket Event Handlers', () => {
     });
 
     // Simulate participant joining
-    participantJoinedHandler();
+    await act(async () => {
+      participantJoinedHandler();
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/1 participant/i)).toBeInTheDocument();
@@ -396,15 +403,19 @@ describe('HostDashboard - Socket Event Handlers', () => {
     });
 
     // Add participants first
-    participantJoinedHandler();
-    participantJoinedHandler();
+    await act(async () => {
+      participantJoinedHandler();
+      participantJoinedHandler();
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/2 participants/i)).toBeInTheDocument();
     });
 
     // Simulate participant leaving
-    participantLeftHandler();
+    await act(async () => {
+      participantLeftHandler();
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/1 participant/i)).toBeInTheDocument();
@@ -453,14 +464,16 @@ describe('HostDashboard - Connection Status', () => {
     fireEvent.click(createButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/connected/i)).toBeInTheDocument();
+      expect(screen.getByText(/🟢 connected/i)).toBeInTheDocument();
     });
 
     // Simulate connection status change
-    connectionStatusHandler({ status: 'disconnected' });
+    await act(async () => {
+      connectionStatusHandler({ status: 'disconnected' });
+    });
 
     await waitFor(() => {
-      expect(screen.getByText(/disconnected/i)).toBeInTheDocument();
+      expect(screen.getByText(/🔴 disconnected/i)).toBeInTheDocument();
     });
   });
 
@@ -488,7 +501,9 @@ describe('HostDashboard - Connection Status', () => {
     });
 
     // Simulate reconnecting
-    reconnectingHandler({ attempting: true });
+    await act(async () => {
+      reconnectingHandler({ attempting: true });
+    });
 
     await waitFor(() => {
       expect(screen.getByText(/reconnecting to server/i)).toBeInTheDocument();
@@ -518,7 +533,7 @@ describe('HostDashboard - Poll State Changes', () => {
   });
 
   test('handles error when changing poll state', async () => {
-    socketService.changePollState.mockRejectedValue(new Error('Failed to change state'));
+    socketService.changePollState = jest.fn().mockRejectedValue(new Error('Failed to change state'));
 
     render(<HostDashboard />);
 
@@ -542,7 +557,7 @@ describe('HostDashboard - Poll State Changes', () => {
     fireEvent.click(openButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/failed to change poll state/i)).toBeInTheDocument();
+      expect(screen.getByText(/failed to change state/i)).toBeInTheDocument();
     });
   });
 });
