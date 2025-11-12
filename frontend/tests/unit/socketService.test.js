@@ -56,9 +56,9 @@ jest.mock('../../src/services/socketService', () => {
           }
         });
       }),
-    submitVote: (roomCode, nickname, optionIndex) =>
+    submitVote: (roomCode, participantId, optionIndex) =>
       new Promise((resolve, reject) => {
-        mockSocket.emit('submit-vote', { roomCode, nickname, optionIndex }, response => {
+        mockSocket.emit('submit-vote', { roomCode, participantId, optionIndex }, response => {
           if (response.success) {
             resolve();
           } else {
@@ -229,12 +229,12 @@ describe('socketService', () => {
         });
 
         // Act
-        await submitVote('ABC', 'Eve', 1);
+        await submitVote('ABC', '12345', 1);
 
         // Assert
         expect(mockSocket.emit).toHaveBeenCalledWith(
           'submit-vote',
-          { roomCode: 'ABC', nickname: 'Eve', optionIndex: 1 },
+          { roomCode: 'ABC', participantId: '12345', optionIndex: 1 },
           expect.any(Function)
         );
       });

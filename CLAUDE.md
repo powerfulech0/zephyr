@@ -15,6 +15,7 @@ Auto-generated from all feature plans. Last updated: 2025-11-07
 - N/A (testing infrastructure) (007-service-layer-tests)
 - JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, Vite 7.2.2 (build tool), react-dom 19.2.0 (010-fix-option-input-focus)
 - N/A (bug fix only, no data storage changes) (010-fix-option-input-focus)
+- JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, react-dom 19.2.0, Socket.io-client 4.x, Vite 7.2.2 (011-fix-vote-submission)
 
 ### Backend (001-voting-app-mvp + 002-production-ready)
 
@@ -355,9 +356,9 @@ npm run test:performance
 - `poll-state-changed` - Poll state changed {newState, previousState}
 
 ## Recent Changes
+- 011-fix-vote-submission: Added JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, react-dom 19.2.0, Socket.io-client 4.x, Vite 7.2.2
 - 010-fix-option-input-focus: Added JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, Vite 7.2.2 (build tool), react-dom 19.2.0
 - 007-service-layer-tests: Added JavaScript ES6+ (frontend) + Jest 30.x, @testing-library/react, @testing-library/jest-dom, babel-jest
-- 006-fix-integration-tests: Added JavaScript ES6+ (frontend), Node.js 18+ LTS (test runner) + React 18.x, Jest 30.x, @testing-library/react, @testing-library/jest-dom, prop-types
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -63,6 +63,7 @@ function handleJoinRoom(socket, pollService, io) {
           callback({
             success: true,
             reconnected: true,
+            participantId: participant.id,
             previousVote: participant.previousVote,
             poll: {
               roomCode: poll.roomCode,
@@ -93,6 +94,7 @@ function handleJoinRoom(socket, pollService, io) {
           callback({
             success: true,
             reconnected: false,
+            participantId: participant.id,
             poll: {
               roomCode: poll.roomCode,
               question: poll.question,

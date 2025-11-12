@@ -64,16 +64,16 @@ export const joinRoom = (roomCode, nickname) =>
   new Promise((resolve, reject) => {
     socket.emit('join-room', { roomCode, nickname }, response => {
       if (response.success) {
-        resolve(response.poll);
+        resolve(response);
       } else {
         reject(new Error(response.error));
       }
     });
   });
 
-export const submitVote = (roomCode, nickname, optionIndex) =>
+export const submitVote = (roomCode, participantId, optionIndex) =>
   new Promise((resolve, reject) => {
-    socket.emit('submit-vote', { roomCode, nickname, optionIndex }, response => {
+    socket.emit('submit-vote', { roomCode, participantId, optionIndex }, response => {
       if (response.success) {
         resolve();
       } else {

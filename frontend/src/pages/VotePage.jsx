@@ -27,13 +27,16 @@ function VotePage() {
   const [isReconnecting, setIsReconnecting] = useState(false); // T091
   const [connectionStatus, setConnectionStatus] = useState('connected'); // T092
 
+  const [participantId, setParticipantId] = useState('');
+
   useEffect(() => {
     // Load data from sessionStorage
     const storedPoll = sessionStorage.getItem('poll');
     const storedNickname = sessionStorage.getItem('nickname');
     const storedRoomCode = sessionStorage.getItem('roomCode');
+    const storedParticipantId = sessionStorage.getItem('participantId');
 
-    if (!storedPoll || !storedNickname || !storedRoomCode) {
+    if (!storedPoll || !storedNickname || !storedRoomCode || !storedParticipantId) {
       setError('Session expired. Please join again.');
       setTimeout(() => navigate('/join'), 2000);
       return;
@@ -43,6 +46,7 @@ function VotePage() {
     setPoll(pollData);
     setNickname(storedNickname);
     setRoomCode(storedRoomCode);
+    setParticipantId(storedParticipantId);
     setPollState(pollData.state);
 
     // Initialize vote results array
@@ -95,7 +99,7 @@ function VotePage() {
     setError(null);
 
     try {
-      await submitVote(roomCode, nickname, optionIndex);
+      await submitVote(roomCode, participantId, optionIndex);
       setSelectedOption(optionIndex);
       setHasVoted(true);
       setShowConfirmation(true);
