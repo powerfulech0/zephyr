@@ -88,13 +88,13 @@ async function restoreNetworkConditions(page) {
  * Simulate backend failure by intercepting API requests and returning error responses
  *
  * @param {Page} page - Playwright page instance
- * @param {string} urlPattern - URL pattern to intercept (e.g., "/api/polls", "**/vote")
+ * @param {string} urlPattern - URL pattern to intercept (e.g., "/api/polls", "/api/vote")
  * @param {number} statusCode - HTTP status code to return (default: 500)
  * @param {Object} errorBody - Error response body (default: {error: "Internal Server Error"})
  * @returns {Promise<void>}
  *
  * @example
- * await simulateBackendFailure(page, '**/vote', 500, { error: 'Vote failed' });
+ * await simulateBackendFailure(page, '/api/vote', 500, { error: 'Vote failed' });
  */
 async function simulateBackendFailure(page, urlPattern, statusCode = 500, errorBody = { error: 'Internal Server Error' }) {
   console.log(`Simulating backend failure for ${urlPattern} with status ${statusCode}`);
@@ -116,7 +116,7 @@ async function simulateBackendFailure(page, urlPattern, statusCode = 500, errorB
  * @returns {Promise<void>}
  *
  * @example
- * await restoreBackendRequests(page, '**/vote');
+ * await restoreBackendRequests(page, '/api/vote');
  */
 async function restoreBackendRequests(page, urlPattern) {
   console.log(`Restoring normal backend requests for ${urlPattern}`);
