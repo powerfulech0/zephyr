@@ -63,12 +63,12 @@
 
 > **NOTE: Write these test specs FIRST using TDD approach (test → fail → implement page objects → pass)**
 
-- [ ] T015 [US1] Test: Host navigates to dashboard and sees poll creation form in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 1)
-- [ ] T016 [US1] Test: Host creates poll with question and 3 options, receives 6-character room code in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 2)
-- [ ] T017 [US1] Test: Host opens voting, poll state changes to 'open', controls update in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 3)
-- [ ] T018 [US1] Test: Host views live-updating vote counts and percentages in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 4 - simulate votes via API)
-- [ ] T019 [US1] Test: Host closes voting, poll state changes to 'closed', final results displayed in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 5)
-- [ ] T020 [US1] Test: Host refreshes browser during active poll, state and data persist in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 6)
+- [x] T015 [US1] Test: Host navigates to dashboard and sees poll creation form in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 1)
+- [x] T016 [US1] Test: Host creates poll with question and 3 options, receives 6-character room code in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 2)
+- [x] T017 [US1] Test: Host opens voting, poll state changes to 'open', controls update in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 3)
+- [x] T018 [US1] Test: Host views live-updating vote counts and percentages in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 4 - simulate votes via API)
+- [x] T019 [US1] Test: Host closes voting, poll state changes to 'closed', final results displayed in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 5)
+- [x] T020 [US1] Test: Host refreshes browser during active poll, state and data persist in tests/e2e/specs/host-lifecycle.spec.js (Acceptance Scenario 6)
 
 ### Implementation/Refinement for User Story 1
 
