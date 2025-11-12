@@ -1,0 +1,185 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'feature/**']
+  workflow_dispatch: # Allow manual trigger
+
+# Cancel previous runs on same PR/branch
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-tests:
+    name: E2E Tests (Chromium, Firefox, WebKit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies (root)
+        run: npm ci
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Start backend server
+        working-directory: ./backend
+        run: npm start &
+        env:
+          NODE_ENV: test
+          PORT: 4000
+
+      - name: Start frontend dev server
+        working-directory: ./frontend
+        run: npm run dev &
+        env:
+          NODE_ENV: test
+          VITE_PORT: 5173
+
+      - name: Wait for services to be ready
+        run: |
+          npx wait-on http://localhost:4000/api/health http://localhost:5173 \
+            --timeout 120000 \
+            --interval 1000 \
+            --verbose
+
+      - name: Run E2E tests (${{ matrix.browser }})
+        run: npm run test:e2e -- --project=${{ matrix.browser }}
+        env:
+          CI: true
+          BASE_URL: http://localhost:5173
+          API_URL: http://localhost:4000
+          HEADLESS: true
+
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-results-${{ matrix.browser }}
+          path: |
+            tests/e2e/reports/
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const browser = '${{ matrix.browser }}';
+            const status = '${{ job.status }}';
+
+            let comment = `### E2E Test Results (${browser})\n\n`;
+            comment += status === 'success'
+              ? `✅ All E2E tests passed in ${browser}!`
+              : `❌ E2E tests failed in ${browser}. Check artifacts for details.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  e2e-tests-summary:
+    name: E2E Tests Summary
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check E2E test results
+        run: |
+          if [ "${{ needs.e2e-tests.result }}" == "success" ]; then
+            echo "✅ All E2E tests passed across all browsers"
+            exit 0
+          else
+            echo "❌ Some E2E tests failed. Check individual browser results above."
+            exit 1
+          fi
+
+  # Optional: Run E2E tests on schedule (nightly)
+  nightly-e2e:
+    name: Nightly E2E Tests (Full Suite)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install all dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+          cd ../frontend && npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start services
+        run: |
+          cd backend && npm start &
+          cd ../frontend && npm run dev &
+          npx wait-on http://localhost:4000/api/health http://localhost:5173
+
+      - name: Run full E2E suite (all browsers, all tests)
+        run: npm run test:e2e
+        env:
+          CI: true
+          BASE_URL: http://localhost:5173
+          API_URL: http://localhost:4000
+          HEADLESS: true
+
+      - name: Upload full test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: nightly-e2e-results
+          path: |
+            tests/e2e/reports/
+            playwright-report/
+            test-results/
+          retention-days: 14

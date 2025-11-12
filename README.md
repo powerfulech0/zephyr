@@ -139,6 +139,122 @@ npm test
 # ✅ Performance tests (20 concurrent participants)
 ```
 
+### Frontend Tests
+
+```bash
+cd frontend
+
+# Run all tests with coverage
+npm test
+
+# Watch mode for development
+npm run test:watch
+
+# ✅ Component tests (React Testing Library)
+# ✅ Service layer tests (API, WebSocket clients)
+# ✅ Integration tests (user workflows)
+```
+
+### End-to-End Tests (E2E)
+
+Comprehensive browser automation tests validating complete user workflows across Chrome, Firefox, and Safari.
+
+#### Prerequisites
+
+```bash
+# Install Playwright browsers (one-time setup)
+npx playwright install chromium firefox webkit
+```
+
+#### Running E2E Tests
+
+```bash
+# Run all E2E tests (from repository root)
+npm run test:e2e
+
+# Run tests in headed mode (see browser)
+npm run test:e2e -- --headed
+
+# Run specific browser only
+npm run test:e2e -- --project=chromium
+npm run test:e2e -- --project=firefox
+npm run test:e2e -- --project=webkit
+
+# Run specific test file
+npm run test:e2e -- tests/e2e/specs/host-lifecycle.spec.js
+
+# Debug mode (step through tests)
+npm run test:e2e -- --debug
+
+# Generate HTML report
+npm run test:e2e -- --reporter=html
+npx playwright show-report
+```
+
+#### E2E Test Coverage
+
+**User Story 1 (P1) - Host Poll Lifecycle**: 6 scenarios
+- ✅ Host creates poll and receives room code
+- ✅ Host opens/closes voting
+- ✅ Host views live vote updates
+- ✅ Host refreshes browser during active poll (state persists)
+
+**User Story 2 (P2) - Participant Vote Journey**: 6 scenarios
+- ✅ Participant joins with room code
+- ✅ Participant submits and changes vote
+- ✅ Participant sees real-time vote updates
+- ✅ Error handling (invalid room code, duplicate nickname)
+
+**User Story 3 (P3) - Multi-User Interaction**: 5 scenarios
+- ✅ 10 concurrent participants join and vote
+- ✅ Real-time vote synchronization (<2s latency)
+- ✅ Participant count accuracy
+- ✅ WebSocket reliability under load
+
+**User Story 4 (P4) - Cross-Browser & Error Handling**: 5 scenarios
+- ✅ Core workflows work in Chrome, Firefox, Safari
+- ✅ Network disconnection recovery
+- ✅ Backend error handling
+- ✅ Session expiration handling
+
+**Edge Cases**: 10 scenarios
+- ✅ WebSocket disconnection during vote
+- ✅ Concurrent vote submissions
+- ✅ Poll state transitions (open → close → open)
+- ✅ High network latency (5+ seconds)
+- ✅ Maximum participant limits (20+ users)
+- ✅ And more...
+
+#### Troubleshooting E2E Tests
+
+**Tests fail with "Connection refused"**
+```bash
+# Ensure backend and frontend are running:
+# Terminal 1: cd backend && npm start
+# Terminal 2: cd frontend && npm run dev
+# Terminal 3: npm run test:e2e
+```
+
+**Browser not found**
+```bash
+# Install Playwright browsers
+npx playwright install
+```
+
+**Flaky tests (intermittent failures)**
+```bash
+# Run in CI mode with retries
+CI=true npm run test:e2e
+```
+
+**View test execution videos**
+```bash
+# Videos are recorded on failure and saved to:
+# tests/e2e/reports/test-results/
+```
+
+For more details, see [E2E Testing Quickstart](specs/013-e2e-testing/quickstart.md)
+
 
 ## 🏛️ Project Structure
 
@@ -163,8 +279,23 @@ zephyr/
 │   │   └── App.jsx            # Main app & routing
 │   ├── tests/                 # Frontend tests
 │   └── README.md              # Frontend documentation
+├── tests/                      # End-to-End tests
+│   └── e2e/
+│       ├── config/            # Playwright configuration
+│       ├── pages/             # Page Object Model (HostDashboardPage, JoinPage, VotePage)
+│       ├── specs/             # Test specifications (host-lifecycle, participant-journey, multi-user, etc.)
+│       ├── fixtures/          # Test data generators and utilities
+│       ├── helpers/           # WebSocket, browser, and network helpers
+│       └── reports/           # Test execution reports (screenshots, videos, traces)
 ├── specs/                      # Feature specifications
-│   └── 001-voting-app-mvp/    # MVP spec, plan, tasks
+│   ├── 001-voting-app-mvp/    # MVP spec, plan, tasks
+│   ├── 002-production-ready/  # Production features
+│   └── 013-e2e-testing/       # E2E testing spec, plan, contracts
+├── .github/workflows/          # CI/CD pipelines
+│   ├── test.yml               # Backend/frontend tests
+│   ├── build.yml              # Build workflow
+│   ├── deploy.yml             # Deployment workflow
+│   └── e2e-tests.yml          # E2E test workflow (new)
 ├── shared/                     # Shared constants (event types)
 ├── package.json                # Root dependencies
 ├── CLAUDE.md                   # Development guide
@@ -191,6 +322,8 @@ zephyr/
 
 ### Testing
 - **Backend Testing**: Jest 30.x
+- **Frontend Testing**: Jest 30.x + React Testing Library
+- **E2E Testing**: Playwright 1.40+ (Chromium, Firefox, WebKit)
 - **Coverage**: 95.53% (backend)
 
 ## 📊 Performance
