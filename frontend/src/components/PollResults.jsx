@@ -7,15 +7,15 @@ function PollResults({ options, counts, percentages, pollState }) {
     return <div className="poll-results">No results yet</div>;
   }
 
-  const maxCount = Math.max(...counts, 1);
+  const maxCount = Math.max(...(counts || []), 1);
 
   return (
     <div className="poll-results">
       <h3>Results {pollState === 'waiting' && '(Voting Not Started)'}</h3>
       <div className="results-container">
         {options.map((option, index) => {
-          const count = counts[index] || 0;
-          const percentage = percentages[index] || 0;
+          const count = (counts && counts[index]) || 0;
+          const percentage = (percentages && percentages[index]) || 0;
           const barWidth = maxCount > 0 ? (count / maxCount) * 100 : 0;
 
           return (

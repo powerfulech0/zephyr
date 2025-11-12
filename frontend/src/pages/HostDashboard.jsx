@@ -26,7 +26,7 @@ function HostDashboard() {
   const [poll, setPoll] = useState(null);
   const [pollState, setPollState] = useState('waiting');
   const [participantCount, setParticipantCount] = useState(0);
-  const [voteResults, setVoteResults] = useState({ counts: [], percentages: [] });
+  const [voteResults, setVoteResults] = useState({ votes: [], percentages: [] });
   const [isReconnecting, setIsReconnecting] = useState(false); // T091
   const [connectionStatus, setConnectionStatus] = useState('connected'); // T092
 
@@ -38,7 +38,7 @@ function HostDashboard() {
 
     const handleVoteUpdate = data => {
       setVoteResults({
-        counts: data.votes,
+        votes: data.votes,
         percentages: data.percentages,
       });
     };
@@ -137,7 +137,7 @@ function HostDashboard() {
       setPoll(response);
       setPollState(response.state);
       setVoteResults({
-        counts: new Array(filteredOptions.length).fill(0),
+        votes: new Array(filteredOptions.length).fill(0),
         percentages: new Array(filteredOptions.length).fill(0),
       });
 
@@ -264,7 +264,7 @@ function HostDashboard() {
 
       <PollResults
         options={poll.options}
-        counts={voteResults.counts}
+        counts={voteResults.votes}
         percentages={voteResults.percentages}
         pollState={pollState}
       />

@@ -46,6 +46,15 @@ describe('PollResults Component', () => {
     render(<PollResults options={options} counts={[0]} percentages={[0]} pollState="open" />);
     expect(screen.getByText('Results update in real-time as votes come in')).toBeInTheDocument();
   });
+
+  it('should handle undefined counts gracefully without crashing', () => {
+    const options = ['Option A', 'Option B'];
+    // Test edge case where counts might be undefined (before fix this would cause TypeError)
+    render(<PollResults options={options} counts={undefined} percentages={[0, 0]} pollState="open" />);
+    // Should not crash - component should render
+    expect(screen.getByText('Option A')).toBeInTheDocument();
+    expect(screen.getByText('Option B')).toBeInTheDocument();
+  });
 });
 
 describe('ParticipantCounter Component', () => {
