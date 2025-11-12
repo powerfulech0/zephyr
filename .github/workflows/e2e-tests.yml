@@ -103,10 +103,9 @@ jobs:
 
       - name: Start frontend dev server
         working-directory: ./frontend
-        run: npm start &
+        run: npm start -- --port 5173 --host &
         env:
           NODE_ENV: test
-          PORT: 5173
 
       - name: Wait for services to be ready
         run: |
@@ -246,7 +245,7 @@ jobs:
       - name: Start services
         run: |
           cd backend && npm start &
-          cd ../frontend && npm start &
+          cd ../frontend && npm start -- --port 5173 --host &
           npx wait-on http://localhost:4000/api/health http://localhost:5173
         env:
           NODE_ENV: test
