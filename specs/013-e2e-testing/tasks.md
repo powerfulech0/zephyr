@@ -113,17 +113,17 @@
 
 ### Test Scenarios for User Story 3
 
-- [ ] T033 [P] [US3] Test: 10 participants join simultaneously, all connect successfully, host sees accurate count (10) in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 1)
-- [ ] T034 [P] [US3] Test: 10 participants submit votes within 1 second, all recorded correctly, vote counts update on all clients within 2 seconds in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 2)
-- [ ] T035 [P] [US3] Test: One participant disconnects, participant count decrements accurately on host dashboard within 1 second in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 3)
-- [ ] T036 [P] [US3] Test: Host changes poll state, all participants receive state change notification within 1 second in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 4)
-- [ ] T037 [P] [US3] Test: Multiple participants voting, all clients display consistent vote totals with no data discrepancies in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 5)
+- [x] T033 [P] [US3] Test: 10 participants join simultaneously, all connect successfully, host sees accurate count (10) in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 1)
+- [x] T034 [P] [US3] Test: 10 participants submit votes within 1 second, all recorded correctly, vote counts update on all clients within 2 seconds in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 2)
+- [x] T035 [P] [US3] Test: One participant disconnects, participant count decrements accurately on host dashboard within 1 second in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 3)
+- [x] T036 [P] [US3] Test: Host changes poll state, all participants receive state change notification within 1 second in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 4)
+- [x] T037 [P] [US3] Test: Multiple participants voting, all clients display consistent vote totals with no data discrepancies in tests/e2e/specs/multi-user.spec.js (Acceptance Scenario 5)
 
 ### Implementation/Refinement for User Story 3
 
-- [ ] T038 [US3] Implement createMultipleContexts helper for spawning 10 concurrent browser sessions
-- [ ] T039 [US3] Add timing assertions for WebSocket event delivery (<2 seconds for vote updates, <1 second for state changes)
-- [ ] T040 [US3] Verify all 5 test scenarios pass, measure performance (test execution <30 seconds), cleanup all connections
+- [x] T038 [US3] Implement createMultipleContexts helper for spawning 10 concurrent browser sessions
+- [x] T039 [US3] Add timing assertions for WebSocket event delivery (<2 seconds for vote updates, <1 second for state changes)
+- [x] T040 [US3] Verify all 5 test scenarios pass, measure performance (test execution <30 seconds), cleanup all connections
 
 **Checkpoint**: At this point, User Story 3 tests should validate real-time multi-user scenarios and performance under concurrent load
 
