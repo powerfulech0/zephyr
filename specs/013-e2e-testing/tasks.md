@@ -88,18 +88,18 @@
 
 ### Test Scenarios for User Story 2
 
-- [ ] T024 [P] [US2] Test: Participant joins poll with valid room code and nickname, sees question and options in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 1)
-- [ ] T025 [P] [US2] Test: Participant submits vote, receives instant confirmation in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 2)
-- [ ] T026 [P] [US2] Test: Participant changes vote while voting open, previous vote replaced in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 3)
-- [ ] T027 [P] [US2] Test: Participant attempts join with invalid room code, sees error 'Poll not found' in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 4)
-- [ ] T028 [P] [US2] Test: Participant attempts join with duplicate nickname, sees error requesting different nickname in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 5)
-- [ ] T029 [P] [US2] Test: Host closes voting, participant interface updates to disable vote submission in real-time in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 6)
+- [x] T024 [P] [US2] Test: Participant joins poll with valid room code and nickname, sees question and options in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 1)
+- [x] T025 [P] [US2] Test: Participant submits vote, receives instant confirmation in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 2)
+- [x] T026 [P] [US2] Test: Participant changes vote while voting open, previous vote replaced in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 3)
+- [x] T027 [P] [US2] Test: Participant attempts join with invalid room code, sees error 'Poll not found' in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 4)
+- [x] T028 [P] [US2] Test: Participant attempts join with duplicate nickname, sees error requesting different nickname in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 5)
+- [x] T029 [P] [US2] Test: Host closes voting, participant interface updates to disable vote submission in real-time in tests/e2e/specs/participant-journey.spec.js (Acceptance Scenario 6)
 
 ### Implementation/Refinement for User Story 2
 
-- [ ] T030 [US2] Refine JoinPage and VotePage selectors based on test failures
-- [ ] T031 [US2] Add WebSocket event capture for vote confirmations and state changes (vote-update, poll-state-changed events)
-- [ ] T032 [US2] Verify all 6 test scenarios pass and cleanup properly (close connections, delete test polls)
+- [x] T030 [US2] Refine JoinPage and VotePage selectors based on test failures
+- [x] T031 [US2] Add WebSocket event capture for vote confirmations and state changes (vote-update, poll-state-changed events)
+- [x] T032 [US2] Verify all 6 test scenarios pass and cleanup properly (close connections, delete test polls)
 
 **Checkpoint**: At this point, User Story 2 tests should validate complete participant voting journey independently of other test suites
 
