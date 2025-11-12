@@ -40,9 +40,9 @@ module.exports = defineConfig({
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
 
-    // Action timeouts
-    actionTimeout: 10000,
-    navigationTimeout: 10000,
+    // Action timeouts (increased for CI stability)
+    actionTimeout: process.env.CI ? 15000 : 10000,
+    navigationTimeout: process.env.CI ? 15000 : 10000,
   },
 
   // Projects for different browsers

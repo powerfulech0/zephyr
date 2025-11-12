@@ -51,18 +51,25 @@ class JoinPage extends BasePage {
         // Wait for URL to change to /vote/{roomCode} (success)
         this.page.waitForURL(/\/vote\/[A-Z0-9]{6}/, { timeout: 5000 }),
         // Or wait for error message to appear (failure)
-        this.waitForSelector(JoinPage.ERROR_MESSAGE, { timeout: 5000 }),
+        this.page.waitForSelector(JoinPage.ERROR_MESSAGE, { state: 'visible', timeout: 5000 }),
       ]);
-
+    } catch (error) {
+      // Check if we ended up on vote page despite timeout
       const currentUrl = this.page.url();
       if (currentUrl.includes('/vote/')) {
-        console.log(`✓ Successfully joined poll ${roomCode}`);
-      } else {
-        const errorMsg = await this.getErrorMessage();
-        console.log(`✗ Join failed: ${errorMsg}`);
+        console.log(`✓ Successfully joined poll ${roomCode} (slow navigation)`);
+        return;
       }
-    } catch (error) {
       throw new Error(`Join poll timed out: ${error.message}`);
+    }
+
+    // Check result
+    const currentUrl = this.page.url();
+    if (currentUrl.includes('/vote/')) {
+      console.log(`✓ Successfully joined poll ${roomCode}`);
+    } else {
+      const errorMsg = await this.getErrorMessage();
+      console.log(`✗ Join failed: ${errorMsg}`);
     }
   }
 

@@ -147,11 +147,13 @@ test.describe('User Story 4: Cross-Browser and Error Handling', () => {
     const hostPage = new HostDashboardPage(page);
     await hostPage.goto();
 
-    // Attempt to create poll with only 1 option
-    const invalidPoll = generatePoll({ options: ['Only One Option'] });
+    // Manually fill form with only 1 option (don't use createPoll() which has its own validation)
+    await hostPage.fill('#poll-question', 'Test Question');
+    await hostPage.fill('#poll-option-0', 'Only One Option');
+    await hostPage.fill('#poll-option-1', ''); // Leave second option empty
 
-    // Try to create the poll
-    await hostPage.createPoll(invalidPoll.question, invalidPoll.options);
+    // Try to submit
+    await hostPage.click('button[type="submit"]');
 
     // Wait for error message to appear
     const errorMessage = await page.locator('.error-message, .alert-danger, [role="alert"]').first().textContent({ timeout: 5000 }).catch(() => null);
@@ -160,8 +162,8 @@ test.describe('User Story 4: Cross-Browser and Error Handling', () => {
     expect(errorMessage.toLowerCase()).toMatch(/at least.*2.*option|minimum.*2.*option|need.*2.*option/i);
 
     // Verify no room code is displayed (poll not created)
-    const roomCodeExists = await page.locator('text=/room code|join code/i').isVisible({ timeout: 2000 }).catch(() => false);
-    expect(roomCodeExists).toBe(false);
+    const roomCodeVisible = await page.locator('.room-code strong').isVisible({ timeout: 2000 }).catch(() => false);
+    expect(roomCodeVisible).toBe(false);
 
     console.log('✓ Poll creation validation error displayed correctly');
   });

@@ -10,11 +10,11 @@ class BasePage {
   /**
    * Create a new BasePage instance
    * @param {import('@playwright/test').Page} page - Playwright page instance
-   * @param {string} baseUrl - Application base URL
    */
-  constructor(page, baseUrl) {
+  constructor(page) {
     this.page = page;
-    this.baseUrl = baseUrl;
+    // Use Playwright's configured baseURL from test context
+    // Page.goto() will automatically prepend baseURL from playwright.config.js
   }
 
   /**
@@ -23,8 +23,10 @@ class BasePage {
    * @returns {Promise<void>}
    */
   async goto(path = '/') {
-    const url = `${this.baseUrl}${path}`;
-    await this.page.goto(url);
+    // Playwright will automatically prepend baseURL from config
+    await this.page.goto(path, { waitUntil: 'domcontentloaded' });
+    // Wait for page to be fully interactive
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**
@@ -121,6 +123,8 @@ class BasePage {
    */
   async click(selector, options = {}) {
     try {
+      // Wait for element to be visible and clickable
+      await this.page.waitForSelector(selector, { state: 'visible', timeout: 10000 });
       await this.page.click(selector, options);
     } catch (error) {
       throw new Error(`Failed to click ${selector}: ${error.message}`);
@@ -136,6 +140,8 @@ class BasePage {
    */
   async fill(selector, value) {
     try {
+      // Wait for element to be visible and editable
+      await this.page.waitForSelector(selector, { state: 'visible', timeout: 10000 });
       await this.page.fill(selector, value);
     } catch (error) {
       throw new Error(`Failed to fill ${selector}: ${error.message}`);

@@ -54,12 +54,16 @@ class HostDashboardPage extends BasePage {
     for (let i = 0; i < options.length; i++) {
       const optionSelector = `${HostDashboardPage.POLL_OPTION_INPUT_PREFIX}${i}`;
 
-      // If option input doesn't exist yet, click "Add Option" button
-      const optionExists = await this.page.locator(optionSelector).count() > 0;
-      if (!optionExists) {
+      // Check how many option inputs currently exist
+      const currentOptionCount = await this.page.locator('[id^="poll-option-"]').count();
+
+      // If we need more inputs than exist, click "Add Option" button
+      if (i >= currentOptionCount) {
         await this.click(HostDashboardPage.ADD_OPTION_BUTTON);
         // Wait for new input to appear
-        await this.waitForSelector(optionSelector);
+        await this.waitForSelector(optionSelector, { timeout: 5000 });
+        // Give React time to finish rendering
+        await this.page.waitForTimeout(100);
       }
 
       await this.fill(optionSelector, options[i]);
