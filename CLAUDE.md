@@ -17,6 +17,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-07
 - N/A (bug fix only, no data storage changes) (010-fix-option-input-focus)
 - JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, react-dom 19.2.0, Socket.io-client 4.x, Vite 7.2.2 (011-fix-vote-submission)
 - JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, react-dom 19.2.0, Socket.io-client 4.x, Vite 7.2.2 (build tool) (012-fix-poll-results-error)
+- JavaScript ES6+ (Node.js 18+ LTS for test runner) (013-e2e-testing)
+- N/A (tests use existing application storage - backend in-memory/PostgreSQL) (013-e2e-testing)
 
 ### Backend (001-voting-app-mvp + 002-production-ready)
 
@@ -357,9 +359,9 @@ npm run test:performance
 - `poll-state-changed` - Poll state changed {newState, previousState}
 
 ## Recent Changes
+- 013-e2e-testing: Added JavaScript ES6+ (Node.js 18+ LTS for test runner)
 - 012-fix-poll-results-error: Added JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, react-dom 19.2.0, Socket.io-client 4.x, Vite 7.2.2 (build tool)
 - 011-fix-vote-submission: Added JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, react-dom 19.2.0, Socket.io-client 4.x, Vite 7.2.2
-- 010-fix-option-input-focus: Added JavaScript ES6+ (frontend), React 19.2.0 + React 19.2.0, Vite 7.2.2 (build tool), react-dom 19.2.0
 
 
 <!-- MANUAL ADDITIONS START -->
