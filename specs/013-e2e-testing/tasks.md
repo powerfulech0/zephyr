@@ -45,9 +45,9 @@
 - [x] T009 [P] Create cleanup fixture in tests/e2e/fixtures/testUtils.js (CleanupTracker class with trackPoll, trackConnection, cleanup methods)
 - [x] T010 [P] Implement WebSocket helpers in tests/e2e/helpers/websocketHelpers.js (captureSocketEvents, waitForSocketEvent, getSocketEvents, clearSocketEvents, assertEventReceived per contract)
 - [x] T011 [P] Implement browser helpers in tests/e2e/helpers/browserHelpers.js (waitForNetworkIdle, retryOperation, createMultipleContexts per contract)
-- [ ] T012 Create HostDashboardPage class in tests/e2e/pages/HostDashboardPage.js (createPoll, getRoomCode, openVoting, closeVoting, getResults, getParticipantCount, getPollState methods per contract)
-- [ ] T013 [P] Create JoinPage class in tests/e2e/pages/JoinPage.js (joinPoll, getErrorMessage, isJoinSuccessful methods per contract)
-- [ ] T014 [P] Create VotePage class in tests/e2e/pages/VotePage.js (getPollQuestion, getOptions, selectOption, submitVote, getConfirmation, isVotingDisabled, getCurrentVote, changeVote methods per contract)
+- [x] T012 Create HostDashboardPage class in tests/e2e/pages/HostDashboardPage.js (createPoll, getRoomCode, openVoting, closeVoting, getResults, getParticipantCount, getPollState methods per contract)
+- [x] T013 [P] Create JoinPage class in tests/e2e/pages/JoinPage.js (joinPoll, getErrorMessage, isJoinSuccessful methods per contract)
+- [x] T014 [P] Create VotePage class in tests/e2e/pages/VotePage.js (getPollQuestion, getOptions, selectOption, submitVote, getConfirmation, isVotingDisabled, getCurrentVote, changeVote methods per contract)
 
 **Checkpoint**: Foundation ready - test scenario implementation can now begin in parallel
 
