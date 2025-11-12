@@ -78,7 +78,7 @@ jobs:
 
       - name: Upload test artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: e2e-test-results-${{ matrix.browser }}
           path: |
@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload HTML report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report-${{ matrix.browser }}
           path: playwright-report/
@@ -175,7 +175,7 @@ jobs:
 
       - name: Upload full test artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nightly-e2e-results
           path: |
