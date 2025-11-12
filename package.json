@@ -4,12 +4,12 @@
   "description": "End-to-end testing infrastructure for Zephyr voting application",
   "private": true,
   "scripts": {
-    "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed",
-    "test:e2e:debug": "playwright test --debug",
-    "test:e2e:ui": "playwright test --ui",
+    "test:e2e": "playwright test --config=tests/e2e/config/playwright.config.js",
+    "test:e2e:headed": "playwright test --config=tests/e2e/config/playwright.config.js --headed",
+    "test:e2e:debug": "playwright test --config=tests/e2e/config/playwright.config.js --debug",
+    "test:e2e:ui": "playwright test --config=tests/e2e/config/playwright.config.js --ui",
     "test:e2e:report": "playwright show-report",
-    "test:e2e:ci": "CI=true playwright test"
+    "test:e2e:ci": "CI=true playwright test --config=tests/e2e/config/playwright.config.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
