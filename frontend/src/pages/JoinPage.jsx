@@ -52,14 +52,15 @@ function JoinPage() {
     setError(null);
 
     try {
-      const poll = await joinRoom(roomCode.trim().toUpperCase(), nickname.trim());
+      const response = await joinRoom(roomCode.trim().toUpperCase(), nickname.trim());
 
       // Store poll data and navigate to vote page
-      sessionStorage.setItem('roomCode', poll.roomCode);
+      sessionStorage.setItem('roomCode', response.poll.roomCode);
       sessionStorage.setItem('nickname', nickname.trim());
-      sessionStorage.setItem('poll', JSON.stringify(poll));
+      sessionStorage.setItem('participantId', response.participantId);
+      sessionStorage.setItem('poll', JSON.stringify(response.poll));
 
-      navigate(`/vote/${poll.roomCode}`);
+      navigate(`/vote/${response.poll.roomCode}`);
     } catch (err) {
       setError(err.message || 'Failed to join room');
       setLoading(false);

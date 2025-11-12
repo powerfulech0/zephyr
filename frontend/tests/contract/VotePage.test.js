@@ -58,6 +58,7 @@ describe('VotePage - Session Storage Handling', () => {
     sessionStorage.setItem('poll', JSON.stringify(mockPoll));
     sessionStorage.setItem('nickname', 'TestUser');
     sessionStorage.setItem('roomCode', 'ABC123');
+    sessionStorage.setItem('participantId', '12345');
 
     render(
       <MemoryRouter initialEntries={['/vote/ABC123']}>
@@ -90,6 +91,7 @@ describe('VotePage - Vote Submission', () => {
     sessionStorage.setItem('poll', JSON.stringify(mockPoll));
     sessionStorage.setItem('nickname', 'TestUser');
     sessionStorage.setItem('roomCode', 'ABC123');
+    sessionStorage.setItem('participantId', '12345');
 
     socketService.submitVote = jest.fn().mockResolvedValue({});
     socketService.onPollStateChanged = jest.fn();
@@ -111,7 +113,7 @@ describe('VotePage - Vote Submission', () => {
     fireEvent.click(redButton);
 
     await waitFor(() => {
-      expect(socketService.submitVote).toHaveBeenCalledWith('ABC123', 'TestUser', 0);
+      expect(socketService.submitVote).toHaveBeenCalledWith('ABC123', '12345', 0);
     });
   });
 
@@ -179,7 +181,7 @@ describe('VotePage - Vote Submission', () => {
     fireEvent.click(blueButton);
 
     await waitFor(() => {
-      expect(socketService.submitVote).toHaveBeenCalledWith('ABC123', 'TestUser', 1);
+      expect(socketService.submitVote).toHaveBeenCalledWith('ABC123', '12345', 1);
     });
   });
 
@@ -236,6 +238,7 @@ describe('VotePage - Socket Event Handlers', () => {
     sessionStorage.setItem('poll', JSON.stringify(mockPoll));
     sessionStorage.setItem('nickname', 'TestUser');
     sessionStorage.setItem('roomCode', 'ABC123');
+    sessionStorage.setItem('participantId', '12345');
 
     socketService.submitVote = jest.fn().mockResolvedValue({});
     socketService.onPollStateChanged = jest.fn();
@@ -320,6 +323,7 @@ describe('VotePage - Connection Status', () => {
     sessionStorage.setItem('poll', JSON.stringify(mockPoll));
     sessionStorage.setItem('nickname', 'TestUser');
     sessionStorage.setItem('roomCode', 'ABC123');
+    sessionStorage.setItem('participantId', '12345');
 
     socketService.submitVote = jest.fn().mockResolvedValue({});
     socketService.onPollStateChanged = jest.fn();
@@ -441,6 +445,7 @@ describe('VotePage - Poll States', () => {
     sessionStorage.setItem('poll', JSON.stringify(mockPoll));
     sessionStorage.setItem('nickname', 'TestUser');
     sessionStorage.setItem('roomCode', 'ABC123');
+    sessionStorage.setItem('participantId', '12345');
 
     render(
       <MemoryRouter initialEntries={['/vote/ABC123']}>
@@ -458,6 +463,7 @@ describe('VotePage - Poll States', () => {
     sessionStorage.setItem('poll', JSON.stringify(closedPoll));
     sessionStorage.setItem('nickname', 'TestUser');
     sessionStorage.setItem('roomCode', 'ABC123');
+    sessionStorage.setItem('participantId', '12345');
 
     render(
       <MemoryRouter initialEntries={['/vote/ABC123']}>
@@ -475,6 +481,7 @@ describe('VotePage - Poll States', () => {
     sessionStorage.setItem('poll', JSON.stringify(openPoll));
     sessionStorage.setItem('nickname', 'TestUser');
     sessionStorage.setItem('roomCode', 'ABC123');
+    sessionStorage.setItem('participantId', '12345');
 
     render(
       <MemoryRouter initialEntries={['/vote/ABC123']}>

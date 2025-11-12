@@ -155,10 +155,13 @@ describe('JoinPage - Form Validation', () => {
 
   test('trims whitespace from room code and nickname', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC234',
-      question: 'Test Question',
-      options: ['Option 1', 'Option 2'],
-      state: 'waiting'
+      participantId: '12345',
+      poll: {
+        roomCode: 'ABC234',
+        question: 'Test Question',
+        options: ['Option 1', 'Option 2'],
+        state: 'waiting'
+      }
     };
 
     socketService.joinRoom.mockResolvedValue(mockPollResponse);
@@ -201,10 +204,13 @@ describe('JoinPage - Form Validation', () => {
 
   test('validates room code format (6 characters, valid alphabet)', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC234',
-      question: 'Test Question',
-      options: ['Option 1', 'Option 2'],
-      state: 'waiting'
+      participantId: '12345',
+      poll: {
+        roomCode: 'ABC234',
+        question: 'Test Question',
+        options: ['Option 1', 'Option 2'],
+        state: 'waiting'
+      }
     };
 
     socketService.joinRoom.mockResolvedValue(mockPollResponse);
@@ -244,10 +250,13 @@ describe('JoinPage - API Integration', () => {
 
   test('calls joinRoom API with correct parameters on valid submission', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC234',
-      question: 'Test Question',
-      options: ['Option 1', 'Option 2'],
-      state: 'waiting'
+      participantId: '12345',
+      poll: {
+        roomCode: 'ABC234',
+        question: 'Test Question',
+        options: ['Option 1', 'Option 2'],
+        state: 'waiting'
+      }
     };
 
     socketService.joinRoom.mockResolvedValue(mockPollResponse);
@@ -273,10 +282,13 @@ describe('JoinPage - API Integration', () => {
 
   test('navigates to vote page on successful join (route: /vote/:roomCode)', async () => {
     const mockPollResponse = {
-      roomCode: 'ABC234',
-      question: 'Test Question',
-      options: ['Option 1', 'Option 2'],
-      state: 'waiting'
+      participantId: '12345',
+      poll: {
+        roomCode: 'ABC234',
+        question: 'Test Question',
+        options: ['Option 1', 'Option 2'],
+        state: 'waiting'
+      }
     };
 
     socketService.joinRoom.mockResolvedValue(mockPollResponse);
@@ -302,7 +314,8 @@ describe('JoinPage - API Integration', () => {
     // Verify session storage was updated
     expect(sessionStorage.getItem('roomCode')).toBe('ABC234');
     expect(sessionStorage.getItem('nickname')).toBe('TestUser');
-    expect(JSON.parse(sessionStorage.getItem('poll'))).toEqual(mockPollResponse);
+    expect(sessionStorage.getItem('participantId')).toBe('12345');
+    expect(JSON.parse(sessionStorage.getItem('poll'))).toEqual(mockPollResponse.poll);
   });
 });
 
@@ -501,10 +514,13 @@ describe('JoinPage - Error Handling', () => {
     socketService.joinRoom
       .mockRejectedValueOnce(new Error('Room not found'))
       .mockResolvedValueOnce({
-        roomCode: 'ABC234',
-        question: 'Test Question',
-        options: ['Option 1', 'Option 2'],
-        state: 'waiting'
+        participantId: '12345',
+        poll: {
+          roomCode: 'ABC234',
+          question: 'Test Question',
+          options: ['Option 1', 'Option 2'],
+          state: 'waiting'
+        }
       });
 
     render(

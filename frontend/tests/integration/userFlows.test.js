@@ -139,6 +139,7 @@ describe('Participant Join and Vote Flow (User Story 2)', () => {
         }),
         nickname: 'Alice',
         roomCode: 'AB3K9T',
+        participantId: '12345',
       };
       return store[key];
     });
@@ -172,7 +173,7 @@ describe('Participant Join and Vote Flow (User Story 2)', () => {
     fireEvent.click(blueOption);
 
     await waitFor(() => {
-      expect(submitVote).toHaveBeenCalledWith('AB3K9T', 'Alice', 1);
+      expect(submitVote).toHaveBeenCalledWith('AB3K9T', '12345', 1);
     });
   });
 
@@ -187,6 +188,7 @@ describe('Participant Join and Vote Flow (User Story 2)', () => {
         }),
         nickname: 'Bob',
         roomCode: 'AB3K9T',
+        participantId: '67890',
       };
       return store[key];
     });
@@ -260,6 +262,7 @@ describe('Connection Status and Reconnection (User Story 3)', () => {
         }),
         nickname: 'Test',
         roomCode: 'AB3K9T',
+        participantId: '99999',
       };
       return store[key];
     });
