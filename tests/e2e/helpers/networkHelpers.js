@@ -88,9 +88,9 @@ async function restoreNetworkConditions(page) {
  * Simulate backend failure by intercepting API requests and returning error responses
  *
  * @param {Page} page - Playwright page instance
- * @param {string} urlPattern - URL pattern to intercept (e.g., '/api/polls', '**/vote')
+ * @param {string} urlPattern - URL pattern to intercept (e.g., "/api/polls", "**/vote")
  * @param {number} statusCode - HTTP status code to return (default: 500)
- * @param {Object} errorBody - Error response body (default: {error: 'Internal Server Error'})
+ * @param {Object} errorBody - Error response body (default: {error: "Internal Server Error"})
  * @returns {Promise<void>}
  *
  * @example
