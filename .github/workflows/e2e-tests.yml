@@ -18,6 +18,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    # Service containers for PostgreSQL and Redis
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: zephyr_test
+          POSTGRES_USER: zephyr_test
+          POSTGRES_PASSWORD: zephyr_test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     strategy:
       fail-fast: false
       matrix:
@@ -47,12 +73,33 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
+      - name: Run database migrations
+        working-directory: ./backend
+        run: npm run migrate:up || echo "No migrations to run"
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: zephyr_test
+          DB_USER: zephyr_test
+          DB_PASSWORD: zephyr_test_password
+
       - name: Start backend server
         working-directory: ./backend
         run: npm start &
         env:
           NODE_ENV: test
           PORT: 4000
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: zephyr_test
+          DB_USER: zephyr_test
+          DB_PASSWORD: zephyr_test_password
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          REDIS_PASSWORD: ""
+          LOG_LEVEL: info
+          ALLOWED_ORIGINS: http://localhost:5173
 
       - name: Start frontend dev server
         working-directory: ./frontend
@@ -140,6 +187,32 @@ jobs:
     if: github.event_name == 'schedule'
     timeout-minutes: 30
 
+    # Service containers for PostgreSQL and Redis
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: zephyr_test
+          POSTGRES_USER: zephyr_test
+          POSTGRES_PASSWORD: zephyr_test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -159,11 +232,35 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      - name: Run database migrations
+        working-directory: ./backend
+        run: npm run migrate:up || echo "No migrations to run"
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: zephyr_test
+          DB_USER: zephyr_test
+          DB_PASSWORD: zephyr_test_password
+
       - name: Start services
         run: |
           cd backend && npm start &
           cd ../frontend && npm run dev &
           npx wait-on http://localhost:4000/api/health http://localhost:5173
+        env:
+          NODE_ENV: test
+          PORT: 4000
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: zephyr_test
+          DB_USER: zephyr_test
+          DB_PASSWORD: zephyr_test_password
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          REDIS_PASSWORD: ""
+          LOG_LEVEL: info
+          ALLOWED_ORIGINS: http://localhost:5173
 
       - name: Run full E2E suite (all browsers, all tests)
         run: npm run test:e2e
