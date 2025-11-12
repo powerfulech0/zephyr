@@ -22,14 +22,15 @@ class HostDashboardPage extends BasePage {
   // After poll creation
   static ROOM_CODE_ELEMENT = '.room-code strong'; // "Room Code: <strong>ABC123</strong>"
   static POLL_HEADER = '.poll-header';
-  static PARTICIPANT_COUNT = '.participant-counter'; // From ParticipantCounter component
-  static OPEN_VOTING_BUTTON = 'button:has-text("Open Voting")'; // PollControls component
-  static CLOSE_VOTING_BUTTON = 'button:has-text("Close Voting")'; // PollControls component
-  static POLL_STATE_INDICATOR = '.poll-state'; // Poll state display (if exists)
+  static PARTICIPANT_COUNTER = '.participant-counter'; // ParticipantCounter component
+  static PARTICIPANT_COUNT_TEXT = '.counter-text'; // Contains "X participants connected"
+  static OPEN_VOTING_BUTTON = 'button.btn-open'; // PollControls: "Open Voting" button
+  static CLOSE_VOTING_BUTTON = 'button.btn-close'; // PollControls: "Close Voting" button
+  static POLL_STATE_INDICATOR = '.poll-status span'; // Poll state display in PollControls
   static POLL_RESULTS_CONTAINER = '.poll-results'; // PollResults component
-  static RESULT_OPTION = '.result-option'; // Individual result items
-  static RESULT_COUNT = '.result-count';
-  static RESULT_PERCENTAGE = '.result-percentage';
+  static RESULT_ITEM = '.result-item'; // Individual result items
+  static OPTION_TEXT = '.option-text'; // Option name within result-item
+  static VOTE_COUNT = '.vote-count'; // Vote count and percentage text
 
   /**
    * Create new poll by filling form and submitting
@@ -180,8 +181,8 @@ class HostDashboardPage extends BasePage {
       throw new Error('Poll results container not found');
     }
 
-    // Get all result items
-    const resultItems = await this.page.locator(HostDashboardPage.RESULT_OPTION).all();
+    // Get all result items (.result-item from PollResults component)
+    const resultItems = await this.page.locator(HostDashboardPage.RESULT_ITEM).all();
 
     if (resultItems.length === 0) {
       console.warn('⚠ No result items found, returning empty results');
@@ -191,15 +192,18 @@ class HostDashboardPage extends BasePage {
     const results = {};
 
     for (const item of resultItems) {
-      // Extract option text (varies by component structure)
-      // The PollResults component likely has option text and vote data
-      const optionText = await item.locator('.option-text, .option-name').textContent().catch(() => '');
-      const countText = await item.locator(HostDashboardPage.RESULT_COUNT).textContent().catch(() => '0');
-      const percentageText = await item.locator(HostDashboardPage.RESULT_PERCENTAGE).textContent().catch(() => '0%');
+      // Extract option text from .option-text span
+      const optionText = await item.locator(HostDashboardPage.OPTION_TEXT).textContent().catch(() => '');
 
-      // Parse count and percentage
-      const count = parseInt(countText.match(/\d+/)?.[0] || '0', 10);
-      const percentage = parseInt(percentageText.match(/\d+/)?.[0] || '0', 10);
+      // Extract vote count text (format: "5 votes (50%)")
+      const voteCountText = await item.locator(HostDashboardPage.VOTE_COUNT).textContent().catch(() => '0 votes (0%)');
+
+      // Parse count and percentage from text like "5 votes (50%)"
+      const countMatch = voteCountText.match(/(\d+)\s*vote/);
+      const percentageMatch = voteCountText.match(/\((\d+)%\)/);
+
+      const count = countMatch ? parseInt(countMatch[1], 10) : 0;
+      const percentage = percentageMatch ? parseInt(percentageMatch[1], 10) : 0;
 
       if (optionText.trim()) {
         results[optionText.trim()] = { count, percentage };
@@ -215,16 +219,17 @@ class HostDashboardPage extends BasePage {
    * @returns {Promise<number>} Participant count
    */
   async getParticipantCount() {
-    const counterElement = this.page.locator(HostDashboardPage.PARTICIPANT_COUNT);
+    const counterElement = this.page.locator(HostDashboardPage.PARTICIPANT_COUNTER);
 
     if (!(await counterElement.isVisible())) {
       console.warn('⚠ Participant counter not visible, returning 0');
       return 0;
     }
 
-    const counterText = await counterElement.textContent();
+    // Get text from .counter-text span (format: "5 participants connected" or "1 participant connected")
+    const counterText = await counterElement.locator(HostDashboardPage.PARTICIPANT_COUNT_TEXT).textContent().catch(() => '0 participants connected');
 
-    // Extract number from text like "Participants: 5" or "5 participants"
+    // Extract number from text like "5 participants connected"
     const match = counterText.match(/(\d+)/);
     const count = match ? parseInt(match[1], 10) : 0;
 
@@ -237,7 +242,18 @@ class HostDashboardPage extends BasePage {
    * @returns {Promise<'waiting'|'open'|'closed'>} Current poll state
    */
   async getPollState() {
-    // Check which button is visible to infer state
+    // First try to get state from the .poll-status indicator (most reliable)
+    const stateIndicator = this.page.locator(HostDashboardPage.POLL_STATE_INDICATOR).first();
+    const stateIndicatorVisible = await stateIndicator.isVisible().catch(() => false);
+
+    if (stateIndicatorVisible) {
+      const stateText = await stateIndicator.textContent();
+      const state = stateText.trim().toLowerCase();
+      console.log(`📍 Poll state (from indicator): ${state}`);
+      return state;
+    }
+
+    // Fallback: Check which button is visible to infer state
     const openButtonVisible = await this.page.locator(HostDashboardPage.OPEN_VOTING_BUTTON).isVisible().catch(() => false);
     const closeButtonVisible = await this.page.locator(HostDashboardPage.CLOSE_VOTING_BUTTON).isVisible().catch(() => false);
 
@@ -249,19 +265,11 @@ class HostDashboardPage extends BasePage {
     } else if (!openButtonVisible && !closeButtonVisible) {
       state = 'closed';
     } else {
-      // Both visible or neither visible - check for explicit state indicator
-      console.warn('⚠ Could not determine poll state from buttons, checking state indicator');
-      const stateText = await this.getText(HostDashboardPage.POLL_STATE_INDICATOR).catch(() => '');
-      if (stateText.toLowerCase().includes('open')) {
-        state = 'open';
-      } else if (stateText.toLowerCase().includes('closed')) {
-        state = 'closed';
-      } else {
-        state = 'waiting';
-      }
+      console.warn('⚠ Could not determine poll state, defaulting to waiting');
+      state = 'waiting';
     }
 
-    console.log(`📍 Poll state: ${state}`);
+    console.log(`📍 Poll state (from buttons): ${state}`);
     return state;
   }
 }

@@ -72,9 +72,9 @@
 
 ### Implementation/Refinement for User Story 1
 
-- [ ] T021 [US1] Refine HostDashboardPage selectors based on test failures (update CSS selectors to match actual frontend elements)
-- [ ] T022 [US1] Add WebSocket event capture to tests for real-time state changes (poll-state-changed events)
-- [ ] T023 [US1] Verify all 6 test scenarios pass independently and cleanup properly
+- [x] T021 [US1] Refine HostDashboardPage selectors based on test failures (update CSS selectors to match actual frontend elements)
+- [x] T022 [US1] Add WebSocket event capture to tests for real-time state changes (poll-state-changed events)
+- [x] T023 [US1] Verify all 6 test scenarios pass independently and cleanup properly
 
 **Checkpoint**: At this point, User Story 1 tests should be fully functional, providing automated validation of host poll lifecycle
 
