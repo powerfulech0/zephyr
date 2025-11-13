@@ -33,6 +33,14 @@ class HostDashboardPage extends BasePage {
   static VOTE_COUNT = '.vote-count'; // Vote count and percentage text
 
   /**
+   * Navigate to host dashboard page
+   * @returns {Promise<void>}
+   */
+  async goto() {
+    await super.goto('/host');
+  }
+
+  /**
    * Create new poll by filling form and submitting
    * @param {string} question - Poll question text
    * @param {string[]} options - Array of 2-5 option texts

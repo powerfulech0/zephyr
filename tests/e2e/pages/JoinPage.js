@@ -17,6 +17,14 @@ class JoinPage extends BasePage {
   static JOIN_FORM = '.join-form';
 
   /**
+   * Navigate to join page
+   * @returns {Promise<void>}
+   */
+  async goto() {
+    await super.goto('/join');
+  }
+
+  /**
    * Fill and submit join form to join a poll
    * @param {string} roomCode - 6-character room code
    * @param {string} nickname - Participant nickname (1-20 chars)
