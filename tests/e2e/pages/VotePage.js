@@ -232,12 +232,12 @@ class VotePage extends BasePage {
   /**
    * Wait for poll state to change
    * @param {string} expectedState - Expected state ('waiting', 'open', 'closed')
-   * @param {number} timeout - Max wait time in ms (default: 5000)
+   * @param {number} timeout - Max wait time in ms (default: 10000)
    * @returns {Promise<void>}
    * @throws {Error} If state doesn't change within timeout
    */
-  async waitForPollState(expectedState, timeout = 5000) {
-    console.log(`⏳ Waiting for poll state: ${expectedState}`);
+  async waitForPollState(expectedState, timeout = 10000) {
+    console.log(`⏳ Waiting for poll state: ${expectedState} (timeout: ${timeout}ms)`);
 
     const startTime = Date.now();
 

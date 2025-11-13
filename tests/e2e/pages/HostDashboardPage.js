@@ -132,6 +132,33 @@ class HostDashboardPage extends BasePage {
   }
 
   /**
+   * Wait for poll state to change to expected value
+   * @param {string} expectedState - Expected state ('waiting', 'open', 'closed')
+   * @param {number} timeout - Max wait time in ms (default: 10000)
+   * @returns {Promise<void>}
+   * @throws {Error} If state doesn't change within timeout
+   */
+  async waitForPollState(expectedState, timeout = 10000) {
+    console.log(`⏳ Waiting for poll state: ${expectedState} (timeout: ${timeout}ms)`);
+
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      const currentState = await this.getPollState();
+      if (currentState === expectedState) {
+        console.log(`✓ Poll state changed to: ${expectedState}`);
+        return;
+      }
+      await this.page.waitForTimeout(200);
+    }
+
+    const currentState = await this.getPollState();
+    throw new Error(
+      `Poll state did not change to "${expectedState}" within ${timeout}ms. Current state: "${currentState}"`
+    );
+  }
+
+  /**
    * Click "Open Voting" button to transition poll to open state
    * @returns {Promise<void>}
    * @throws {Error} If button not found or state doesn't change
@@ -147,8 +174,8 @@ class HostDashboardPage extends BasePage {
 
     await button.click();
 
-    // Wait a moment for state change to propagate via WebSocket
-    await this.page.waitForTimeout(500);
+    // Wait for state change to propagate via WebSocket
+    await this.waitForPollState('open', 10000);
 
     console.log('✓ Voting opened');
   }
@@ -169,8 +196,8 @@ class HostDashboardPage extends BasePage {
 
     await button.click();
 
-    // Wait a moment for state change to propagate via WebSocket
-    await this.page.waitForTimeout(500);
+    // Wait for state change to propagate via WebSocket
+    await this.waitForPollState('closed', 10000);
 
     console.log('✓ Voting closed');
   }

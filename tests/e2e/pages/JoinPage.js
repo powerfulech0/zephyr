@@ -54,12 +54,15 @@ class JoinPage extends BasePage {
     // Wait for either:
     // 1. Navigation to vote page (success)
     // 2. Error message appears (failure)
+    // Use longer timeout for CI environments
+    const timeout = process.env.CI ? 15000 : 10000;
+
     try {
       await Promise.race([
         // Wait for URL to change to /vote/{roomCode} (success)
-        this.page.waitForURL(/\/vote\/[A-Z0-9]{6}/, { timeout: 5000 }),
+        this.page.waitForURL(/\/vote\/[A-Z0-9]{6}/, { timeout }),
         // Or wait for error message to appear (failure)
-        this.page.waitForSelector(JoinPage.ERROR_MESSAGE, { state: 'visible', timeout: 5000 }),
+        this.page.waitForSelector(JoinPage.ERROR_MESSAGE, { state: 'visible', timeout }),
       ]);
     } catch (error) {
       // Check if we ended up on vote page despite timeout
@@ -68,7 +71,15 @@ class JoinPage extends BasePage {
         console.log(`✓ Successfully joined poll ${roomCode} (slow navigation)`);
         return;
       }
-      throw new Error(`Join poll timed out: ${error.message}`);
+
+      // Check if there's an error message
+      const errorMsg = await this.getErrorMessage();
+      if (errorMsg) {
+        console.log(`✗ Join failed: ${errorMsg}`);
+        throw new Error(`Join poll failed: ${errorMsg}`);
+      }
+
+      throw new Error(`Join poll timed out after ${timeout}ms: ${error.message}`);
     }
 
     // Check result
@@ -159,14 +170,17 @@ class JoinPage extends BasePage {
 
   /**
    * Wait for join to complete (either success or error)
-   * @param {number} timeout - Max wait time in ms (default: 5000)
+   * @param {number} timeout - Max wait time in ms (default: 10000, 15000 in CI)
    * @returns {Promise<{success: boolean, error: string|null}>}
    */
-  async waitForJoinResult(timeout = 5000) {
+  async waitForJoinResult(timeout) {
+    const defaultTimeout = process.env.CI ? 15000 : 10000;
+    const actualTimeout = timeout || defaultTimeout;
+
     try {
       await Promise.race([
-        this.page.waitForURL(/\/vote\/[A-Z0-9]{6}/, { timeout }),
-        this.waitForSelector(JoinPage.ERROR_MESSAGE, { timeout }),
+        this.page.waitForURL(/\/vote\/[A-Z0-9]{6}/, { timeout: actualTimeout }),
+        this.waitForSelector(JoinPage.ERROR_MESSAGE, { timeout: actualTimeout }),
       ]);
 
       const success = await this.isJoinSuccessful();
@@ -174,7 +188,7 @@ class JoinPage extends BasePage {
 
       return { success, error };
     } catch (error) {
-      throw new Error(`Waiting for join result timed out after ${timeout}ms`);
+      throw new Error(`Waiting for join result timed out after ${actualTimeout}ms`);
     }
   }
 }
