@@ -2,6 +2,10 @@
   "name": "zephyr-e2e-tests",
   "version": "1.0.0",
   "description": "End-to-end testing infrastructure for Zephyr voting application",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "private": true,
   "scripts": {
     "test:e2e": "playwright test --config=tests/e2e/config/playwright.config.js",
@@ -13,10 +17,12 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
+    "lerna": "^9.0.0",
     "playwright": "^1.40.0",
     "wait-on": "^7.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "dependencies": {}
 }
