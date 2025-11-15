@@ -3,18 +3,19 @@ services:
     image: postgres:18-alpine
     restart: always
     container_name: zephyr-postgres
+    env_file:
+      - '.env'
     environment:
-      POSTGRES_USER: zephyr
-      POSTGRES_PASSWORD: zephyr_dev_password
-      POSTGRES_DB: zephyr_dev
       TZ: UTC
       PGTZ: UTC
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    depends_on:
+      - localstack
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U zephyr -d zephyr_dev"]
+      test: ["CMD-SHELL", "pg_isready -U zephyr_dev_user -d zephyr_dev_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -74,6 +75,43 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - postgres
+   
+  localstack:
+    container_name: zephyr-localstack
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: "secretsmanager"
+      DEFAULT_REGION: "us-east-1"
+    volumes:
+      # Mount the Docker socket to allow LocalStack to interact with the Docker host
+      - "/var/run/docker.sock:/var/run/docker.sock" 
+      # Optional: Persist data between container restarts (requires a LocalStack Pro license for some services, but basic persistence is available in free tier)
+      - "./localstack:/var/lib/localstack"
+      # Here you mount your setup file so it will be executed
+      # when the container starts
+      - "./scripts/init.sh:/etc/localstack/init/ready.d/script.sh"
+    healthcheck:
+      test: ["CMD", "curl", "-s", "http://localhost:4566/_localstack/init/ready"]
+      interval: 20s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+    
+  # Optional: a service to run AWS CLI commands inside a container
+  aws-cli:
+    container_name: zephyr-aws-cli
+    image: amazon/aws-cli:latest
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    # Command will be overridden when running specific aws-cli commands
+    command: ["secretsmanager", "get-secret-value", "--secret-id=zephyr/dev", "--endpoint-url=http://localstack:4566"]
 
 volumes:
   postgres_data:
