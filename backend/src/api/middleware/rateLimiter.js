@@ -1,9 +1,9 @@
 const rateLimit = require('express-rate-limit');
 const RedisStore = require('rate-limit-redis');
-const { getRedisClient } = require('../../config/cache');
-const logger = require('../../config/logger');
-const AuditLogRepository = require('../../models/repositories/AuditLogRepository');
-const { rateLimitExceeded } = require('../../services/metricsService');
+const { getRedisClient } = require('../../config/cache.js');
+const logger = require('../../config/logger.js');
+const AuditLogRepository = require('../../models/repositories/AuditLogRepository.js');
+const { rateLimitExceeded } = require('../../services/metricsService.js');
 
 /**
  * Rate limiting middleware using express-rate-limit with Redis store
@@ -28,9 +28,7 @@ function getRedisStore(prefix) {
       client: getRedisClient(),
       prefix,
     });
-  } catch (error) {
-    // Fall back to memory store if Redis not available
-    logger.warn({ prefix }, 'Redis not available for rate limiting, using memory store');
+  } catch {
     return undefined; // express-rate-limit will use default MemoryStore
   }
 }
@@ -72,7 +70,7 @@ const globalRateLimiter = rateLimit({
         path: req.path,
         method: req.method,
       },
-    }).catch((error) => {
+    }).catch(error => {
       logger.error({ error: error.message }, 'Failed to log rate limit violation to audit_logs');
     });
 
@@ -120,8 +118,11 @@ const voteRateLimiter = rateLimit({
         rateLimitType: 'vote',
         roomCode: req.body?.roomCode,
       },
-    }).catch((error) => {
-      logger.error({ error: error.message }, 'Failed to log vote rate limit violation to audit_logs');
+    }).catch(error => {
+      logger.error(
+        { error: error.message },
+        'Failed to log vote rate limit violation to audit_logs'
+      );
     });
 
     res.status(429).json({
@@ -168,8 +169,11 @@ const pollCreationRateLimiter = rateLimit({
         rateLimitType: 'pollCreation',
         question: req.body?.question?.substring(0, 50), // First 50 chars only
       },
-    }).catch((error) => {
-      logger.error({ error: error.message }, 'Failed to log poll creation rate limit violation to audit_logs');
+    }).catch(error => {
+      logger.error(
+        { error: error.message },
+        'Failed to log poll creation rate limit violation to audit_logs'
+      );
     });
 
     res.status(429).json({

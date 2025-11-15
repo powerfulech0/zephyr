@@ -48,11 +48,11 @@ function initializePool() {
   }
 
   const config = {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT, 10) || 5432,
-    database: process.env.DB_NAME || 'zephyr_dev',
-    user: process.env.DB_USER || 'zephyr',
-    password: process.env.DB_PASSWORD || 'zephyr_dev_password',
+    host: process.env.POSTGRES_HOST || 'localhost',
+    port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
+    database: process.env.POSTGRES_DB || 'zephyr_dev',
+    user: process.env.POSTGRES_USER || 'zephyr',
+    password: process.env.POSTGRES_PASSWORD || 'zephyr_dev_password',
     max: parseInt(process.env.DB_POOL_MAX, 10) || 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
