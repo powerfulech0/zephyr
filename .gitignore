@@ -99,3 +99,6 @@ Thumbs.db
 /screenshots/
 /videos/
 /traces/
+
+# LocalStack
+localstack/
